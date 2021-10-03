@@ -20,11 +20,11 @@ class VoteInfo:
     def id(self):
         del self._id
     
-  @property
+    @property
     def parent_id(self):
         return self._parent_id
     
-
+ 
     @id.setter
     def parent_id(self,value):
         self._parent_id=value
