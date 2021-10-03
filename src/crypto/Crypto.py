@@ -1,5 +1,6 @@
 import nacl.utils
-from nacl.public import PrivateKey, SealedBox
+from nacl.public import PrivateKey, SealedBox,Box
+import glob
 
 
 class GenerateKey():
@@ -13,48 +14,68 @@ class GenerateKey():
             self.generate(i)
 
     @property
-    def key_pairs(self,idx):
-        if idx==-1:
-            return self._key_pairs
-        return self._key_pairs[idx]
+    def key_pairs(self):
+        return self._key_pairs
 
     @property
-    def public_keys(self,idx):
-        if idx==-1:
-            return self._public_keys
-        return self._public_keys[idx]
+    def public_keys(self):        
+        return self._public_keys    
 
-    @key_pairs.setter
-    def key_pairs(self,key_pair,idx):
-        self._public_keys[idx]=key_pair[0]
-        self._key_pairs[idx]=(key_pair)
+
+    def _get_key_pair(self,idx):
+        if idx in self._key_pairs.keys():
+            return self._key_pairs[idx]
+        return None
+        
+    def _get_public_keys(self,idx):
+        if idx in self._public_keys.keys():
+            return self._public_keys[idx]
+        return None
+          
 
     @key_pairs.deleter
-    def key_pairs(self,idx):
-        if idx == -1:
-            del self._public_keys
-            del self._key_pairs
-        else: 
-            del self._public_keys[idx]
-            del self._key_pairs[idx]
+    def key_pairs(self):
+        del self._public_keys
+        del self._key_pairs
+        
 
 
     def generate(self,idx):
         key = PrivateKey.generate()
         public_key = (key.public_key)._public_key.hex()
         private_key = key._private_key.hex()
-        self._key_pairs[idx]=(public_key,private_key)
+        self._key_pairs[idx]=(public_key,key)
+        self._public_keys[idx]=key.public_key
         
     def write_config(self):
         
         for dic_key in self._key_pairs.keys():
-            with open("../conf/diem_key_"+str(dic_key)+".sec.conf","w") as file:
+            with open("../../conf/diem_key_"+str(dic_key)+"_.sec.conf","w") as file:
                 entry = ["private_key="+ str(self._key_pairs[dic_key][1]),"\npublic_key="+ str(self._key_pairs[dic_key][0])]
                 file.writelines(entry)                
 
     def read_config(self):
         #pass 
-        
+        conf_files= [f for f in glob.glob("diem_key_*.sec.conf")]
 
-# x = GenerateKey(5)
+        for file in conf_files:
+            idx =  file.split['_']
+            with open("diem_key_"+idx+".sec.conf","r") as file:
+                entry = file.readLines(2)
+                
+    def encrypt(self,msg,from_idx,to_idx):               
+        sender_box = Box(self._get_key_pair(from_idx)[1], self._get_public_keys(to_idx))
+        return sender_box.encrypt(str.encode(msg))     
+    
+    def decrypt(self,msg,from_idx,to_idx):
+        receiver_box = Box(self._get_key_pair(to_idx)[1],self._get_public_keys(from_idx))
+        return receiver_box.decrypt(msg).decode('utf-8')
+
+
+        
+x = GenerateKey(5)
 # x.write_config()
+# print(x.key_pairs)
+enc_msg=(x.encrypt("test",from_idx=0,to_idx=1))
+dcyp_mes=x.decrypt(enc_msg,to_idx=1,from_idx=0)
+print(dcyp_mes)
