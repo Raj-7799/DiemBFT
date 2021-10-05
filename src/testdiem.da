@@ -18,7 +18,7 @@ class RunDiemBFT(process):
       
       setup(replica, (
           i,
-          replicas, 
+          other_replicas, 
           self.faulty_replicas, 
           self.replicas_required,
           self.messages,

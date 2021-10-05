@@ -11,3 +11,5 @@ class Replica(process):
     
     def run():
         output("Yo Starting replica with pID", self.pID)
+        print(self.replicas)
+        
