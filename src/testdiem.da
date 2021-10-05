@@ -1,18 +1,20 @@
+from client.client import Client
 from diem_core import diem_replica
 
 class RunDiemBFT(process): 
   def setup(config:dict): 
       self.faulty_replicas   = config['faultyReplicas']
       self.replicas_required = 3 * faulty_replicas + 1
-      self.messages          = config['messages']
-      self.client            = config['client']
       self.delta             = config['timeoutDelta']
+      self.clients           = config['clients']
+      self.requests          = config['requests']
+      self.clientTimeout     = config['clientTimeout']
 
   def run():
     output("Spawning replicas")
-    replicas = new(diem_replica.Replica, num= self.replicas_required)
-    output(len(replicas))
-    
+    replicas = new(diem_replica.Replica, num=self.replicas_required)
+    clients = new(Client, num=self.clients)
+
     for i, replica in enumerate(replicas):
       other_replicas = [r for r in replicas if r != replica]
       
@@ -21,21 +23,33 @@ class RunDiemBFT(process):
           other_replicas, 
           self.faulty_replicas, 
           self.replicas_required,
-          self.messages,
-          self.delta
+          self.delta,
+          self.clients
       ))
 
       start(replica)
 
+    for i, client in enumerate(clients):
+      setup(clients, (
+        i,
+        self.requests,
+        self.clientTimeout,
+        replicas
+      ))
+    
+    start(clients)
+      
 def main():
   config(clock='Lamport')
-  
+  config(channel='reliable')
+
   configs = [
     {
-      'messages'      : 5,
       'faultyReplicas': 1,
-      'client'        : 1,
-      'timeoutDelta'  : 500 # milliseconds
+      'timeoutDelta'  : 500,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 4,
+      'clientTimeout' : 5000,
     }
   ]
 
