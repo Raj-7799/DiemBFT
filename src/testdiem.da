@@ -23,8 +23,7 @@ class RunDiemBFT(process):
           other_replicas, 
           self.faulty_replicas, 
           self.replicas_required,
-          self.delta,
-          self.clients
+          self.delta
       ))
 
       start(replica)

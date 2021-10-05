@@ -1,23 +1,20 @@
 import sys
 from client import client
 
-from client.client import Client
-
 class Replica(process):
-    def setup(pID:int, other_replicas, faulty_replica_count: int, replica_count:int, delta:int, clients:Client):
+    def setup(pID:int, other_replicas, faulty_replica_count: int, replica_count:int, delta:int):
         self.pID = pID
         self.replicas = other_replicas
         self.fCount = faulty_replica_count
         self.rCount = replica_count
         self.tDelta = delta
-        self.clients=clients
     
     def run():
         output("Yo Starting replica with pID", self.pID)
         print(self.replicas)
         await(some(sent(("Yo bro",))))
     
-    def receive(msg=("Yo boiii", ), from_=self.clients):
+    def receive(msg=("Yo boiii", ), from_=source):
         output("Replying back")
-        send(("Yo bro",), to=self.clients)
+        send(("Yo bro",), to=source)
         
