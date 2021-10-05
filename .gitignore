@@ -4,6 +4,7 @@ __pycache__/*
 *$py.class
 
 
+
 #Editior 
 .vscode/
 *.egg-info/
@@ -13,4 +14,5 @@ __pycache__/*
 #Config
 config/*
 
+*.conf
 
