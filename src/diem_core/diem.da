@@ -1,0 +1,15 @@
+import sys
+
+class Replica(process):
+    def setup(other_replicas, faulty_replica_count: int, replica_count:int, messages:int, delta:int):
+        pass
+    
+    def run():
+        output("YO STARTING")
+        send(('Ping'), to=other_replicas)
+
+        await(replica_count<0)
+    
+    def receive(msg=('Ping',)):
+        output('Ponged!!!')
+        replica_count -= 100

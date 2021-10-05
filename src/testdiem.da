@@ -1,0 +1,41 @@
+from diem_core import diem
+
+class RunDiemBFT(process): 
+  def setup(config:dict): 
+      self.faulty_replicas   = config['faultyReplicas']
+      self.replicas_required = 3 * faulty_replicas + 1
+      self.messages          = config['messages']
+      self.client            = config['client']
+      self.delta             = config['timeoutDelta']
+
+  def run():
+    output("Spawning replicas")
+    replicas = new(diem.Replica, num= 3)
+    output(len(replicas))
+    
+    setup(replicas, (
+        replicas, 
+        self.faulty_replicas, 
+        self.replicas_required,
+        self.messages,
+        self.delta
+        ))
+
+    start(replicas)
+
+def main():
+  config(clock='Lamport')
+  
+  configs = [
+    {
+      'messages'      : 5,
+      'faultyReplicas': 1,
+      'client'        : 1,
+      'timeoutDelta'  : 500 # milliseconds
+    }
+  ]
+
+  for configuration in configs:
+    runner = new(RunDiemBFT)
+    setup(runner, (configuration,))
+    start(runner)
