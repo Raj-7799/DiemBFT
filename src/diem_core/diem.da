@@ -1,8 +1,0 @@
-import sys
-
-class Replica(process):
-    def setup(other_replicas, faulty_replica_count: int, replica_count:int, messages:int, delta:int):
-        pass
-    
-    def run():
-        output("YO STARTING")

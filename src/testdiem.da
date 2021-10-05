@@ -1,4 +1,4 @@
-from diem_core import diem
+from diem_core import diem_replica
 
 class RunDiemBFT(process): 
   def setup(config:dict): 
@@ -10,18 +10,22 @@ class RunDiemBFT(process):
 
   def run():
     output("Spawning replicas")
-    replicas = new(diem.Replica, num= 3)
+    replicas = new(diem_replica.Replica, num= self.replicas_required)
     output(len(replicas))
     
-    setup(replicas, (
-        replicas, 
-        self.faulty_replicas, 
-        self.replicas_required,
-        self.messages,
-        self.delta
-        ))
+    for i, replica in enumerate(replicas):
+      other_replicas = [r for r in replicas if r != replica]
+      
+      setup(replica, (
+          i,
+          replicas, 
+          self.faulty_replicas, 
+          self.replicas_required,
+          self.messages,
+          self.delta
+      ))
 
-    start(replicas)
+      start(replica)
 
 def main():
   config(clock='Lamport')
