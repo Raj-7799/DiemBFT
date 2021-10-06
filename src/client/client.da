@@ -1,0 +1,17 @@
+class Client(process):
+  def setup(clientID: int, requests: int, clientTimeout: int, diemReplicas):
+    self.pID          = clientID
+    self.nReq         = requests
+    self.timeout      = clientTimeout
+    self.diemReplicas = diemReplicas
+  
+  def run():
+    output("Yo running client!!!")
+    output("Broadcasting messages to replicas")
+    send(("Yo boiii",), to=self.diemReplicas)
+    await(self.nReq == 0)
+
+  def receive(msg=("Yo bro",), from_=self.diemReplicas):
+    output("Got message from replica ", self.nReq)
+    self.nReq -= 1
+    
