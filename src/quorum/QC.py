@@ -1,12 +1,16 @@
-import VoteInfo as voteInfo
-import LedgerCommitInfo as ledgerCommitInfo
+from vote import VoteInfo as voteinfo
+from blockchain import LedgerCommitInfo as ledgerCommitInfo
+from crypto import Keys as keys
 
 class QC():
     def __init__(self,author):
-        self._vote_info=voteInfo.VoteInfo()
+        self._vote_info=voteinfo.VoteInfo()
         self._ledger_commit_info = ledgerCommitInfo.LedgerCommitInfo()
-        self._signature=None
+        self._signatures=None
         self._author=author
+        key=keys.Keys(self._author) ## find sender 
+        self._signature=key.sign_message(self._signature)
+        
 
     
     @property
@@ -23,5 +27,5 @@ class QC():
     
 
     @property
-    def signature(self):
-        return self._signature
+    def signatures(self):
+        return self._signatures
