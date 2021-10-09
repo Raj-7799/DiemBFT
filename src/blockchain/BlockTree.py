@@ -25,7 +25,7 @@ class BlockTree:
         return self._high_commit_qc
 
     def process_qc(self,qc):
-        if qc.ledger_commit_info.commit_state_id != None:
+        if qc['ledger_commit_info']['commit_state_id'] != None:
 
         pass
     
