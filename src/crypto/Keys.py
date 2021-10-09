@@ -1,3 +1,15 @@
+from nacl.public import PrivateKey, PublicKey,SealedBox,Box
+from nacl.signing import SigningKey,VerifyKey
+from nacl.exceptions import BadSignatureError
+from nacl.encoding import HexEncoder
+import os
+
+
+
+absolute_path=os.path.dirname(os.path.abspath(__file__))
+CONF_FILE_PATH=absolute_path+"/../../conf/"
+
+print(CONF_FILE_PATH)
 class Keys:
     def __init__(self,idx):
         self._public_keys=list()
@@ -11,40 +23,65 @@ class Keys:
 
     def read_config(self):
 
-        with open("../../conf/"+self.config_file,"r") as file:
+        with open(CONF_FILE_PATH+self.config_file,"r") as file:
             entry = file.read().splitlines() 
-            self._private_key=entry[0].split("=")[1]
+            self._private_key=PrivateKey(bytes.fromhex(entry[0].split("=")[1]))
        
-            self._public_key=entry[1].split("=")[1]
+            self._public_key=PublicKey(bytes.fromhex(entry[1].split("=")[1]))
             
         
-        with open("../../conf/"+self._public_key_file,"r") as file:
+        with open(CONF_FILE_PATH+self._public_key_file,"r") as file:
             entries=file.read().splitlines() 
             for entry in entries:
-                self._public_keys.append(entry.split("=")[1])
+                self._public_keys.append(PublicKey(bytes.fromhex(entry.split("=")[1])))
 
             
-    def encrypt(self,msg,to_idx): 
-
-        
-        priv_key = PrivateKey(bytes.fromhex(self.private_key)) 
-        pub_key = PublicKey(bytes.fromhex(self.public_keys[to_idx]))
+    def encrypt(self,msg,to_idx):         
+        priv_key = self.private_key
+        pub_key = self.public_keys[to_idx]
         #Box needs private key and Public key object
         sender_box = Box(priv_key,pub_key)
         return sender_box.encrypt(str.encode(msg))     
     
     def decrypt(self,msg,from_idx):
-        priv_key = PrivateKey(bytes.fromhex(self.private_key))
-        pub_key = PublicKey(bytes.fromhex(self.public_keys[from_idx]))
+        priv_key = self.private_key
+        pub_key = self.public_keys[from_idx]
         #Box needs private key and Public key object
         receiver_box = Box(priv_key,pub_key)
         return receiver_box.decrypt(msg).decode('utf-8')
 
+    ##Uses only receivers public key, which only reciever can decrypt using its private key 
+    def encrypt_no_trace(self,msg,reciever_id):
+        msg = bytes(msg,"utf-8")
+        receiver_public_key = self.public_keys[reciever_id]
+        seal_box=SealedBox(receiver_public_key) #
+        return seal_box.encrypt(msg)
 
-    def sign(self,msg):
-        priv_key = PrivateKey(bytes.fromhex(self.private_key))
-        sign_box=SealedBox(priv_key)
-        return sign_box.encrypt(msg)
+    def decrypt_no_trace(self,enc_msg):
+        unseal_box=SealedBox(self.private_key)
+        return unseal_box.decrypt(enc_msg).decode("utf-8")
+
+
+    def sign_message(self,msg):        
+        msg=bytes(msg,"utf-8")
+        signing_key = SigningKey.generate()
+        signed_hex = signing_key.sign(msg,encoder=HexEncoder)
+        verify_key = signing_key.verify_key
+        verify_key_hex = verify_key.encode(encoder=HexEncoder)
+        
+        return [signed_hex,verify_key_hex]
+
+    def verify_message(self,signed_msg):
+        signed_hex, verify_key_hex=signed_msg
+        signature_bytes = HexEncoder.decode(signed_hex.signature)
+        verify_key = VerifyKey(verify_key_hex,encoder=HexEncoder)
+        try:
+            return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
+        except BadSignatureError:
+            return None
+
+
+
 
     @property
     def public_key(self):
@@ -66,3 +103,9 @@ class Keys:
 # enc_msg=k.encrypt("tmp",0)
 # dcyp_mes=k0.decrypt(enc_msg,1)
 # print(dcyp_mes)
+
+# result =k.sign_message("test")
+# print(k0.verify_message(result))
+
+# enc_msg_no_trace= k.encrypt_no_trace("tmp1",0)
+# print(k0.decrypt_no_trace(enc_msg_no_trace))

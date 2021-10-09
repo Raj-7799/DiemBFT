@@ -5,19 +5,28 @@
 # sender ← u; // Added automatically when constructed
 # signature ← sign u (ledger commit info); // Signed automatically when constructed
 
-from crypto import Keys
+from crypto import Keys as keys
 class VoteMsg:
 
     def __init__(self,ledger_commit_info):
         self._vote_info=None
         self._ledger_commit_info=ledger_commit_info
         self._high_commit_qc=None
-        self._sender=list()
+        #self._sender=list()
         self._sender=0 # both are same need to revisit
         
-        key=Keys(self.sender)
-        self.signature=key.sign(self.ledger_commit_info) # to be implmented 
+        key=keys.Keys(self.sender) ## find sender 
+        # Using digtal signature to sign the message to avoid computation for generating message using public-private key encryption
+        self._signature=key.sign_message(self.ledger_commit_info) 
         
+
+    @property
+    def sender(self):
+        return self._sender
+
+    @property
+    def signature(self):
+        return self._signature
 
     @property
     def ledger_commit_info(self):
