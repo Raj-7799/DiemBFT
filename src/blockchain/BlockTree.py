@@ -1,12 +1,12 @@
 import nacl.hash
-from quorum import Quorum
+from quorum import QC as qc
 import Block as block
 class BlockTree:
     def __init__(self):
-        self._qc = Quorum.QC(1)
-        self._high_qc = Quorum.QC(1) # highest known QC
+        self._qc = qc.QC(1)
+        self._high_qc = qc.QC(1) # highest known QC
         self._pending_votes=None # collected votes per block indexed by their LedgerInfo hash
-        self._high_commit_qc=Quorum.QC(1) # highest QC that serves as a commit certificate
+        self._high_commit_qc=qc.QC(1) # highest QC that serves as a commit certificate
         
     @property
     def qc(self):
@@ -25,6 +25,8 @@ class BlockTree:
         return self._high_commit_qc
 
     def process_qc(self,qc):
+        if qc['ledger_commit_info']['commit_state_id'] != None:
+
         pass
     
 
@@ -45,6 +47,6 @@ class BlockTree:
         
     
 
-x=BlockTree()
-compute_block=x.generate_block(1,2)
-print(compute_block)
+# x=BlockTree()
+# compute_block=x.generate_block(1,2)
+# print(compute_block)
