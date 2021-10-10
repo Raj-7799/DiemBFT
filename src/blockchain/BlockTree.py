@@ -1,6 +1,6 @@
 import nacl.hash
 from quorum import QC as qc
-import Block as block
+import blockchain as block
 class BlockTree:
     def __init__(self):
         self._qc = qc.QC(1)
@@ -26,9 +26,7 @@ class BlockTree:
 
     def process_qc(self,qc):
         if qc['ledger_commit_info']['commit_state_id'] != None:
-
-        pass
-    
+            pass 
 
     def execute_insert(self,block):
         pass

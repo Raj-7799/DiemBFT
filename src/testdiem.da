@@ -1,5 +1,9 @@
+from crypto.GenerateKey import GenerateKey
+from crypto.Keys import Keys
 from client.client import Client
 from diem_core import diem_replica
+from diem_core.replica_info import ReplicaInfo
+from client.client_info import ClientInfo
 
 class RunDiemBFT(process): 
   def setup(config:dict): 
@@ -15,25 +19,42 @@ class RunDiemBFT(process):
     replicas = new(diem_replica.Replica, num=self.replicas_required)
     clients = new(Client, num=self.clients)
 
+    GenerateKey(self.replicas_required + 1).write_config()
+    KeySets = [ Keys(i) for i in range(self.replicas_required + 1)]
+
+    replicaInfos = {}
+    replicaToPvtKeys = {}
+
+    clientInfo = {}
+
     for i, replica in enumerate(replicas):
-      other_replicas = [r for r in replicas if r != replica]
-      
+      KeySet = KeySets[i]
+      replicaInfos[replica] = ReplicaInfo(replica, KeySet.public_key, i)
+      replicaToPvtKeys[i] = KeySet.private_key
+
+    for i in self.clients:
+      clientInfo[i] = ClientInfo(KeySets[-1].public_key, i)
+
+    for i, replica in enumerate(replicas):
       setup(replica, (
           i,
-          other_replicas, 
+          replicaInfos, 
           self.faulty_replicas, 
           self.replicas_required,
-          self.delta
+          self.delta,
+          replicaToPvtKeys[i],
+          clientInfo
       ))
 
-      start(replica)
+    start(replicas)
 
     for i, client in enumerate(clients):
       setup(clients, (
         i,
         self.requests,
         self.clientTimeout,
-        replicas
+        replicaInfos,
+        KeySets[-1].private_key
       ))
     
     start(clients)
