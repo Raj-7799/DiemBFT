@@ -1,20 +1,47 @@
 import sys
+
+from client.client_info import ClientInfo
+from .replica_info import ReplicaInfo
 from client import client
 
+
 class Replica(process):
-    def setup(pID:int, other_replicas, faulty_replica_count: int, replica_count:int, delta:int):
+    def setup(pID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]"):
         self.pID = pID
-        self.replicas = other_replicas
+        self.replicaInfos = replicaInfos
         self.fCount = faulty_replica_count
         self.rCount = replica_count
         self.tDelta = delta
-    
+        self.privateKey = privateKey
+        self.clientInfos = clientInfos
+
+        self.blockTree = None
+        self.leaderElection = None
+        self.paceMaker = None
+
     def run():
         output("Yo Starting replica with pID", self.pID)
-        print(self.replicas)
-        await(some(sent(("Yo bro",))))
-    
-    def receive(msg=("Yo boiii", ), from_=source):
-        output("Replying back")
+        output(self.replicaInfos)
+
+        await(some(received(("Yo bro",))))
+
+    # def receive(msg=("Yo boiii", ), from_=source):
+    #     output("Replying back")
+    #     send(("Yo bro",), to=source)
+
+    def process_certificate(qc):
+        self.blockTree.process_qc(qc)
+        # self.LeaderElection.update_leaders(qc)
+        # self.PaceMaker.advance_round(qc.vote_info.round)
+
+    def receive(msg=("Yo bro",), from_=source):
         send(("Yo bro",), to=source)
-        
+
+    def receive(msg=("message", msg), from_=source):
+        if msg == "Hello":
+            output("Message received is 1")
+        elif msg == "2":
+            output("Message received is 2")
+        else:
+            print(msg)
+            output("Message received is not one of us")
