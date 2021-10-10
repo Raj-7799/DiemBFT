@@ -80,8 +80,12 @@ class Keys:
         except BadSignatureError:
             return None
 
-
-
+    @property
+    def getKeyValuePair(self):
+        return {
+            "public" : self.public_key(),
+            "private" : self.private_key()
+        }
 
     @property
     def public_key(self):
