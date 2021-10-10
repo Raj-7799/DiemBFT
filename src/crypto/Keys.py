@@ -121,11 +121,11 @@ class Keys:
 # enc_msg_no_trace= k.encrypt_no_trace("tmp1",0)
 # print(k0.decrypt_no_trace(enc_msg_no_trace))
 
-k=Keys(1)
-print(k.public_key)
-result=k.sign_message("tmp")
-print(result)
+# k=Keys(1)
+# print(k.public_key)
+# result=k.sign_message("tmp")
+# print(result)
 
 
-k0=Keys(0) 
-print(k0.verify_message(result))
+# k0=Keys(0) 
+# print(k0.verify_message(result))
