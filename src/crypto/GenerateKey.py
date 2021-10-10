@@ -64,7 +64,6 @@ class GenerateKey():
         with open(CONF_FILE_PATH+public_key_file,"w") as file:
             key=[ str(i)+"="+self._public_keys[i]+"\n" for i in range(len(self._public_keys))]            
             file.writelines(key)
-                    
 
         
 
