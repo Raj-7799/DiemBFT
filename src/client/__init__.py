@@ -1,4 +1,3 @@
-print("client ")
 import os 
 import logging
 absolute_path=os.path.dirname(os.path.abspath(__file__))
