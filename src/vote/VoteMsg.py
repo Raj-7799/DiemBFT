@@ -8,8 +8,8 @@
 from crypto import Keys as keys
 class VoteMsg:
 
-    def __init__(self,ledger_commit_info):
-        self._vote_info=None
+    def __init__(self,vote_info,ledger_commit_info):
+        self._vote_info=vote_info
         self._ledger_commit_info=ledger_commit_info
         self._high_commit_qc=None
         #self._sender=list()

@@ -1,12 +1,12 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 
 
 class VoteInfo:
 
-    def __init__(self,id,round_,parent_id,parent_round,exec_state_id):
+    def __init__(self,id,round_no,parent_id,parent_round,exec_state_id):
         self._id = id
-        self._round = round_
-        self._parent_id = parent_id
+        self._round = round_no
+        self._parent_id = parent_id       
         self._parent_round = parent_round
         self._exec_state_id = exec_state_id
 
@@ -27,24 +27,24 @@ class VoteInfo:
     def round(self):
         return self._round
 
-    @id.setter
+    @round.setter
     def round(self, round):
         self._round = round
 
-    @id.deleter
+    @round.deleter
     def round(self):
         del self._round
 
     @property
-    def parent_id(self):
+    def parent_id(self):      
         return self._parent_id
     
  
-    @id.setter
+    @parent_id.setter
     def parent_id(self,value):
         self._parent_id=value
 
-    @id.deleter
+    @parent_id.deleter
     def parent_id(self):
         del self._parent_id
     
@@ -54,11 +54,11 @@ class VoteInfo:
         return self._parent_round
     
 
-    @id.setter
+    @parent_round.setter
     def parent_round(self,value):
         self._parent_round=value
 
-    @id.deleter
+    @parent_round.deleter
     def parent_round(self):
         del self._parent_round
     
@@ -68,11 +68,11 @@ class VoteInfo:
         return self._exec_state_id
     
 
-    @id.setter
+    @exec_state_id.setter
     def exec_state_id(self,value):
         self._exec_state_id=value
 
-    @id.deleter
+    @exec_state_id.deleter
     def exec_state_id(self):
         del self._exec_state_id
     
@@ -96,3 +96,7 @@ class VoteInfoSchema(Schema):
     parent_id = fields.Integer()
     parent_round = fields.Integer()
     exec_state_id = fields.Integer()
+
+    # @post_load
+    # def deserialize(self, data, **kwargs):
+    #     return VoteInfoSchema(**data)
