@@ -49,7 +49,7 @@ class RunDiemBFT(process):
     start(replicas)
 
     for i, client in enumerate(clients):
-      setup(clients, (
+      setup(client, (
         i,
         self.requests,
         self.clientTimeout,
