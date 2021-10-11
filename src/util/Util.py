@@ -15,11 +15,14 @@ def max_round_qc(current_qc,high_qc):
 
 
 def hash(object):
-    
     digest = HASHER(bytes(object,'utf-8'), encoder=nacl.encoding.HexEncoder)
     return digest
 
+def serialize(object, schema):
+    return schema.dumps(object)
 
+def deserialize(json, schema):
+    return schema.loads(json)
 
     
 

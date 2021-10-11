@@ -1,5 +1,5 @@
 
-from  certificates.quorum import Quorum as QC
+from  certificates.quorum import Quorum
 from crypto import Keys as keys
 from vote import VoteInfo
 from vote import VoteInfo as vi
@@ -8,14 +8,13 @@ from blockchain import BlockTree as bt
 from blockchain import Ledger as ld
 from blockchain import Block as blk
 from blockchain import LedgerCommitInfo as lci
-from blockchain.BlockTree import PendingBlockTree,BlockTree
-# from util import max_round_noqc,hash
-from util.Util import max_round_qc,hash
+from util import Util as util
+
+# from util import max_round_qc,hash
+from util.Util import deserialize, max_round_qc,hash, serialize
 
 
 class TestSuite:
-
-
     def __init__(self):
         pass
 
@@ -114,16 +113,29 @@ class TestSuite:
         print(block_generated.id,block_generated.round)
 
 
-            
-            
 
-            
+    def test_serializers(self):
+        v = vi.VoteInfo(1, 2, 3, 4, 5)
+        serialed_v = util.serialize(v, VoteInfoSchema())
+        ledger = lci.LedgerCommitInfo(1, util.hash(serialed_v))
+        serialized_ledger = util.serialize(ledger, lci.LedgerCommitInfoSchema())
+        va = util.deserialize(serialed_v, VoteInfoSchema())
+        d = util.deserialize(serialized_ledger, lci.LedgerCommitInfoSchema())
+        print(type(d._vote_info_hash))
+        qc = Quorum.QC(v, ledger)
+        print(ledger.vote_info_hash)
+        serialized_qc = util.serialize(qc, Quorum.QCSchema())
+        print(serialized_qc)
+        # serialed_qc = util.serialize(qc, pass)
 
 
 test =  TestSuite()
+# test.testLedger()
+test.test_qc_serialize()
 test.testLedger()
 test.testPendingBlockTree()
 test.testBlockTree()
+    
 
 # b =  bt.BlockTree()
 # print(b.pending_block_tree)
