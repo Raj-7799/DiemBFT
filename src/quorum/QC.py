@@ -3,7 +3,7 @@ from blockchain import LedgerCommitInfo as ledgerCommitInfo
 from crypto import Keys as keys
 
 class QC():
-    def __init__(self,author):
+    def __init__(self,author,vote_info):
         self._vote_info=voteinfo.VoteInfo()
         self._ledger_commit_info = ledgerCommitInfo.LedgerCommitInfo()
         self._signatures=None

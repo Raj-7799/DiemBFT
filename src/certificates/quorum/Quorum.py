@@ -5,11 +5,11 @@ from crypto import Keys as keys
 
 
 class QC():
-    def __init__(self,author):
-        self._vote_info=voteinfo.VoteInfo()
-        self._ledger_commit_info = ledgerCommitInfo.LedgerCommitInfo()
-        self._signatures="test"
-        self._author=author
+    def __init__(self,vote_info,ledger_commit_info,votes):
+        self._vote_info=vote_info
+        self._ledger_commit_info = ledger_commit_info
+        self._signatures=votes
+        self._author=0
         key=keys.Keys(self._author) ## find sender 
         self._signature=key.sign_message(self._signatures)
         
