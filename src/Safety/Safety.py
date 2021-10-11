@@ -1,6 +1,7 @@
-from blockchain import LedgerCommitInfo
-from vote import VoteInfo
-from vote import VoteMsg
+from blockchain import LedgerCommitInfo as LedgerCommitInfo
+from vote import VoteInfo as VoteInfo
+from vote import VoteMsg as VoteMsg
+
 
 class Safety():
 
@@ -52,13 +53,13 @@ class Safety():
         if self._valid_signatures(b, last_tc) and self.safe_to_vote(b.round, qc_round, last_tc):
             self.update_highest_qc_round(qc_round)
             self.increase_highest_vote_round(b.round)
-            vote_info = VoteInfo()
+            vote_info = VoteInfo.VoteInfo()
             vote_info.id = b.id
             vote_info.round = b.round
             vote_info.parent_id = b.qc.vote_info.id
             vote_info.parent_round = qc_round
             vote_info.exec_state_id = self._ledger.pending_state(b.id)
-            ledger_commit_info = LedgerCommitInfo()
+            ledger_commit_info = LedgerCommitInfo.LedgerCommitInfo()
             ledger_commit_info.commit_state_id = self.commit_state_id_candidate(b.round, b.qc)
             ledger_commit_info.vote_info_hash = self._hash(b.round, b.qc)
-            return VoteMsg(vote_info, ledger_commit_info, self._blocktree.high_commit_qc)
+            return VoteMsg.VoteMsg(vote_info, ledger_commit_info, self._blocktree.high_commit_qc)

@@ -1,13 +1,11 @@
-
-
 import time
 import threading
 from Messages import TimeoutMsg
 
-class Pacemaker:
 
+class Pacemaker:
     def __init__(self, safety, blocktree, replica):  # delta and f can be taken from config
-        output("instatiate pacemaker")
+        #output("instatiate pacemaker")
         self._safety = safety
         self._replica = replica
         self._current_round = 0
@@ -16,16 +14,16 @@ class Pacemaker:
         self._dict_of_timer = {}
 
     def get_round_timer(self):
-        return 4 * self.replica.tDelta
+        return 4 * 1.0  #self.replica.tDelta
 
-    def on_timeout(self):
-        self._local_timeout_round
+    def _on_timeout(self):
+        self.local_timeout_round
 
     def _start_timer(self, round):
-        self._dict_of_timer[round] = threading.Timer(self._get_round_timer(), on_timeout)
+        self._dict_of_timer[round] = threading.Timer(self.get_round_timer(), self._on_timeout())
         self._dict_of_timer[round].start()
-        output('Send local Timeout Message to self Replica')
-        self.(local_timeout_round)  #send((""), to=self._replica)
+        #output('Send local Timeout Message to self Replica')
+        self.local_timeout_round  #send((""), to=self._replica)
 
     def _stop_timer(self, round):
         self._dict_of_timer[round].cancel()
@@ -37,7 +35,7 @@ class Pacemaker:
 
     def local_timeout_round(self):
         timeout_info = self._safety.make_timeout(self._current_round, self._blocktree.high_qc, self._last_round_tc)
-        timeout_msg = TimeoutMsg()
+        timeout_msg = TimeoutMsg.TimeoutMsg()
         timeout_msg.tmo_info = timeout_info
         timeout_msg.last_round_tc = timeout_info
         output("Broadcasting messages to replicas")
