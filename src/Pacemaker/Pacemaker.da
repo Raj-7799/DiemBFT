@@ -39,6 +39,9 @@ class Pacemaker:
         timeout_msg = TimeoutMsg()
         timeout_msg.tmo_info = timeout_info
         timeout_msg.last_round_tc = timeout_info
+        output("Broadcasting messages to replicas")
+        for _, replicaInfo in self.replicaInfos.items():
+          send(("process_timeout_message", timeout_msg), to=replicaInfo.process)
 
     def _check_if_sender_pending(self, sender):
         for pending_tmo_info in self._pending_timeouts[tmo_info.round]:
