@@ -76,22 +76,13 @@ class GenerateKey():
             key=[ str(i)+"="+ (self._public_keys[i]).decode()+"\n" for i in range(len(self._public_keys))]            
             file.writelines(key)
 
-        
 
     def cleanup(self):
         files=glob.glob(CONF_FILE_PATH+'*')
-        # print(files)
         for file in files:
             x = os.remove(file)
-        print("after clean up ",len(files))
     
-
-
-
-
-
-
    
-x = GenerateKey(2)
-x.write_config()
+# x = GenerateKey(2)
+# x.write_config()
 
