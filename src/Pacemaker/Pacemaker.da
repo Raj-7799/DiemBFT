@@ -6,6 +6,7 @@ from Messages import TimeoutMsg
 class Pacemaker:
     def __init__(self, safety, blocktree, replica):  # delta and f can be taken from config
         #output("instatiate pacemaker")
+        #output("Entered constructer")
         self._safety = safety
         self._replica = replica
         self._current_round = 0
