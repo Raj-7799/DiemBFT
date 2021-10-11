@@ -2,12 +2,12 @@ import time
 import threading
 from Messages import TimeoutMsg
 
-
 class Pacemaker:
     def __init__(self, safety, blocktree, replica):  # delta and f can be taken from config
-        #output("instatiate pacemaker")
+        #output("instlsatiate pacemaker")
         #output("Entered constructer")
         self._safety = safety
+        self._blocktree = blocktree
         self._replica = replica
         self._current_round = 0
         self._last_round_tc = None
@@ -27,10 +27,12 @@ class Pacemaker:
         self.local_timeout_round  #send((""), to=self._replica)
 
     def _stop_timer(self, round):
-        self._dict_of_timer[round].cancel()
+        print(self._dict_of_timer.keys())
+        if round in self._dict_of_timer[round]:
+            self._dict_of_timer[round].cancel()
 
     def start_timer(self, new_round):
-        self._stop_timer(self._current_round)
+        #self._stop_timer(self._current_round)
         self._current_round = new_round
         self._start_timer(round)
 
@@ -39,9 +41,9 @@ class Pacemaker:
         timeout_msg = TimeoutMsg.TimeoutMsg()
         timeout_msg.tmo_info = timeout_info
         timeout_msg.last_round_tc = timeout_info
-        output("Broadcasting messages to replicas")
-        for _, replicaInfo in self.replicaInfos.items():
-          send(("process_timeout_message", timeout_msg), to=replicaInfo.process)
+        #output("Broadcasting messages to replicas")
+        for _, replicaInfo in self._replica.replicaInfos.items():
+            print("replica")  #send(("process_timeout_message", timeout_msg), to=replicaInfo.process)
 
     def _check_if_sender_pending(self, sender):
         for pending_tmo_info in self._pending_timeouts[tmo_info.round]:
