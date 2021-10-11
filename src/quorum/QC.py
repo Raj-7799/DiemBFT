@@ -29,3 +29,7 @@ class QC():
     @property
     def signatures(self):
         return self._signatures
+
+    def get_signers(self):
+        #TODO: Need to implement this
+        return []
