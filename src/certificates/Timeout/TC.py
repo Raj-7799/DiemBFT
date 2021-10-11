@@ -12,8 +12,8 @@ class TC():
 
 
     @property
-    def tmo_high_qc(self):
-        return self._tmo_high_qc
+    def tmo_high_qc_rounds(self):
+        return self._tmo_high_qc_rounds
 
 
     @property
