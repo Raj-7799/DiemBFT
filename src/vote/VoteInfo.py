@@ -30,28 +30,6 @@ class VoteInfo:
     # def round(self, round):
     #     self._round = round
 
-<<<<<<< HEAD
-    @round.setter
-    def round(self, round):
-        self._round = round
-
-    @round.deleter
-    def round(self):
-        del self._round
-
-    @property
-    def parent_id(self):      
-        return self._parent_id
-    
- 
-    @parent_id.setter
-    def parent_id(self,value):
-        self._parent_id=value
-
-    @parent_id.deleter
-    def parent_id(self):
-        del self._parent_id
-=======
     # @id.deleter
     # def round(self):
     #     del self._round
@@ -68,7 +46,6 @@ class VoteInfo:
     # @id.deleter
     # def parent_id(self):
     #     del self._parent_id
->>>>>>> f45347c401cd9f701465214504487d90ab6f29b2
     
 
     # @property
@@ -76,15 +53,6 @@ class VoteInfo:
     #     return self._parent_round
     
 
-<<<<<<< HEAD
-    @parent_round.setter
-    def parent_round(self,value):
-        self._parent_round=value
-
-    @parent_round.deleter
-    def parent_round(self):
-        del self._parent_round
-=======
     # @id.setter
     # def parent_round(self,value):
     #     self._parent_round=value
@@ -92,7 +60,6 @@ class VoteInfo:
     # @id.deleter
     # def parent_round(self):
     #     del self._parent_round
->>>>>>> f45347c401cd9f701465214504487d90ab6f29b2
     
 
     # @property
@@ -100,29 +67,6 @@ class VoteInfo:
     #     return self._exec_state_id
     
 
-<<<<<<< HEAD
-    @exec_state_id.setter
-    def exec_state_id(self,value):
-        self._exec_state_id=value
-
-    @exec_state_id.deleter
-    def exec_state_id(self):
-        del self._exec_state_id
-    
-
-    # def __str__(self):
-        
-        
-    #     # seralized_object = VoteInfoSchema.load(
-    #     #                                         {"_id":self.id,
-    #     #                                         "_round":self.round,
-    #     #                                         "_parent_id":self.parent_id,
-    #     #                                         "_parent_round":self.parent_round,
-    #     #                                         "_exec_state_id":self.exec_state_id
-    #     #                                     })
-    #     return seralized_object
-    
-=======
     # @id.setter
     # def exec_state_id(self,value):
     #     self._exec_state_id=value
@@ -130,7 +74,6 @@ class VoteInfo:
     # @id.deleter
     # def exec_state_id(self):
     #     del self._exec_state_id
->>>>>>> f45347c401cd9f701465214504487d90ab6f29b2
 
 class VoteInfoSchema(Schema):
     id            = fields.Integer()
@@ -139,12 +82,6 @@ class VoteInfoSchema(Schema):
     parent_round  = fields.Integer()
     exec_state_id = fields.Integer()
 
-<<<<<<< HEAD
-    # @post_load
-    # def deserialize(self, data, **kwargs):
-    #     return VoteInfoSchema(**data)
-=======
     @post_load
     def to_object(self, data, **kwargs):
         return VoteInfo(**data)
->>>>>>> f45347c401cd9f701465214504487d90ab6f29b2
