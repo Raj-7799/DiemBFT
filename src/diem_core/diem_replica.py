@@ -29,7 +29,6 @@ class Replica(da.DistProcess):
 
     def run(self):
         self.output('Yo Starting replica with pID', self._state.pID)
-        print(self._state.replicas)
         super()._label('_st_label_218', block=False)
 
         def ExistentialOpExpr_219():

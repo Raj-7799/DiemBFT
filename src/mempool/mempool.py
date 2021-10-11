@@ -6,6 +6,7 @@ class MemPool:
         self.locator = {}
     
     def get_transactions(self):
+        # currently only sends one transaction
         if self.queue:
             command = self.queue.popleft()
             if command in self.locator:
@@ -16,10 +17,12 @@ class MemPool:
             return None
 
     def insert_command(self, command, client):
-        if command in self.locator:
+        if command not in self.locator:
             self.queue.append(command)
             self.locator[command] = client
     
     def validate_command(self, command):
         return command in self.locator
-        
+    
+    def __str__(self):
+        return "{} {}".format(self.queue, self.locator)
