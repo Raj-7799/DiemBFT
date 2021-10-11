@@ -51,12 +51,10 @@ class GenerateKey():
         self._public_keys[idx]=public_key
         
     def write_config(self):
-        print("Writing ")
         self.cleanup()
         public_key_file = "diem_public_key.sec.conf"
 
         for dic_key in self._key_pairs.keys():
-            print(CONF_FILE_PATH+"diem_key_"+str(dic_key)+".sec.conf")
             with open(CONF_FILE_PATH+"diem_key_"+str(dic_key)+".sec.conf","w") as file:
                 entry = ["private_key="+ str(self._key_pairs[dic_key][1]),"\npublic_key="+ str(self._key_pairs[dic_key][0])]
                 file.writelines(entry) 
@@ -69,7 +67,7 @@ class GenerateKey():
 
     def cleanup(self):
         files=glob.glob(CONF_FILE_PATH+'*')
-        print(files)
+        # print(files)
         for file in files:
             os.remove(file)
 
