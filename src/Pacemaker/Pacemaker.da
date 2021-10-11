@@ -23,8 +23,8 @@ class Pacemaker:
     def _start_timer(self, round):
         self._dict_of_timer[round] = threading.Timer(self._get_round_timer(), on_timeout)
         self._dict_of_timer[round].start()
-        print("Send local Timeout Message to Replica")
-
+        output('Send local Timeout Message to self Replica')
+        self.(local_timeout_round)  #send((""), to=self._replica)
 
     def _stop_timer(self, round):
         self._dict_of_timer[round].cancel()
