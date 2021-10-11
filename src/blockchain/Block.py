@@ -1,3 +1,5 @@
+from marshmallow import Schema, fields
+
 class Block:
 
     def __init__(self,author,round,payload,qc,id):
@@ -57,3 +59,10 @@ class Block:
 
 # b=Block(1,2,3,4,5)
 # print(b.author)
+
+class BlockSchema(Schema):
+    author  = fields.Str()
+    round   = fields.Int()
+    payload = fields.Str()
+    qc      = fields.Int()
+    id      = fields.Int()
