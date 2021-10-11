@@ -1,12 +1,13 @@
+from marshmallow import Schema, fields
+
 class VoteInfo:
 
-    def __init__(self):
-        self._id = None
-        self._round = None
-        self._parent_id = None
-        self._parent_round = None
-        self._exec_state_id = None
-
+    def __init__(self, id, round, parent_id, parent_round, exec_state_id):
+        self._id = id
+        self._round = round
+        self._parent_id = parent_id
+        self._parent_round = parent_round
+        self._exec_state_id = exec_state_id
 
     @property
     def id(self):

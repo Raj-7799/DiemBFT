@@ -40,9 +40,10 @@ class Safety():
             return self._ledger.pending_state(qc.id)
         else:
             return None
-    'Safety: Private'
-
-    def _valid_signatures(self, b, last_tc):
+    
+    '''Safety: Private'''
+    #validate function currently always returns true
+    def valid_signatures(self, b, last_tc):
         return True
 
     def _hash(self, vote_info):
