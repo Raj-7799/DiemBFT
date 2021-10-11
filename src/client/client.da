@@ -11,7 +11,7 @@ class Client(process):
     output("Broadcasting messages to replicas")
 
     for _, replicaInfo in self.replicaInfos.items():
-      send(("Yo bro",), to=replicaInfo.process)
+      send(("request", "abcd"), to=replicaInfo.process)
     
     await(self.nReq == 0)
 
