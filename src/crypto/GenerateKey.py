@@ -16,7 +16,6 @@ class GenerateKey():
         self._key_pairs=dict()
         self._public_keys=dict()    
         for i in range(count):
-            #self.generate(i)
             self.generate_signing_keys(i)
 
     @property
