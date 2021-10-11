@@ -38,8 +38,8 @@ class VoteInfo:
     
  
     @parent_id.setter
-    def parent_id(self,value):
-        self._parent_id=value
+    def parent_id(self, parent_id):
+        self._parent_id = parent_id
 
     @parent_id.deleter
     def parent_id(self):
@@ -52,8 +52,8 @@ class VoteInfo:
     
 
     @parent_round.setter
-    def parent_round(self,value):
-        self._parent_round=value
+    def parent_round(self, parent_round):
+        self._parent_round = parent_round
 
     @parent_round.deleter
     def parent_round(self):
@@ -66,8 +66,8 @@ class VoteInfo:
     
 
     @exec_state_id.setter
-    def exec_state_id(self,value):
-        self._exec_state_id=value
+    def exec_state_id(self, exec_state_id):
+        self._exec_state_id = exec_state_id
 
     @exec_state_id.deleter
     def exec_state_id(self):
