@@ -13,7 +13,7 @@ class Safety:
         self._highest_qc_round = None
 
     def increase_highest_vote_round(self, round):
-        self._highest_vote_round = max(round, self._highest_vote_round);
+        self._highest_vote_round = max(round, self._highest_vote_round)
 
     def update_highest_qc_round(self, qc_round):
         self._highest_qc_round = max(qc_round, self._highest_qc_round)
@@ -40,6 +40,7 @@ class Safety:
             return self.ledger.pending_state(qc.id)
         else:
             return None
+    
     '''Safety: Private'''
     #validate function currently always returns true
     def valid_signatures(self, b, last_tc):
