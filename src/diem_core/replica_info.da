@@ -1,0 +1,6 @@
+class ReplicaInfo:
+    def __init__(self, process, public_key, replicaID):
+        self.process = process
+        self.public_key = public_key
+        self.replicaID = replicaID
+

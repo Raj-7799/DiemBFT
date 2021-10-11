@@ -1,4 +1,6 @@
 import nacl.hash
+from quorum import QC as qc
+import blockchain as block
 
 
 from blockchain import Block as block
@@ -41,8 +43,6 @@ class PendingBlockTree(dict):
     def add(self,prev_block_id,block):
         self[block]=prev_block_id
 
-
-
 class BlockTree:
     def __init__(self):
         self._qc = qc.QC(1)
@@ -84,9 +84,7 @@ class BlockTree:
         #high qc ← max round {qc, high qc}
         self.high_qc=max_round_qc(qc,self.high_qc)
 
-        pass
-    
-
+  
     def execute_and_insert(self,block):
         Ledger.speculate(block.qc.block_id,block.id,block.payload)
         self.pending_block_tree.add(block.qc.block_id,block)  # forking is possible so we need to know which node to extend
