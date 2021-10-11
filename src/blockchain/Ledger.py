@@ -1,11 +1,18 @@
+import plyvel
+
 class Ledger():
 
     def __init__(self):
-        pass
+        self._db = plyvel.DB('/tmp/diemLedger/', create_if_missing=True)
+        self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate/', create_if_missing=True)
+
+
+
+    
 
 
     # apply txns speculatively
-    def speculate(self,prev_block_id, block_id, txns): 
+    def speculate(self,prev_block_id, block_id, txns):
         pass
 
 
@@ -16,7 +23,10 @@ class Ledger():
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,block_id):
-        pass
+        block = self._db_speculate.get(block_id)
+        if  block is not None:
+            self._db.put(block_id,block)
+            self._db_speculate.delete(block_id)                   
 
 
     #returns a committed block given its id

@@ -1,17 +1,25 @@
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, diemReplicas):
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):
     self.pID          = clientID
     self.nReq         = requests
     self.timeout      = clientTimeout
-    self.diemReplicas = diemReplicas
+    self.replicaInfos = replicaInfos
+    self.private_key = private_key
   
   def run():
     output("Yo running client!!!")
     output("Broadcasting messages to replicas")
-    send(("Yo boiii",), to=self.diemReplicas)
+
+    for _, replicaInfo in self.replicaInfos.items():
+      send(("request", "abcd"), to=replicaInfo.process)
+    
     await(self.nReq == 0)
 
-  def receive(msg=("Yo bro",), from_=self.diemReplicas):
-    output("Got message from replica ", self.nReq)
-    self.nReq -= 1
-    
+  def receive(msg=("Yo bro",), from_=source):
+    if source in self.replicaInfos:  
+      replicaInfo = self.replicaInfos[source]
+      output("Got message from replica ", replicaInfo.replicaID)
+      self.nReq -= 1
+    else:
+      output("Received unknown message")
+      

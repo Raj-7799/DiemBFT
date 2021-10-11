@@ -12,4 +12,5 @@ Implementation of DiemBFT
 - ``` conda activate diem ```
 - ``` pip install pyDistAlgo ```
 - ``` pip install pynacl ```
+- ``` pip install plyvel ```
 
