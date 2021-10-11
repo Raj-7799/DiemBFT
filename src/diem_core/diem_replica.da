@@ -1,5 +1,5 @@
 import sys
-from DiemBFT.src.Messages.ProposalMsg import ProposalMsg
+from Messages.ProposalMsg import ProposalMsg
 
 from client.client_info import ClientInfo
 from .replica_info import ReplicaInfo
@@ -39,7 +39,7 @@ class Replica(process):
             proposal_msg = ProposalMsg(block, last_tc, blockTree.high_commit_qc)
 
             for replicaInfo in replicaInfos:
-                send(("process_proposal_msg", proposal_msg), replicaInfo.process)
+                send(("process_proposal_msg", proposal_msg), to=replicaInfo.process)
 
     def receive(msg=("request", cmd), from_=source):
         output("Inserting cmd {} into mempool of replica {}".format(cmd, self.replicaID))
