@@ -5,7 +5,8 @@ from crypto import Keys as keys
 
 
 class QC():
-    def __init__(self,vote_info,ledger_commit_info,votes):
+    def __init__(self,vote_info,ledger_commit_info,votes=None):
+        
         self._vote_info=vote_info
         self._ledger_commit_info = ledger_commit_info
         self._signatures=votes

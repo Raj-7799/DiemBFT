@@ -1,3 +1,6 @@
+from marshmallow import Schema, fields
+
+
 class VoteInfo:
 
     def __init__(self,id,round_,parent_id,parent_round,exec_state_id):
@@ -73,3 +76,23 @@ class VoteInfo:
     def exec_state_id(self):
         del self._exec_state_id
     
+
+    # def __str__(self):
+        
+        
+    #     # seralized_object = VoteInfoSchema.load(
+    #     #                                         {"_id":self.id,
+    #     #                                         "_round":self.round,
+    #     #                                         "_parent_id":self.parent_id,
+    #     #                                         "_parent_round":self.parent_round,
+    #     #                                         "_exec_state_id":self.exec_state_id
+    #     #                                     })
+    #     return seralized_object
+    
+
+class VoteInfoSchema(Schema):
+    id = fields.Integer()
+    round = fields.Integer()
+    parent_id = fields.Integer()
+    parent_round = fields.Integer()
+    exec_state_id = fields.Integer()

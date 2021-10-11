@@ -5,9 +5,9 @@
 # vote info hash; // Hash of VoteMsg.vote info
 
 class LedgerCommitInfo:
-    def __init__(self):
-        self._commit_state_id=None
-        self._vote_info_hash=None
+    def __init__(self,commit_state_id=None,vote_info_hash=None):
+        self._commit_state_id=commit_state_id
+        self._vote_info_hash=vote_info_hash
     
     
 

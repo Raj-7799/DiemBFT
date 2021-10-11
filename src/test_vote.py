@@ -1,26 +1,60 @@
-from vote import VoteMsg as votemsg
-from crypto import GenerateKey as genkey
 
+from  certificates.quorum import Quorum as QC
 from crypto import Keys as keys
-from quorum import QC as quorum
-
+from vote import VoteInfo
+from vote import VoteInfo as vi
+from vote.VoteInfo import VoteInfoSchema 
 from blockchain import BlockTree as bt
+from blockchain import Ledger as ld
+from blockchain import Block as blk
+from blockchain import LedgerCommitInfo as lci
+
+# from util import max_round_qc,hash
+from util.Util import max_round_qc,hash
 
 
-from util import max_round_qc
-
-b =  bt.BlockTree()
-print(b.pending_block_tree)
-b.pending_block_tree[10]='test'
-b.pending_block_tree[12]='test12'
+class TestSuite:
 
 
-print("block ",b.pending_block_tree)
-b.pending_block_tree.prune(12)
-print("block pruning ",b.pending_block_tree)
+    def __init__(self):
+        pass
 
-qc_a = quorum.QC(1)
-qc_b = quorum.QC(2)
+    def testLedger(self):
+
+        l = ld.Ledger()
+        genesis_voteInfo = vi.VoteInfo(id=0,round_=0,parent_id=0,parent_round=0,exec_state_id=0)
+        
+        print("genesis_voteInfo ",genesis_voteInfo.id)   
+        seralized_genesis_voteInfo =  VoteInfoSchema().dumps(genesis_voteInfo)
+        print(type(seralized_genesis_voteInfo)," ",seralized_genesis_voteInfo)
+        ledger_commit_info = lci.LedgerCommitInfo(commit_state_id=0,vote_info_hash=hash((seralized_genesis_voteInfo)))  
+        print("ledger_conmmit_info",ledger_commit_info)
+        print("ledger type ",type(ledger_commit_info))
+        genesis_qc = QC.QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info)
+        print("genesis_qc", type(genesis_qc))
+        genesis =  blk.Block("genesis",0,"text",genesis_qc,1)
+        print("qc type",type(genesis.qc))
+        print("qc ",genesis.qc)
+
+        l.speculate(prev_block_id=genesis.qc.vote_info.parent_id,block_id=genesis.id,txns=genesis.payload)
+
+
+test =  TestSuite()
+test.testLedger()
+
+
+# b =  bt.BlockTree()
+# print(b.pending_block_tree)
+# b.pending_block_tree[10]='test'
+# b.pending_block_tree[12]='test12'
+
+
+# print("block ",b.pending_block_tree)
+# b.pending_block_tree.prune(12)
+# print("block pruning ",b.pending_block_tree)
+
+# qc_a = quorum.QC(1)
+# qc_b = quorum.QC(2)
 
 
 # y = genkey.GenerateKey(5)

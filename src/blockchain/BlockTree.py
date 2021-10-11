@@ -1,12 +1,12 @@
 import nacl.hash
-from quorum import QC as qc
+
 import blockchain as block
 
 
 from blockchain import Block as block
 from certificates.quorum import Quorum as qc
 from blockchain import Ledger
-from util import max_round_qc
+from util.Util import max_round_qc
 
 class PendingBlockTree(dict):
 
@@ -78,6 +78,7 @@ class BlockTree:
 
     def process_qc(self,qc):
         if qc['ledger_commit_info']['commit_state_id'] != None:
+            #Ledger.commit(qc['vote_info']['parent_id'])
             Ledger.commit(qc['vote_info']['parent_id'])
             self.pending_block_tree.prune(qc['vote']['parent_id'])
             self.high_commit_qc=max_round_qc(qc,self.high_commit_qc) # max_rond high commit qc ← max round {qc, high commit qc} // max round need elaboration
