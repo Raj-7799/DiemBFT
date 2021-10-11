@@ -8,7 +8,7 @@ __pycache__/*
 #Editior 
 .vscode/
 *.egg-info/
-
+.idea
 
 
 #Config

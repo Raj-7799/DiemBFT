@@ -1,0 +1,11 @@
+#from Safety import Safety
+
+from Pacemaker import Pacemaker
+
+def run():
+    output("Running for first time")
+
+def main():
+    output("hello")
+    p = Pacemaker(None, None, None)
+    p.start_timer(0)
