@@ -2,6 +2,8 @@ import nacl.utils
 from nacl.public import PrivateKey
 import glob
 import os
+from nacl.encoding import HexEncoder
+from nacl.signing import SigningKey
 
 from nacl import encoding
  
@@ -14,7 +16,8 @@ class GenerateKey():
         self._key_pairs=dict()
         self._public_keys=dict()    
         for i in range(count):
-            self.generate(i)
+            #self.generate(i)
+            self.generate_signing_keys(i)
 
     @property
     def key_pairs(self):
@@ -49,18 +52,28 @@ class GenerateKey():
         private_key = key._private_key.hex()
         self._key_pairs[idx]=(public_key,private_key)
         self._public_keys[idx]=public_key
-        
+    
+    def generate_signing_keys(self,idx):
+        private_key_obj = (SigningKey.generate())
+        private_key_hex=private_key_obj.encode(encoder=HexEncoder)
+        public_key = private_key_obj.verify_key
+        public_key_hex=public_key.encode(encoder=HexEncoder)
+        self._key_pairs[idx]=(public_key_hex,private_key_hex)
+        self._public_keys[idx]=public_key_hex
+
     def write_config(self):
         self.cleanup()
         public_key_file = "diem_public_key.sec.conf"
 
         for dic_key in self._key_pairs.keys():
             with open(CONF_FILE_PATH+"diem_key_"+str(dic_key)+".sec.conf","w") as file:
-                entry = ["private_key="+ str(self._key_pairs[dic_key][1]),"\npublic_key="+ str(self._key_pairs[dic_key][0])]
+                # print("private key ",self._key_pairs[dic_key][1].decode())
+                entry = ["private_key="+   (self._key_pairs[dic_key][1]).decode(),"\npublic_key="+  (self._key_pairs[dic_key][0]).decode()]
                 file.writelines(entry) 
 
         with open(CONF_FILE_PATH+public_key_file,"w") as file:
-            key=[ str(i)+"="+self._public_keys[i]+"\n" for i in range(len(self._public_keys))]            
+            
+            key=[ str(i)+"="+ (self._public_keys[i]).decode()+"\n" for i in range(len(self._public_keys))]            
             file.writelines(key)
 
         
@@ -69,16 +82,16 @@ class GenerateKey():
         files=glob.glob(CONF_FILE_PATH+'*')
         # print(files)
         for file in files:
-            os.remove(file)
-
-
-
-
-
-
-
-
+            x = os.remove(file)
+        print("after clean up ",len(files))
     
-# x = GenerateKey(2)
-# x.write_config()
+
+
+
+
+
+
+   
+x = GenerateKey(2)
+x.write_config()
 
