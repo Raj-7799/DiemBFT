@@ -9,7 +9,6 @@ import os
 absolute_path=os.path.dirname(os.path.abspath(__file__))
 CONF_FILE_PATH=absolute_path+"/../../conf/"
 
-print(CONF_FILE_PATH)
 class Keys:
     def __init__(self,idx):
         self._public_keys=list()
@@ -91,8 +90,12 @@ class Keys:
         except BadSignatureError:
             return None
 
-
-
+    @property
+    def getKeyValuePair(self):
+        return {
+            "public" : self.public_key(),
+            "private" : self.private_key()
+        }
 
     @property
     def public_key(self):

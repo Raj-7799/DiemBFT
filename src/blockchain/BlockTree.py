@@ -1,4 +1,6 @@
 import nacl.hash
+from quorum import QC as qc
+import blockchain as block
 
 
 from blockchain import Block as block
@@ -22,8 +24,6 @@ class PendingBlockTree(dict):
         #use prev root to trace and delete the nodes that not child of id node or id nodes it self
 
         self["root"]=id
-
-
 
 
 
@@ -67,9 +67,6 @@ class BlockTree:
             self.high_commit_qc=max_round(qc,self.high_commit_qc) # max_rond high commit qc ← max round {qc, high commit qc} // max round need elaboration
         #high qc ← max round {qc, high qc}
         self.high_qc=max_round(qc,self.high_qc)
-
-        pass
-    
 
     def execute_insert(self,block):
         pass
