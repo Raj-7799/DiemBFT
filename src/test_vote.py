@@ -1,17 +1,17 @@
 
 from  certificates.quorum import Quorum
 from crypto import Keys as keys
-from vote import VoteInfo
-from vote import VoteInfo as vi
-from vote.VoteInfo import VoteInfoSchema 
-from blockchain import BlockTree as bt
-from blockchain import Ledger as ld
-from blockchain import Block as blk
-from blockchain import LedgerCommitInfo as lci
-from util import Util as util
+
+from VoteInfo import VoteInfo as vi
+from VoteInfo import VoteInfoSchema 
+from BlockTree import BlockTree as bt
+from Ledger import Ledger as ld
+from Block import Block as blk
+from LedgerCommitInfo import LedgerCommitInfo as lci
+from Util import Util as util
 
 # from util import max_round_qc,hash
-from util.Util import deserialize, max_round_qc,hash, serialize
+from Util import deserialize, max_round_qc,hash, serialize
 
 
 class TestSuite:
