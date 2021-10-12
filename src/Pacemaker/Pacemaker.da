@@ -1,6 +1,5 @@
-
-import threading
 from Messages import TimeoutMsg as timeoutmsg
+import threading
 from certificates.Timeout import TC as Tc
 
 class Pacemaker:

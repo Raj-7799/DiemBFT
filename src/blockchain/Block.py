@@ -1,6 +1,6 @@
 class Block:
 
-    def __init__(self,author,round,payload,qc,id):
+    def __init__(self,author, round, payload, qc, id):
         self._author=author
         self._round=round
         self._payload=payload
@@ -36,7 +36,7 @@ class Block:
     def qc(self):
         return self._qc
     
-    @payload.setter
+    @qc.setter
     def qc(self,qc):
         self._qc=qc
 
@@ -45,7 +45,7 @@ class Block:
         return self._id
     
     @id.setter
-    def id(self,id):
+    def id(self, id):
         self._id=id
 
 
