@@ -18,10 +18,8 @@ class LeaderElection:
         while i < self.window_size or len(last_authors) < self.exclude_size:
             current_block = self.replica.ledger.committed_block(current_qc.vote_info.parent_id)
             block_author = current_block.author
-            #TODO:  add some validation for genesis block
             
             if i < self.window_size:
-                # TODO : make get_signers method in qc
                 signers = current_qc.get_signers()
                 for signer in signers:
                     active_validators[signer] = True
@@ -37,6 +35,11 @@ class LeaderElection:
                 del active_validators[author]
         
         active_validators = list(active_validators.keys())
+        
+        # This is to make sure when proposal fails in very first round we handle it smoothly
+        if len(active_validators) == 0:
+            return None
+        
         random.seed(qc.vote_info.roundNo)
         return active_validators[random.randint(0, len(active_validators) - 1)]
 
@@ -47,7 +50,13 @@ class LeaderElection:
         current_round = self.replica.paceMaker.current_round
 
         if extended_round + 1 == qc_round and qc_round + 1 == current_round:
-            self.reputation_leaders[current_round + 1] = self.elect_reputation_leaders(qc)
+            elected_leader = self.elect_reputation_leaders(qc)
+            ##In paper : self.reputation_leaders[current_round + 1]
+            ## changes:  if elected_leader is not None:self.reputation_leaders[current_round + 1] = elected_leader 
+            ## Incase the very first proposal voting fails, the genesis block will only have one author and no signature
+            # This will return no elected_leader
+            if elected_leader is not None:
+                self.reputation_leaders[current_round + 1] = elected_leader
     
     def get_leader(self, roundNo):
         if roundNo in self.reputation_leaders:
