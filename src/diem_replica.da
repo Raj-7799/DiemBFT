@@ -1,16 +1,8 @@
-import sys
-import ProposalMsg
+import BlockTree
 
 from client_info import ClientInfo
-from replica_info import ReplicaInfo
 import mempool
-import Util
-import pickle
-from VoteInfo import VoteInfo
-from TimeoutInfo import TimeoutInfo
-from Quorum import QC
-import Pacemaker as PM
-
+from replica_info import ReplicaInfo
 
 class Replica(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]"):
@@ -23,21 +15,11 @@ class Replica(process):
         self.clientInfos = clientInfos
         self.memPool = mempool.MemPool()
 
-        self.blockTree = None
         self.leaderElection = None
         self.safety = None
-        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout)  #Pacemaker()
-        self.paceMaker.start_timer(0);
+        self.blockTree = BlockTree.BlockTree(self.fCount,self.replicaID, self.privateKey, get_replica_public_key(self.replicaID))
 
-    def run():
-        output("Yo Starting replica with pID")
-        await(some(received(("Yo bro",))))
-    
-    def pacemaker_broadcast_timeout(tmo_message):
-        output("Pacemaker broadcasting timeout lol!")
-        #for _, replicaInfo in self.replicaInfos.items():
-            #send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
-            
+        
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
             if replicaInfo.replicaID == replicaID:
@@ -46,6 +28,12 @@ class Replica(process):
     def get_replica_public_key(replicaID):
         replicaInfo = get_replica_info(replicaID)
         return replicaInfo.public_key
+    
+    def run():
+        output("Yo Starting replica with pID", self.replicaID)
+        output("Yo Starting replica with pID")
+        await(some(received(("Yo bro",))))
+
 
     def process_certificate(qc):
         self.blockTree.process_qc(qc)
@@ -73,6 +61,7 @@ class Replica(process):
         self.process_certificate(P.block.qc)
         self.process_certificate(P.high_commit_qc)
         self.paceMaker.advance_round_tc(P.last_round_tc)
+        
 
         current_round = self.paceMaker.currentRound
         current_leader = self.leaderElection.get_leader(current_round)
@@ -97,13 +86,14 @@ class Replica(process):
             output("Sending vote message to {} from {}", nextLeaderInfo.replicaID, self.replicaID)
             send(("vote", vote_message), to=nextLeaderInfo.process)
 
+
     def receive(msg=("process_vote_msg", M), from_=source):
         qc = self.blockTree.process_vote(M)
 
         if qc:
             self.process_certificate(qc)
             self.process_next_round_event(None)
-    
+
     def receive(msg=("process_timeout_msg", M), from_=source):
         self.process_certificate(M.tmo_info.high_qc)
         self.process_certificate(M.high_commit_qc)

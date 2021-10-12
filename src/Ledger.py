@@ -2,10 +2,13 @@ import plyvel
 
 class Ledger():
 
-    def __init__(self):
-        self._db = plyvel.DB('/tmp/diemLedger/', create_if_missing=True)
-        self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate/', create_if_missing=True)
-        self._db            
+    def __init__(self,genesis_block, replicaID):
+        self.replicaID = replicaID
+        self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
+        self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(self.replicaID), create_if_missing=True)
+        self.speculate(genesis_block.id,genesis_block.id,genesis_block)
+        self.commit(genesis_block.id)
+        
 
 
     # apply txns speculatively

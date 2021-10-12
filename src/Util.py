@@ -1,11 +1,10 @@
-
-import Quorum as qc
 import nacl.encoding
 import nacl.hash
 from nacl.public import PrivateKey, PublicKey,SealedBox,Box
 from nacl.signing import SigningKey,VerifyKey
 from nacl.exceptions import BadSignatureError
 from nacl.encoding import HexEncoder
+
 import pickle
 
 
@@ -43,4 +42,3 @@ def verify_message(signed_msg):
         return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
     except BadSignatureError:
         return None
-

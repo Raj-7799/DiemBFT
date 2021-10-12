@@ -1,5 +1,5 @@
-from Quorum import QC
 import Util
+from BlockTree import QC
 
 class TimeoutInfo():
     def __init__(self, roundNo: int, high_qc: QC, sender: int, pvt_key, pbc_key):
