@@ -14,3 +14,4 @@ class TimeoutInfo():
 
     def form_signature_object(self):
         return [self.round, self.sender]
+
