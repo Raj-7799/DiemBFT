@@ -72,7 +72,8 @@ class Keys:
 
     ## Use the below method for siging the message 
     ## Reference : https://pynacl.readthedocs.io/en/latest/signing/#id1
-    def sign_message(self,msg):        
+    def sign_message(self,msg):    
+        msg= msg if msg is not None else " " 
         msg=bytes(msg,"utf-8")        
         signed_hex = self._private_key.sign(msg,encoder=HexEncoder)
         verify_key = self._public_key

@@ -9,11 +9,12 @@ from crypto import Keys as keys
 
 class VoteMsg:
 
-    def __init__(self, u):
-        self._vote_info = None
-        self._ledger_commit_info = None
-        self._high_commit_qc = None
-        self._sender=u # both are same need to revisit
+    def __init__(self,vote_info,ledger_commit_info):
+        self._vote_info=vote_info
+        self._ledger_commit_info=ledger_commit_info
+        self._high_commit_qc=None
+        #self._sender=list()
+        self._sender=0 # both are same need to revisit
         
         key=keys.Keys(self.sender) ## find sender 
         # Using digtal signature to sign the message to avoid computation for generating message using public-private key encryption
