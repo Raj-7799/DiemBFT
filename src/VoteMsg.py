@@ -1,64 +1,21 @@
-# VoteMsg
-# vote_info; // A VoteInfo record
-# ledger_commit_info; // Speculated ledger info
-# high_commit_qc; // QC to synchronize on committed blocks
-# sender ← u; // Added automatically when constructed
-# signature ← sign u (ledger commit info); // Signed automatically when constructed
-
-import Keys as keys
+from LedgerCommitInfo import LedgerCommitInfo as ledgerCommitInfo
+from VoteInfo import VoteInfo as voteInfo
+from Quorum import QC 
+import Util
 
 class VoteMsg:
 
-    def __init__(self,vote_info,ledger_commit_info):
-        self._vote_info=vote_info
-        self._ledger_commit_info=ledger_commit_info
-        self._high_commit_qc=None
-        #self._sender=list()
-        self._sender=0 # both are same need to revisit
+    def __init__(self, vote_info: voteInfo, ledger_commit_info: ledgerCommitInfo, high_commit_qc: QC, sender: int, pvt_key, pbc_key):
+        self.vote_info = vote_info
+        self.ledger_commit_info = ledger_commit_info
+        self.high_commit_qc = high_commit_qc
+        self.sender = sender
+        self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)#key.sign_message(self._ledger_commit_info) 
         
-        key=keys.Keys(self.sender) ## find sender 
-        # Using digtal signature to sign the message to avoid computation for generating message using public-private key encryption
-        self._signature=key.sign_message(self._ledger_commit_info) 
-        
+    def verify_self_signature(self):
+        return Util.check_authenticity(self.form_signature_object(), self.signature)
 
-    @property
-    def vote_info(self):
-        return self._vote_info
-
-    @vote_info.setter
-    def sender(self, vote_info):
-        self._vote_info = vote_info
-    
-    @property
-    def sender(self):   
-        return self._sender
-
-    @sender.setter
-    def sender(self, sender):
-        self._sender = sender
-
-    @property
-    def signature(self):
-        return self._signature
-
-    @signature.setter
-    def signature(self, signature):
-        self._signature = signature
-
-    @property
-    def ledger_commit_info(self):
-        return self._ledger_commit_info
-
-    @ledger_commit_info.setter
-    def ledger_commit_info(self, ledger_commit_info):
-        self._ledger_commit_info = ledger_commit_info
-
-    @property
-    def high_commit_qc(self):
-        return self._high_commit_qc
-    
-    @high_commit_qc.setter
-    def high_commit_qc(self, high_commit_qc):
-        self._high_commit_qc = high_commit_qc
+    def form_signature_object(self):
+        return [self.ledger_commit_info]
 
     
