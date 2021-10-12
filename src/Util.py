@@ -9,22 +9,18 @@ from nacl.encoding import HexEncoder
 import pickle
 
 
-
 def max_round_qc(current_qc,high_qc):
     qc_round =  current_qc.vote_info.round
-    print(type(high_qc))
     high_qc_round =  high_qc.vote_info.round
     if qc_round >  high_qc_round:
         return current_qc
     else:
         return high_qc
 
-def serialize(object, schema):
-    return schema.dumps(object)
-
-def deserialize(json, schema):
-    return schema.loads(json)
-
+def hash(object):
+    hasher = nacl.hash.sha256
+    digest = hasher(pickle.dumps(object), encoder=nacl.encoding.HexEncoder)
+    return digest
 
 def sign_object(obj, pvt_key, pbc_key):
     return sign_message(pickle.dumps(obj), pvt_key, pbc_key)
