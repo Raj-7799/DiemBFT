@@ -1,4 +1,4 @@
 class LedgerCommitInfo:
-    def __init__(self, commit_state_id: int, vote_info_hash):
+    def __init__(self, commit_state_id, vote_info_hash):
         self.commit_state_id = commit_state_id
         self.vote_info_hash = vote_info_hash
