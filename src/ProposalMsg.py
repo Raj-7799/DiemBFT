@@ -1,6 +1,6 @@
 from Block import Block
 from TC import TC
-from Quorum import QC
+from BlockTree import QC
 import Util
 
 class ProposalMsg ():
