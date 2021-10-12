@@ -3,9 +3,10 @@ import ProposalMsg
 
 from client_info import ClientInfo
 from replica_info import ReplicaInfo
-#import client
 import mempool
-#import Pacemaker as PM
+import Util
+import pickle
+from VoteInfo import VoteInfo
 
 
 class Replica(process):
@@ -24,8 +25,18 @@ class Replica(process):
         self.paceMaker = None  #Pacemaker()
         self.safety = None
 
+    def get_replica_info(replicaID):
+        for _, replicaInfo in self.replicaInfos.items():
+            if replicaInfo.replicaID == replicaID:
+                return replicaInfo
+    
+
+    def get_replica_public_key(replicaID):
+        replicaInfo = get_replica_info(replicaID)
+        return replicaInfo.public_key
+    
     def run():
-        output("Yo Starting replica with pID", self.replicaID)
+        output("Yo Starting replica with pID")
         await(some(received(("Yo bro",))))
 
     def process_certificate(qc):
