@@ -5,7 +5,7 @@ from client_info import ClientInfo
 from replica_info import ReplicaInfo
 #import client
 import mempool
-#import Pacemaker as PM
+import Pacemaker as PM
 
 
 class Replica(process):
@@ -21,12 +21,20 @@ class Replica(process):
 
         self.blockTree = None
         self.leaderElection = None
-        self.paceMaker = None  #Pacemaker()
         self.safety = None
+        #pacemaker_help()
+        output("Started Pacemaker {}", float(int(self.tDelta)/1000))
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, self.replicaInfos, pacemaker_broadcast_timeout)  #Pacemaker()
+        self.paceMaker.start_timer(0);
 
     def run():
         output("Yo Starting replica with pID", self.replicaID)
         await(some(received(("Yo bro",))))
+
+    def pacemaker_broadcast_timeout(tmo_message):
+        output("Pacemaker broadcasting timeout lol!")
+        for _, replicaInfo in self.replicaInfos.items():
+            send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
 
     def process_certificate(qc):
         self.blockTree.process_qc(qc)
