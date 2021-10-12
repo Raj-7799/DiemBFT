@@ -1,39 +1,16 @@
+from Quorum import QC
+import Util
+
 class TimeoutInfo():
-    def __init__(self, round, high_qc):
-        self._round = round
-        self._high_qc = high_qc
-        self._sender = None#Implement sender<-u
-        self._signature = None#Implement signature<-signU(round, high_qc.round)
-
-
-    @property
-    def round(self):
-        return self._round
-
-    @round.setter
-    def round(self, round):
-        self._round = round
-
-    @property
-    def high_qc(self):
-        return self._high_qc
-
-    @high_qc.setter
-    def high_qc(self, high_qc):
-        self._high_qc = high_qc
-
-    @property
-    def sender(self):
-        return self._sender
-
-    @sender.setter
-    def sender(self, sender):
-        self._sender = sender
-
-    @property
-    def signature(self):
-        return self._signature
+    def __init__(self, round: int, high_qc: QC, sender: int, pvt_key, pbc_key):
+        self.round = round
+        self.high_qc = high_qc
+        self.sender = sender
+        self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
     
-    @signature.setter
-    def signature(self, signature):
-        self._signature = signature
+    def verify_self_signature(self):
+        return Util.check_authenticity(self.form_signature_object(), self.signature)
+
+    def form_signature_object(self):
+        return [self.round, self.high_qc.vote_info.roundNo]
+

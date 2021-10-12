@@ -3,10 +3,14 @@ import ProposalMsg
 
 from client_info import ClientInfo
 from replica_info import ReplicaInfo
-#import client
 import mempool
 #import Pacemaker as PM
 from vote import VoteInfo as vi
+import Util
+import pickle
+from VoteInfo import VoteInfo
+from TimeoutInfo import TimeoutInfo
+from Quorum import QC
 
 from BlockTree import BlockTree as bt
 
@@ -25,14 +29,17 @@ class Replica(process):
         self.privateKey = privateKey
         self.clientInfos = clientInfos
         self.memPool = mempool.MemPool()
-        genesis_qc ,genesis_block = self.create_genesis_object()
 
-        self.blockTree = bt.BlockTree(genesis_qc,genesis_block,self.fCount)
+        genesis_qc ,genesis_block = self.create_genesis_object()
+        self.blockTree = bt.BlockTree(genesis_qc,genesis_block,self.fCount,self.replicaID)
+
         self.leaderElection = None
         self.paceMaker = None  #Pacemaker()
         self.safety = None
         #self.replica_logger=diem_logger
         
+
+    ## Creating genesis block for startup 
     def create_genesis_object(self):
         genesis_voteInfo = vi.VoteInfo(id=0,round_no=0,parent_id=0,parent_round=0,exec_state_id=0)
         ledger_commit_info = lci.LedgerCommitInfo(commit_state_id=0,vote_info_hash=genesis_voteInfo)  
@@ -41,9 +48,20 @@ class Replica(process):
         return genesis_qc , genesis
 
 
+    def get_replica_info(replicaID):
+        for _, replicaInfo in self.replicaInfos.items():
+            if replicaInfo.replicaID == replicaID:
+                return replicaInfo
+    
+
+    def get_replica_public_key(replicaID):
+        replicaInfo = get_replica_info(replicaID)
+        return replicaInfo.public_key
+    
     def run():
         replica_logger.debug("diem_replica: run {}".format(1))
         output("Yo Starting replica with pID", self.replicaID)
+        output("Yo Starting replica with pID")
         await(some(received(("Yo bro",))))
 
 

@@ -5,7 +5,7 @@ import nacl.hash
 import Block as block
 import Quorum as qc
 import Ledger as ld
-from Util import max_round_qc
+from Util import max_round_qc,hash
 from diembft_logger import get_logger
 from collections import defaultdict
 logger = get_logger("blocktree")
@@ -53,7 +53,7 @@ class PendingBlockTree(dict):
 
 
 class BlockTree:
-    def __init__(self,genesis_qc,genesis_block,fCount):
+    def __init__(self,genesis_qc,genesis_block,fCount,author):
         # self._qc = qc.QC(1)
         self._high_qc = qc # highest known QC
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
@@ -61,6 +61,7 @@ class BlockTree:
         self._pending_block_tree=PendingBlockTree(genesis_block)
         self._ledger = ld.Ledger(genesis_block)
         self.fCount=fCount
+        self.author=author
 
 
     @property
@@ -121,12 +122,17 @@ class BlockTree:
         return None
 
     def generate_block(self,txns,current_round):
-        author=0
-        HASHER = nacl.hash.sha256
-        msg =  str.encode(str(author)+str(current_round)+str(self.high_qc.vote_info.id)+str(self.high_qc.signature))
-        id = HASHER(msg, encoder=nacl.encoding.HexEncoder)
+                
+        msg =  str.encode(str(self.author)+str(current_round)+str(self.high_qc.vote_info.id)+str(self.high_qc.signature))
+        id = hash(msg)
 
-        new_block = block.Block(author=author,round=current_round,payload=txns,qc=self.high_qc,id=id)
+        new_block = block.Block(
+                                    author=self.author,
+                                    round=current_round,
+                                    payload=txns,
+                                    qc=self.high_qc,
+                                    id=id
+                                )
         return new_block
         
     
