@@ -12,5 +12,5 @@ class TimeoutInfo():
         return Util.check_authenticity(self.form_signature_object(), self.signature)
 
     def form_signature_object(self):
-        return [self.round, self.sender]
+        return [self.round, self.high_qc.vote_info.roundNo]
 
