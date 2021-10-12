@@ -1,10 +1,11 @@
 import sys
-from Messages.ProposalMsg import ProposalMsg
+import ProposalMsg
 
-from client.client_info import ClientInfo
-from .replica_info import ReplicaInfo
-from client import client
-from mempool import mempool
+from client_info import ClientInfo
+from replica_info import ReplicaInfo
+import client
+import mempool
+#import Pacemaker as PM
 
 
 class Replica(process):
@@ -20,12 +21,11 @@ class Replica(process):
 
         self.blockTree = None
         self.leaderElection = None
-        self.paceMaker = None
+        self.paceMaker = None  #Pacemaker()
         self.safety = None
 
     def run():
         output("Yo Starting replica with pID", self.replicaID)
-
         await(some(received(("Yo bro",))))
 
     def process_certificate(qc):

@@ -1,7 +1,7 @@
-from blockchain import LedgerCommitInfo as LedgerCommitInfo
-from vote import VoteInfo as VI
-from vote import VoteMsg as VoteMsg
-from certificates.Timeout import TimeoutInfo as Timeoutinfo
+import LedgerCommitInfo as LedgerCommitInfo
+import VoteInfo as VI
+import VoteMsg as VoteMsg
+import TimeoutInfo as Timeoutinfo
 
 
 class Safety():

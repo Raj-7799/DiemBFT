@@ -1,4 +1,4 @@
-class TC():
+class TC:
 #Since TC is used by Pacemaker module only, Its contruction requires all datafields to be declared
     def __init__(self, round, tmo_high_qc_rounds, tmo_signatures):
         self._round = round

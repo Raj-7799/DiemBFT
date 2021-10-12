@@ -5,7 +5,7 @@
 # sender ← u; // Added automatically when constructed
 # signature ← sign u (ledger commit info); // Signed automatically when constructed
 
-from crypto import Keys as keys
+import Keys as keys
 
 class VoteMsg:
 
