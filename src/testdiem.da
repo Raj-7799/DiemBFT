@@ -4,10 +4,7 @@ from client import Client
 import diem_replica
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
-from diembft_logger import get_logger
 
-
-logger = get_logger("testdiem")
 
 class RunDiemBFT(process): 
   def setup(config:dict): 
@@ -21,7 +18,6 @@ class RunDiemBFT(process):
 
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
-    logger.debug("run ")
     
     replicas = new(diem_replica.Replica, num=self.replicas_required)
     clients = new(Client, num=self.clients)
@@ -50,7 +46,7 @@ class RunDiemBFT(process):
           self.replicas_required,
           self.delta,
           replicaToPvtKeys[i],
-          
+          clientInfo
       ))
 
     start(replicas)
