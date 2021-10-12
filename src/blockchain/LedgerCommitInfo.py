@@ -11,6 +11,7 @@ class LedgerCommitInfo:
     def __init__(self,commit_state_id=None,vote_info_hash=None):
         self.commit_state_id=commit_state_id
         self.vote_info_hash=vote_info_hash
+        self.schema = LedgerCommitInfoSchema()
     
     # @property
     # def commit_state_id(self):

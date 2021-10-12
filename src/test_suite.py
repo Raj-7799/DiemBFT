@@ -4,6 +4,7 @@ from crypto import Keys as keys
 from vote import VoteInfo
 from vote import VoteInfo as vi
 from vote.VoteInfo import VoteInfoSchema 
+from vote.VoteMsg import VoteMsg, VoteMsgSchema
 from blockchain import BlockTree as bt
 from blockchain import Ledger as ld
 from blockchain import Block as blk
@@ -20,7 +21,6 @@ class TestSuite:
 
 
     def create_nodes(self):
-
         blocks = list()
         genesis_voteInfo = vi.VoteInfo(id=0,round_no=0,parent_id=0,parent_round=0,exec_state_id=0)
         print("parent id ",genesis_voteInfo.parent_id)
@@ -68,9 +68,6 @@ class TestSuite:
         blocks.append(block3)
         return blocks
 
-
-
-
     def testLedger(self):
 
         l = ld.Ledger()
@@ -79,10 +76,6 @@ class TestSuite:
             l.speculate(prev_block_id=block.qc.vote_info.parent_id,block_id=block.id,txns=block.payload)
             l.commit(block.id)
         l.print_ledger()
-
-        
-
-
         
     def testPendingBlockTree(self):
         blocks=  self.create_nodes()
@@ -100,8 +93,6 @@ class TestSuite:
         for key in pbt.keys():
             print(key,pbt[key],key.id if key!="root" else key)
 
-
-
     def testBlockTree(self):
         blocks=  self.create_nodes()
         bt =  BlockTree(blocks[0].qc)
@@ -113,7 +104,6 @@ class TestSuite:
         print(block_generated.id,block_generated.round)
 
 
-
     def test_serializers(self):
         v = vi.VoteInfo(1, 2, 3, 4, 5)
         serialed_v = util.serialize(v, VoteInfoSchema())
@@ -121,20 +111,22 @@ class TestSuite:
         serialized_ledger = util.serialize(ledger, lci.LedgerCommitInfoSchema())
         va = util.deserialize(serialed_v, VoteInfoSchema())
         d = util.deserialize(serialized_ledger, lci.LedgerCommitInfoSchema())
-        print(type(d._vote_info_hash))
-        qc = Quorum.QC(v, ledger)
-        print(ledger.vote_info_hash)
+        high = Quorum.QC(v, ledger, None)
+        vmsg = VoteMsg(v, ledger, high, 1)
+        vmsgs = util.serialize(vmsg, VoteMsgSchema())
+        print("Vote message", vmsgs)
+        qc = Quorum.QC(v, ledger, [VoteMsg(v, ledger, high)])
         serialized_qc = util.serialize(qc, Quorum.QCSchema())
         print(serialized_qc)
-        # serialed_qc = util.serialize(qc, pass)
+        # serialed_qc = util.serialize(qc)
 
 
 test =  TestSuite()
 # test.testLedger()
-test.test_qc_serialize()
-test.testLedger()
-test.testPendingBlockTree()
-test.testBlockTree()
+test.test_serializers()
+# test.testLedger()
+# test.testPendingBlockTree()
+# test.testBlockTree()
     
 
 # b =  bt.BlockTree()
