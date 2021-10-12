@@ -6,6 +6,8 @@ from nacl.public import PrivateKey, PublicKey,SealedBox,Box
 from nacl.signing import SigningKey,VerifyKey
 from nacl.exceptions import BadSignatureError
 from nacl.encoding import HexEncoder
+import pickle
+
 
 
 def max_round_qc(current_qc,high_qc):
@@ -24,13 +26,18 @@ def deserialize(json, schema):
     return schema.loads(json)
 
 
-def sign_message(msg, pvt_key, pbc_key):    
-    msg= msg if msg is not None else " " 
-    msg=bytes(msg,"utf-8")        
-    signed_hex = pvt_key.sign(msg,encoder=HexEncoder)
+def sign_object(obj, pvt_key, pbc_key):
+    return sign_message(pickle.dumps(obj), pvt_key, pbc_key)
+
+def sign_message(pickled_msg, pvt_key, pbc_key):    
+    signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
     verify_key = pbc_key
     verify_key_hex = verify_key.encode(encoder=HexEncoder)        
     return [signed_hex,verify_key_hex]
+
+def check_authenticity(obj, signed_msg):
+    objIdentity = verify_message(signed_msg)
+    return pickle.dumps(obj) == objIdentity
 
 def verify_message(signed_msg):
     signed_hex, verify_key_hex=signed_msg
