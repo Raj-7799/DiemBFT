@@ -1,12 +1,11 @@
 import nacl.hash
 
-import blockchain as block
 
 
-from blockchain import Block as block
-from certificates.quorum import Quorum as qc
-from blockchain import Ledger as ld
-from util.Util import max_round_qc
+import Block as block
+import Quorum as qc
+import Ledger as ld
+from Util import max_round_qc
 
 class PendingBlockTree(dict):
 
