@@ -1,6 +1,6 @@
 #from Safety import Safety
 
-from Pacemaker import Pacemaker as PM
+import Pacemaker as PM
 
 def run():
     output("Running for first time")

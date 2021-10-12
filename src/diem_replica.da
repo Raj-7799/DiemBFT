@@ -3,7 +3,7 @@ import ProposalMsg
 
 from client_info import ClientInfo
 from replica_info import ReplicaInfo
-import client
+#import client
 import mempool
 #import Pacemaker as PM
 

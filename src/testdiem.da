@@ -1,9 +1,9 @@
-from crypto.GenerateKey import GenerateKey
-from crypto.Keys import Keys
-from client.client import Client
-from diem_core import diem_replica
-from diem_core.replica_info import ReplicaInfo
-from client.client_info import ClientInfo
+import GenerateKey
+import Keys
+from client import Client
+import diem_replica
+from replica_info import ReplicaInfo
+from client_info import ClientInfo
 
 class RunDiemBFT(process): 
   def setup(config:dict): 
