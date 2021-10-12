@@ -1,6 +1,3 @@
-from marshmallow import Schema, fields
-from marshmallow.decorators import post_load
-
 class VoteInfo:
 
     def __init__(self, id: int, round: int, parent_id: int, parent_round: int, exec_state_id: int):

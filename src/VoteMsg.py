@@ -1,10 +1,3 @@
-# VoteMsg
-# vote_info; // A VoteInfo record
-# ledger_commit_info; // Speculated ledger info
-# high_commit_qc; // QC to synchronize on committed blocks
-# sender ← u; // Added automatically when constructed
-# signature ← sign u (ledger commit info); // Signed automatically when constructed
-
 from nacl import utils
 from Keys import Keys as keys
 from LedgerCommitInfo import LedgerCommitInfo as ledgerCommitInfo
