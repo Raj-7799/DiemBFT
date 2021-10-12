@@ -63,11 +63,13 @@ class Pacemaker:
             self._stop_timer(self._current_round)
             self.local_timeout_round()  #  Bracha timeout
         if len(self._pending_timeouts[tmo_info.round]) == (2 * self._replica.fCount) + 1:
-            tc = Tc.TC()
-            tc.round = tmo_info.round
+            tmo_high_qc_rounds = []
+            tmo_signatures = []
             for _tmo_info in self._pending_timeouts[tmo_info.round]:
-                tc.tmo_high_qc_rounds.append(_tmo_info.high_qc.round)
-                tc.tmo_signatures.append(_tmo_info.signature)
+                tmo_high_qc_rounds.append(_tmo_info.high_qc.round)
+                tmo_signatures.append(_tmo_info.signature)
+            
+            tc = Tc.TC(tmo_info.round, tmo_high_qc_rounds, tmo_signatures)
             return tc
         return None
 
