@@ -31,21 +31,14 @@ class Replica(process):
         self.memPool = mempool.MemPool()
 
         genesis_qc ,genesis_block = self.create_genesis_object()
-        self.blockTree = bt.BlockTree(genesis_qc,genesis_block,self.fCount,self.replicaID)
-
+        self.blockTree = bt.BlockTree(self.fCount,self.replicaID)
         self.leaderElection = None
         self.paceMaker = None  #Pacemaker()
         self.safety = None
         #self.replica_logger=diem_logger
         
 
-    ## Creating genesis block for startup 
-    def create_genesis_object(self):
-        genesis_voteInfo = vi.VoteInfo(id=0,round_no=0,parent_id=0,parent_round=0,exec_state_id=0)
-        ledger_commit_info = lci.LedgerCommitInfo(commit_state_id=0,vote_info_hash=genesis_voteInfo)  
-        genesis_qc = qc.QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info)
-        genesis =  blk.Block(0,0,"genesis",genesis_qc)
-        return genesis_qc , genesis
+
 
 
     def get_replica_info(replicaID):

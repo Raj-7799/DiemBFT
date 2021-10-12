@@ -6,6 +6,10 @@ from nacl.public import PrivateKey, PublicKey,SealedBox,Box
 from nacl.signing import SigningKey,VerifyKey
 from nacl.exceptions import BadSignatureError
 from nacl.encoding import HexEncoder
+from VoteInfo import VoteInfo as vi
+from LedgerCommitInfo import LedgerCommitInfo as lci
+from Block import Block as block
+
 import pickle
 
 
@@ -44,3 +48,12 @@ def verify_message(signed_msg):
     except BadSignatureError:
         return None
 
+## Creating genesis block for startup 
+def create_genesis_object():
+    genesis_voteInfo = vi.VoteInfo(id=0,round_no=0,parent_id=0,parent_round=0,exec_state_id=0)
+    ledger_commit_info = lci.LedgerCommitInfo(commit_state_id=0,vote_info_hash=genesis_voteInfo)  
+    
+    genesis_qc = qc.QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info)        
+    genesis_block =  block.Block(0,0,"genesis",genesis_qc)
+    
+    return genesis_qc , genesis_block

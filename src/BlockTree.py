@@ -5,7 +5,7 @@ import nacl.hash
 import Block as block
 import Quorum as qc
 import Ledger as ld
-from Util import max_round_qc,hash
+from Util import max_round_qc,hash,create_genesis_object
 from diembft_logger import get_logger
 from collections import defaultdict
 logger = get_logger("blocktree")
@@ -16,8 +16,7 @@ class PendingBlockTree(dict):
     def __init__(self,genesis_block):
         logger.debug("PendingBlockTree START: init")
         super()
-        #self.block_list=dict()
-        # self.count=0
+
         self.add(genesis_block.id,genesis_block)
         logger.debug("PendingBlockTree END: init")
         
@@ -25,17 +24,11 @@ class PendingBlockTree(dict):
     
     def __setitem__(self, key, value):
         logger.debug("PendingBlockTree START: __setitem__",key)
-        # if self["last_node"] is not None:            
-        #     self[self["last_node"]]=value
-        #     self["last_node"]=value.id #block id to be used for next block insert
-
-        print("insert ",key,value)
-        # self.count+=1
+        
         if value in self:
             del self[value]            
         super().__setitem__(value,key)
-                
-        # print("length ",len(self),value,self.count)
+                        
         if len(self) == 1:     
             super().__setitem__("root",key)       
 
@@ -44,8 +37,9 @@ class PendingBlockTree(dict):
     
     def prune(self,id):        
         #use prev root to trace and delete the nodes that not child of id node or id nodes it self    
-        logger.debug("PendingBlockTree END: prune   {}".format(key))         
+        logger.debug("PendingBlockTree START: prune  ")         
         super().__setitem__("root",id)
+        logger.debug("PendingBlockTree EMD: prune  ")      
 
                      
     def add(self,prev_block_id,block):
@@ -53,10 +47,10 @@ class PendingBlockTree(dict):
 
 
 class BlockTree:
-    def __init__(self,genesis_qc,genesis_block,fCount,author):
-        # self._qc = qc.QC(1)
+    def __init__(self,fCount,author):        
         self._high_qc = qc # highest known QC
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
+        genesis_qc,genesis_block=create_genesis_object()
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)
         self._ledger = ld.Ledger(genesis_block)
@@ -112,7 +106,7 @@ class BlockTree:
         vote_idx = hash(vote.ledger_commit_info)
         self.pending_votes[vote_idx].add(vote.signature)
 
-        if len(self.pending_votes[vote_idx])== 3*self.fCount+1:            
+        if len(self.pending_votes[vote_idx])== 2*self.fCount+1:            
             self.qc = qc.QC(
                 vote_info=vote.vote_info,
                 ledger_commit_info=vote.ledger_commit_info,
@@ -128,12 +122,10 @@ class BlockTree:
                                     payload=txns,
                                     qc=self.high_qc                                    
                                 )
-                                
+
         return new_block
         
-    
-
-
+        ## Creating genesis block for startup 
 # compute_block=x.generate_block(1,2)
 # print(compute_block)
 
