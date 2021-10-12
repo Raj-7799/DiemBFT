@@ -1,6 +1,6 @@
 import Util
 
 class LedgerCommitInfo:
-    def __init__(self, commit_state_id, vote_info_hash):
+    def __init__(self, commit_state_id: str, vote_info_hash: str):
         self.commit_state_id = commit_state_id
-        self.vote_info_hash = Utils.hash(vote_info_hash)
+        self.vote_info_hash = Util.hash(vote_info_hash)
