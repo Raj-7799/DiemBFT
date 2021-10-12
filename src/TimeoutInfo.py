@@ -1,4 +1,3 @@
-from nacl import utils
 from Quorum import QC
 import Util
 
