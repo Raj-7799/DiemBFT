@@ -5,36 +5,41 @@ import nacl.hash
 import Block as block
 import Quorum as qc
 import Ledger as ld
-from Util import max_round_qc
+from Util import max_round_qc,hash,create_genesis_object
+from diembft_logger import get_logger
+from collections import defaultdict
+logger = get_logger("blocktree")
+
 
 class PendingBlockTree(dict):
 
-    def __init__(self):
+    def __init__(self,genesis_block):
+        logger.debug("PendingBlockTree START: init")
         super()
-        self.block_list=dict()
-        self.count=0
+
+        self.add(genesis_block.id,genesis_block)
+        logger.debug("PendingBlockTree END: init")
+        
         
     
     def __setitem__(self, key, value):
+        logger.debug("PendingBlockTree START: __setitem__",key)
         
-        # if self["last_node"] is not None:            
-        #     self[self["last_node"]]=value
-        #     self["last_node"]=value.id #block id to be used for next block insert
-
-        print("insert ",key,value)
-        self.count+=1
         if value in self:
             del self[value]            
         super().__setitem__(value,key)
-                
-        # print("length ",len(self),value,self.count)
+                        
         if len(self) == 1:     
-            super().__setitem__("root",key)            
+            super().__setitem__("root",key)       
+
+        logger.debug("PendingBlockTree END: __setitem__",key)     
 
     
     def prune(self,id):        
-        #use prev root to trace and delete the nodes that not child of id node or id nodes it self        
+        #use prev root to trace and delete the nodes that not child of id node or id nodes it self    
+        logger.debug("PendingBlockTree START: prune  ")         
         super().__setitem__("root",id)
+        logger.debug("PendingBlockTree EMD: prune  ")      
 
                      
     def add(self,prev_block_id,block):
@@ -42,13 +47,15 @@ class PendingBlockTree(dict):
 
 
 class BlockTree:
-    def __init__(self,qc=None,):
-        # self._qc = qc.QC(1)
+    def __init__(self,fCount,author):        
         self._high_qc = qc # highest known QC
-        self._pending_votes=None # collected votes per block indexed by their LedgerInfo hash
-        self._high_commit_qc=qc # highest QC that serves as a commit certificate        
-        self._pending_block_tree=PendingBlockTree()
-        self._ledger = ld.Ledger()
+        self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
+        genesis_qc,genesis_block=create_genesis_object()
+        self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
+        self._pending_block_tree=PendingBlockTree(genesis_block)
+        self._ledger = ld.Ledger(genesis_block)
+        self.fCount=fCount
+        self.author=author
 
 
     @property
@@ -97,9 +104,9 @@ class BlockTree:
     def process_vote(self,vote):
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
-        self.pending_votes[vote_idx].append(vote.signature)
+        self.pending_votes[vote_idx].add(vote.signature)
 
-        if len(self.pending_votes[vote_idx])== 4:            
+        if len(self.pending_votes[vote_idx])== 2*self.fCount+1:            
             self.qc = qc.QC(
                 vote_info=vote.vote_info,
                 ledger_commit_info=vote.ledger_commit_info,
@@ -108,18 +115,17 @@ class BlockTree:
             return self.qc
         return None
 
-    def generate_block(self,txns,current_round):
-        author=0
-        HASHER = nacl.hash.sha256
-        msg =  str.encode(str(author)+str(current_round)+str(self.high_qc.vote_info.id)+str(self.high_qc.signatures))
-        id = HASHER(msg, encoder=nacl.encoding.HexEncoder)
+    def generate_block(self,txns,current_round):        
+        new_block = block.Block(
+                                    author=self.author,
+                                    round=current_round,
+                                    payload=txns,
+                                    qc=self.high_qc                                    
+                                )
 
-        new_block = block.Block(author=author,round=current_round,payload=txns,qc=self.high_qc,id=id)
         return new_block
         
-    
-
-
+        ## Creating genesis block for startup 
 # compute_block=x.generate_block(1,2)
 # print(compute_block)
 

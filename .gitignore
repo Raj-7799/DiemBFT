@@ -18,3 +18,6 @@ config/*
 
 
 .idea
+
+*.log
+*.out
