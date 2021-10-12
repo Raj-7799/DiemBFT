@@ -2,38 +2,37 @@ import TimeoutMsg as timeoutmsg
 import TC as Tc
 import threading
 
+
 class Pacemaker:
-    def __init__(self, safety, blocktree, replica):  # delta and f can be taken from config
-        #output("instantiate pacemaker")
-        #output("Entered constructer")
+    def __init__(self, safety, blocktree, delta, fCount, replica_broadcast):
         self._safety = safety
         self._blocktree = blocktree
-        self._replica = replica
+        self._delta = delta
+        self._fCount = fCount
+        self._replica_broadcast = replica_broadcast
         self._current_round = 0
         self._last_round_tc = None
-        self._pending_timeouts = {}  #dict of
-        self._dict_of_timer = {}
+        self._pending_timeouts = {}  #dict of sets of pending timeouts for a round
+        self._dict_of_timer = {} # dict of timer for a round
 
 
     def get_round_timer(self):
-        return 4 * 1.0  #self.replica.tDelta
+        return 4 * float(int(self._delta)/1000) # Convert Millisecond to second
 
     def _on_timeout(self):
-        self.local_timeout_round
+        #self._replica_broadcast(None)
+        self.local_timeout_round()
 
     def _start_timer(self, round):
         self._dict_of_timer[round] = threading.Timer(self.get_round_timer(), self._on_timeout())
         self._dict_of_timer[round].start()
-        #output('Send local Timeout Message to self Replica')
-        self.local_timeout_round()  #send((""), to=self._replica)
 
     def _stop_timer(self, round):
-        #print(self._dict_of_timer.keys())
-        if round in self._dict_of_timer[round]:
+        if round in self._dict_of_timer:
             self._dict_of_timer[round].cancel()
 
     def start_timer(self, new_round):
-        #self._stop_timer(self._current_round)
+        self._stop_timer(self._current_round)
         self._current_round = new_round
         self._start_timer(round)
 
@@ -41,10 +40,9 @@ class Pacemaker:
         timeout_info = self._safety.make_timeout(self._current_round, self._blocktree.high_qc, self._last_round_tc)
         timeout_msg = timeoutmsg.TimeoutMsg()
         timeout_msg.tmo_info = timeout_info
+        timeout_msg.high_commit_qc = self._blocktree.high_qc
         timeout_msg.last_round_tc = timeout_info
-        #output("Broadcasting messages to replicas")
-        #for _, replicaInfo in self._replica.replicaInfos.items():
-            #send(("process_timeout_message", timeout_msg), to=replicaInfo.process)
+        self._replica_broadcast(timeout_msg)
 
     def _check_if_sender_pending(self, sender, tmo_info):
         for pending_tmo_info in self._pending_timeouts[tmo_info.round]:
@@ -58,10 +56,10 @@ class Pacemaker:
             return None
         if not self._check_if_sender_pending(tmo_info.sender, tmo_info):
             self._pending_timeouts[tmo_info.round].append(tmo_info)
-        if len(self._pending_timeouts[tmo_info.round]) == self._replica.fCount + 1:
+        if len(self._pending_timeouts[tmo_info.round]) == self._fCount + 1:
             self._stop_timer(self._current_round)
             self.local_timeout_round()  #  Bracha timeout
-        if len(self._pending_timeouts[tmo_info.round]) == (2 * self._replica.fCount) + 1:
+        if len(self._pending_timeouts[tmo_info.round]) == (2 * self._fCount) + 1:
             tmo_high_qc_rounds = []
             tmo_signatures = []
             for _tmo_info in self._pending_timeouts[tmo_info.round]:
@@ -76,12 +74,12 @@ class Pacemaker:
         if (tc is None) or (tc.round < self._current_round):
             return False
         self._last_round_tc = tc
-        self._start_timer(tc.round + 1)
+        self.start_timer(tc.round + 1)
         return True
 
     def advance_round_qc(self, qc):
         if qc.vote_info.round < self._current_round:
             return False
         self._last_round_tc = None
-        self._start_timer(qc.vote_info.round + 1)
+        self.start_timer(qc.vote_info.round + 1)
         return True
