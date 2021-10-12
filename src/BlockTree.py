@@ -121,18 +121,14 @@ class BlockTree:
             return self.qc
         return None
 
-    def generate_block(self,txns,current_round):
-                
-        msg =  str.encode(str(self.author)+str(current_round)+str(self.high_qc.vote_info.id)+str(self.high_qc.signature))
-        id = hash(msg)
-
+    def generate_block(self,txns,current_round):        
         new_block = block.Block(
                                     author=self.author,
                                     round=current_round,
                                     payload=txns,
-                                    qc=self.high_qc,
-                                    id=id
+                                    qc=self.high_qc                                    
                                 )
+                                
         return new_block
         
     
