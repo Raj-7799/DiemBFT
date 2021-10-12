@@ -9,14 +9,30 @@ class ProposalMsg ():
     def block(self):
         return self._block
 
+    @block.setter
+    def block(self, block):
+        self._block = block
+
     @property
     def last_round_tc(self):
         return self._last_round_tc
+
+    @last_round_tc.setter
+    def last_round_tc(self, last_round_tc):
+        self._last_round_tc = last_round_tc
 
     @property
     def high_commit_qc(self):
         return self._high_commit_qc
 
+    @high_commit_qc.setter
+    def high_commit_qc(self, high_commit_qc):
+        self._high_commit_qc = high_commit_qc
+
     @property
     def signature(self):
         return self._signature
+
+    @signature.setter
+    def signature(self, signature):
+        self._signature = signature

@@ -7,7 +7,7 @@ import os
 
 
 absolute_path=os.path.dirname(os.path.abspath(__file__))
-CONF_FILE_PATH=absolute_path+"/../../conf/"
+CONF_FILE_PATH=absolute_path+"/../conf/"
 
 class Keys:
     def __init__(self,idx):

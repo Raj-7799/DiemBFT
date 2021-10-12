@@ -8,7 +8,7 @@ from nacl.signing import SigningKey
 from nacl import encoding
  
 absolute_path=os.path.dirname(os.path.abspath(__file__))
-CONF_FILE_PATH=absolute_path+"/../../conf/"
+CONF_FILE_PATH=absolute_path+"/../conf/"
 
 class GenerateKey():
     def __init__(self,count):

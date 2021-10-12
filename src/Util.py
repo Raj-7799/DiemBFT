@@ -1,5 +1,5 @@
 
-from certificates.quorum import Quorum as qc
+import Quorum as qc
 import nacl.encoding
 import nacl.hash
 HASHER = nacl.hash.sha256

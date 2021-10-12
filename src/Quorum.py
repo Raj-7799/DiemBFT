@@ -1,9 +1,9 @@
 from marshmallow import fields
 from marshmallow.decorators import post_load
-from vote import VoteInfo
-from blockchain import LedgerCommitInfo
-from crypto import Keys as keys
-from util import Util
+import VoteInfo
+import LedgerCommitInfo
+import Keys as keys
+import Util
 
 class QC():
     def __init__(self,vote_info,ledger_commit_info,votes=None):
@@ -26,6 +26,9 @@ class QC():
     # def vote_info(self):
     #     return self._vote_info
     
+    # @vote_info.setter
+    # def vote_info(self, vote_info):
+    #     self._vote_info = vote_info
 
     # @property
     # def signatures(self):
