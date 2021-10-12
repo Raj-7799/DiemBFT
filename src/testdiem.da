@@ -1,5 +1,5 @@
-import GenerateKey
-import Keys
+from GenerateKey import GenerateKey
+from Keys import Keys
 from client import Client
 import diem_replica
 from replica_info import ReplicaInfo

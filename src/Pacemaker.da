@@ -57,7 +57,7 @@ class Pacemaker:
         tmo_info = tmo.tmo_info
         if tmo_info.round < self._current_round:
             return None
-        if not _check_if_sender_pending(tmo_info.sender, tmo_info):
+        if not self._check_if_sender_pending(tmo_info.sender, tmo_info):
             self._pending_timeouts[tmo_info.round].append(tmo_info)
         if len(self._pending_timeouts[tmo_info.round]) == self._replica.fCount + 1:
             self._stop_timer(self._current_round)
