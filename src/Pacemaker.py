@@ -4,8 +4,6 @@ import threading
 
 class Pacemaker:
     def __init__(self, safety, blocktree, replica):  # delta and f can be taken from config
-        #output("instantiate pacemaker")
-        #output("Entered constructer")
         self._safety = safety
         self._blocktree = blocktree
         self._replica = replica

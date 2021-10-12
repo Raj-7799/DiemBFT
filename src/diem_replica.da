@@ -3,6 +3,7 @@ import BlockTree
 from client_info import ClientInfo
 import mempool
 from replica_info import ReplicaInfo
+import Pacemaker
 
 class Replica(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]"):
@@ -16,7 +17,7 @@ class Replica(process):
         self.memPool = mempool.MemPool()
 
         self.leaderElection = None
-        self.paceMaker = None  #Pacemaker()
+        self.paceMaker = Pacemaker.Pacemaker()
         self.safety = None
         self.blockTree = BlockTree.BlockTree(self.fCount,self.replicaID, self.privateKey, get_replica_public_key(self.replicaID))
 
