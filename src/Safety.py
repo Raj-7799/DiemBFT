@@ -4,15 +4,15 @@ import TimeoutInfo as Timeoutinfo
 
 class Safety():
 
-    def __init__(self, ledger, blocktree, private_key, public_keys, highest_vote_round, highest_qc_round, sender, pvt_key, pbc_key):
-        self.ledger = ledger
+    def __init__(self, blocktree: bt.BlockTree, public_keys, sender, pbc_key):
         self.blocktree = blocktree
-        self.private_key = private_key
+        self.ledger = self.blocktree._ledger
+        self.private_key = self.blocktree.pvt_key
         self.public_keys = public_keys
-        self.highest_vote_round = highest_vote_round
-        self.highest_qc_round = highest_qc_round
+        self.highest_vote_round = 0
+        self.highest_qc_round = 0
         self.sender = sender
-        self.pvt_key = pvt_key
+        self.pvt_key = self.private_key
         self.pbc_key = pbc_key
 
     def _increase_highest_vote_round(self, roundNo):
