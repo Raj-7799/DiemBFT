@@ -25,14 +25,17 @@ class Pacemaker:
         self.local_timeout_round()
 
     def _start_timer(self, roundNo):
+        print("Starting new timer for round ", roundNo)
         self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout())
         self.dict_of_timer[roundNo].start()
+        print("Starting new timer for round ends ", roundNo)
 
     def _stop_timer(self, roundNo):
         if roundNo in self.dict_of_timer:
             self.dict_of_timer[roundNo].cancel()
 
     def start_timer(self, new_round):
+        print("Starting timer for round ", new_round)
         self._stop_timer(self.current_round)
         self.current_round = new_round
         self._start_timer(self.current_round)
