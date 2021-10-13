@@ -22,15 +22,20 @@ class Replica(process):
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout)
         #self.paceMaker.start_timer(0);
 
+    def broadcast_helper(method, message):
+        for _, replicaInfo in self.replicaInfos.items():
+            send((method, message), to=replicaInfo.process)
+
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
             if replicaInfo.replicaID == replicaID:
                 return replicaInfo
 
     def pacemaker_broadcast_timeout(tmo_message):
-        output("Pacemaker of {} broadcasting timeout!", self.replicaID)
-        for _, replicaInfo in self.replicaInfos.items():
-            send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
+        output("Pacemaker of {} broadcasting timeout!".format(self.replicaID))
+        self.broadcast_helper("process_timeout_message", "tmo_message")
+        #for _, replicaInfo in self.replicaInfos.items():
+            #send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
 
     def get_replica_public_key(replicaID):
         replicaInfo = get_replica_info(replicaID)

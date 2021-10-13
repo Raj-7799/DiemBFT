@@ -1,6 +1,7 @@
 import TimeoutMsg as timeoutmsg
 import TC as Tc
 import threading
+from collections import defaultdict
 
 
 class Pacemaker:
@@ -12,7 +13,7 @@ class Pacemaker:
         self.replica_broadcast = replica_broadcast
         self.current_round = 0
         self.last_round_tc = None
-        self.pending_timeouts = {}  #dict of sets of pending timeouts for a round
+        self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
         self.dict_of_timer = {} # dict of timer for a round
 
 
@@ -40,8 +41,8 @@ class Pacemaker:
         timeout_info = self.safety.make_timeout(self.current_round, self.blocktree.high_qc, self.last_round_tc)
         timeout_msg = timeoutmsg.TimeoutMsg()
         timeout_msg.tmo_info = timeout_info
+        timeout_msg.last_round_tc = self.last_round_tc
         timeout_msg.high_commit_qc = self.blocktree.high_qc
-        timeout_msg.last_round_tc = timeout_info
         self.replica_broadcast(timeout_msg)
 
     def _check_if_sender_pending(self, sender, tmo_info):
@@ -55,14 +56,14 @@ class Pacemaker:
         if tmo_info.roundNo < self.current_round:
             return None
         if not self._check_if_sender_pending(tmo_info.sender, tmo_info):
-            self.pending_timeouts[tmo_info.roundNo].append(tmo_info)
+            self.pending_timeouts[tmo_info.roundNo].add(tmo_info)
         if len(self.pending_timeouts[tmo_info.roundNo]) == self.fCount + 1:
             self._stop_timer(self.current_round)
             self.local_timeout_round()  #  Bracha timeout
         if len(self.pending_timeouts[tmo_info.roundNo]) == (2 * self.fCount) + 1:
             tmo_high_qc_rounds = []
             tmo_signatures = []
-            for _tmo_info in self.pending_timeouts[tmo_info.roundNo]:
+            for _tmo_info in list(self.pending_timeouts[tmo_info.roundNo]):
                 tmo_high_qc_rounds.append(_tmo_info.high_qc.roundNo)
                 tmo_signatures.append(_tmo_info.signature)
             
