@@ -28,7 +28,7 @@ class Replica(process):
                 return replicaInfo
 
     def pacemaker_broadcast_timeout(tmo_message):
-        output("Pacemaker broadcasting timeout lol!")
+        output("Pacemaker of {} broadcasting timeout!", self.replicaID)
         for _, replicaInfo in self.replicaInfos.items():
             send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
 
