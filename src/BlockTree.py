@@ -163,7 +163,7 @@ class BlockTree:
     
 
     
-    def process_vote(self,vote):
+    def process_vote(self, vote):
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
         self.pending_votes[vote_idx].add(vote.signature)

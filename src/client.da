@@ -14,9 +14,11 @@ class Client(process):
     output("Yo running client!!!")
     output("Broadcasting messages to replicas")
     logger.debug("client START: run ")
-    for _, replicaInfo in self.replicaInfos.items():
-      send(("request", "abcd"), to=replicaInfo.process)
     
+    for i in ["abcd", "cdef", "xyzw", "ghfg"]:
+      for _, replicaInfo in self.replicaInfos.items():
+        send(("request", i), to=replicaInfo.process)
+      
     await(self.nReq == 0)
     logger.debug("client END: run ")
 
