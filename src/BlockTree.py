@@ -37,6 +37,13 @@ class QC():
         self.signatures         = votes
         self.author             = author
         self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
+    
+    def get_signers(self):
+        signers = []
+        for voter in self.signatures:
+            signers.append(voter.sender)
+        
+        return signers
 
 class VoteMsg:
     def __init__(self, vote_info: VoteInfo, ledger_commit_info: LedgerCommitInfo, high_commit_qc: QC, sender: int, pvt_key, pbc_key):
