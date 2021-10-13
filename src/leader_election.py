@@ -2,12 +2,13 @@ from collections import OrderedDict
 import random
 
 class LeaderElection:
-    def __init__(self, f, replica):
-        self.validators = [ r for r in replica.replicaInfos]
+    def __init__(self, f, paceMaker, ledger, validators):
+        self.validators = validators
         self.window_size = f + 1
         self.exclude_size = f + 1
         self.reputation_leaders = {}
-        self.replica = replica
+        self.paceMaker = paceMaker
+        self.ledger = ledger
 
     def elect_reputation_leaders(self, qc):
         active_validators = OrderedDict()
@@ -16,7 +17,7 @@ class LeaderElection:
         i = 0
 
         while i < self.window_size or len(last_authors) < self.exclude_size:
-            current_block = self.replica.ledger.committed_block(current_qc.vote_info.parent_id)
+            current_block = self.ledger.committed_block(current_qc.vote_info.parent_id)
             block_author = current_block.author
             
             if i < self.window_size:
@@ -47,7 +48,7 @@ class LeaderElection:
     def update_leaders(self, qc):
         extended_round = qc.vote_info.parent_round
         qc_round = qc.vote_info.roundNo
-        current_round = self.replica.paceMaker.current_round
+        current_round = self.paceMaker.current_round
 
         if extended_round + 1 == qc_round and qc_round + 1 == current_round:
             elected_leader = self.elect_reputation_leaders(qc)

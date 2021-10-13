@@ -69,7 +69,7 @@ def main():
   configs = [
     {
       'faultyReplicas': 1,    # number of replicas which can go faulty
-      'timeoutDelta'  : 500,  # milliseconds
+      'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
       'requests'      : 4,
       'clientTimeout' : 5000,

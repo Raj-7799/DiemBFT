@@ -61,9 +61,9 @@ class VoteMsg:
 
 
 class Block:
-    def __init__(self, author: int, round: int, payload: str, qc: QC, pvt_key, pbc_key):
+    def __init__(self, author: int, roundNo: int, payload: str, qc: QC, pvt_key, pbc_key):
         self.author=author
-        self.roundNo=round
+        self.roundNo=roundNo
         self.payload=payload
         self.qc = qc 
         self.id = Util.sign_object(self.get_block_identity_object(), pvt_key, pbc_key)
@@ -163,7 +163,7 @@ class BlockTree:
     
 
     
-    def process_vote(self,vote):
+    def process_vote(self, vote):
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
         self.pending_votes[vote_idx].add(vote.signature)
