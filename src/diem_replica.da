@@ -3,8 +3,7 @@ import BlockTree
 from client_info import ClientInfo
 import mempool
 from replica_info import ReplicaInfo
-import Pacemaker
-import TimeoutInfo
+import Pacemaker as PM
 import Safety as sf
 
 class Replica(process):
@@ -22,14 +21,22 @@ class Replica(process):
         self.blockTree = BlockTree.BlockTree(self.fCount,self.replicaID, self.privateKey, get_replica_public_key(self.replicaID))
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID, self.get_replica_public_key(self.replicaID))
         
-        self.paceMaker = Pacemaker.Pacemaker(self.safety, self.blockTree, self.fCount)
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, broadcast_helper)
 
-        
+    def broadcast_helper(method, message):
+        for _, replicaInfo in self.replicaInfos.items():
+            send((method, message), to=replicaInfo.process)
+    
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
             if replicaInfo.replicaID == replicaID:
                 return replicaInfo
-    
+
+    def pacemaker_broadcast_timeout(tmo_message):
+        output("Pacemaker of {} broadcasting timeout!".format(self.replicaID))
+        self.broadcast_helper("process_timeout_message", "tmo_message")
+        #for _, replicaInfo in self.replicaInfos.items():
+            #send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
 
     def get_replica_public_key(replicaID):
         replicaInfo = get_replica_info(replicaID)

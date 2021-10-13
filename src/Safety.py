@@ -1,5 +1,7 @@
 import BlockTree as bt
 import TimeoutInfo as Timeoutinfo
+import Ledger as Ledger
+import BlockTree as Blocktree
 
 
 class Safety():
@@ -25,6 +27,7 @@ class Safety():
         return (roundNo + 1) == block_round
 
     def _safe_to_extend(self, block_round, qc_round, tc):
+        #max_tmo_high_qc = max()
         return self._consecutive(block_round, tc.round) and (qc_round >= max(tc.tmo_high_qc_rounds))
 
     def _safe_to_vote(self, block_round, qc_round, tc):
