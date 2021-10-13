@@ -23,7 +23,7 @@ class Replica(process):
 
         self.blockTree = bt.BlockTree(self.fCount,self.replicaID, self.privateKey, get_replica_public_key(self.replicaID))
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
-        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, broadcast_helper)
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids())
 
     def broadcast_helper(method, message):
@@ -43,9 +43,7 @@ class Replica(process):
 
     def pacemaker_broadcast_timeout(tmo_message):
         output("Pacemaker of {} broadcasting timeout!".format(self.replicaID))
-        self.broadcast_helper("process_timeout_message", "tmo_message")
-        #for _, replicaInfo in self.replicaInfos.items():
-            #send(("process_timeout_message", "tmo_message"), to=replicaInfo.process)
+        self.broadcast_helper("process_timeout_msg", tmo_message)
 
     def get_replica_public_key(replicaID):
         replicaInfo = get_replica_info(replicaID)
@@ -100,8 +98,7 @@ class Replica(process):
         output("Advancing round tc")
         self.paceMaker.advance_round_tc(P.last_round_tc)
         
-
-        current_round = self.paceMaker.currentRound
+        current_round = self.paceMaker.current_round
         current_leader = self.leaderElection.get_leader(current_round)
 
         sourceReplica = self.replicaInfos[source]
