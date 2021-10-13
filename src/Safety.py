@@ -2,28 +2,31 @@ import LedgerCommitInfo as LedgerCommitInfo
 import VoteInfo as VI
 import VoteMsg as VoteMsg
 import TimeoutInfo as Timeoutinfo
+import Ledger as Ledger
+import BlockTree as Blocktree
 
 
 class Safety():
 
-    def __init__(self, ledger, blocktree):
+    def __init__(self, ledger: Ledger, blocktree: Blocktree, private_key, public_keys):
         self._ledger = ledger
         self._blocktree = blocktree
-        self._private_key = None
-        self._public_keys = None
-        self._highest_vote_round = None
-        self._highest_qc_round = None
+        self._private_key = private_key
+        self._public_keys = public_keys #list of public keys
+        self._highest_vote_round = 0
+        self._highest_qc_round = 0
 
-    def _increase_highest_vote_round(self, round):
-        self._highest_vote_round = max(round, self._highest_vote_round)
+    def _increase_highest_vote_round(self, roundNo):
+        self._highest_vote_round = max(roundNo, self._highest_vote_round)
 
     def _update_highest_qc_round(self, qc_round):
         self._highest_qc_round = max(qc_round, self._highest_qc_round)
 
-    def _consecutive(self, block_round, round):
-        return (round + 1) == block_round
+    def _consecutive(self, block_round, roundNo):
+        return (roundNo + 1) == block_round
 
     def _safe_to_extend(self, block_round, qc_round, tc):
+        #max_tmo_high_qc = max()
         return self._consecutive(block_round, tc.round) and (qc_round >= max(tc.tmo_high_qc_rounds))
 
     def _safe_to_vote(self, block_round, qc_round, tc):
