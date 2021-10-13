@@ -19,7 +19,7 @@ class Replica(process):
 
         self.leaderElection = None
         self.blockTree = BlockTree.BlockTree(self.fCount,self.replicaID, self.privateKey, get_replica_public_key(self.replicaID))
-        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID, self.get_replica_public_key(self.replicaID))
+        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
         
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, broadcast_helper)
 
