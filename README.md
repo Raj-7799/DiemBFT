@@ -15,3 +15,5 @@ Implementation of DiemBFT
 - ``` pip install bz2file ```
 - ``` pip install plyvel ```
 
+### Command to run code
+- ``` python -m da --message-buffer-size 102400 testdiem.da &> out.log  ```
