@@ -110,7 +110,7 @@ class TestSuite:
             bt.process_qc(block.qc)
         
         block_generated =  bt.generate_block("cmd2",2)
-        print(block_generated.id,block_generated.round)
+        print(block_generated.id,block_generated.roundNo)
 
 
 

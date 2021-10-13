@@ -9,8 +9,8 @@ import pickle
 
 
 def max_round_qc(current_qc,high_qc):
-    qc_round =  current_qc.vote_info.round
-    high_qc_round =  high_qc.vote_info.round
+    qc_round =  current_qc.vote_info.roundNo
+    high_qc_round =  high_qc.vote_info.roundNo
     if qc_round >  high_qc_round:
         return current_qc
     else:

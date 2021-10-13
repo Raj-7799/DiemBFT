@@ -58,7 +58,7 @@ class Replica(process):
     def process_certificate(qc):
         self.blockTree.process_qc(qc)
         self.leaderElection.update_leaders(qc)
-        self.paceMaker.advance_round(qc.vote_info.round)
+        self.paceMaker.advance_round(qc.vote_info.roundNo)
 
     def process_next_round_event(last_tc):
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
@@ -88,7 +88,7 @@ class Replica(process):
 
         sourceReplica = self.replicaInfos[source]
         
-        if P.block.round != current_round or sourceReplica.replicaID != current_leader or P.block.author != sourceReplica.replicaID:
+        if P.block.roundNo != current_round or sourceReplica.replicaID != current_leader or P.block.author != sourceReplica.replicaID:
             return
         
         blockTree.execute_and_insert(P)

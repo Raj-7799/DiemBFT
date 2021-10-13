@@ -28,7 +28,7 @@ class Safety():
 
     def _safe_to_extend(self, block_round, qc_round, tc):
         #max_tmo_high_qc = max()
-        return self._consecutive(block_round, tc.round) and (qc_round >= max(tc.tmo_high_qc_rounds))
+        return self._consecutive(block_round, tc.roundNo) and (qc_round >= max(tc.tmo_high_qc_rounds))
 
     def _safe_to_vote(self, block_round, qc_round, tc):
         if (block_round <= max(self.highest_vote_round, qc_round)):
@@ -38,10 +38,10 @@ class Safety():
     def _safe_to_timeout(self, roundNo, qc_round, tc):
         if (qc_round < self.highest_qc_round) or (roundNo <= max((self.highest_vote_round - 1), qc_round)):
             return False
-        return self._consecutive(roundNo, qc_round) or self._consecutive(roundNo, tc.round)
+        return self._consecutive(roundNo, qc_round) or self._consecutive(roundNo, tc.roundNo)
 
     def _commit_state_id_candidate(self, block_round, qc):
-        if self._consecutive(block_round, qc.vote_info.round):
+        if self._consecutive(block_round, qc.vote_info.roundNo):
             return self.ledger.pending_state(qc.id)
         else:
             return None
