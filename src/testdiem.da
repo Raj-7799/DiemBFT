@@ -4,8 +4,9 @@ from client import Client
 import diem_replica
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
-
-
+import sys
+sys.path.insert(0,'/home/madara/sbu/cse535/distalgo/')
+print(sys.path)
 class RunDiemBFT(process): 
   def setup(config:dict): 
       self.faulty_replicas   = config['faultyReplicas']
@@ -21,7 +22,7 @@ class RunDiemBFT(process):
     
     replicas = new(diem_replica.Replica, num=self.replicas_required)
     clients = new(Client, num=self.clients)
-
+    output("Generating keys ")
     GenerateKey(self.replicas_required + 1).write_config()
     KeySets = [ Keys(i) for i in range(self.replicas_required + 1)]
 
@@ -65,6 +66,7 @@ class RunDiemBFT(process):
 def main():
   config(clock='Lamport')
   config(channel='reliable')
+  
 
   configs = [
     {

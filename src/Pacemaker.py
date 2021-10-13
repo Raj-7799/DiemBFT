@@ -74,10 +74,12 @@ class Pacemaker:
         return None
 
     def advance_round_tc(self, tc):
+        print("Pacemaker.advance_round_tc start ")
         if (tc is None) or (tc.roundNo < self.current_round):
             return False
         self.last_round_tc = tc
         self.start_timer(tc.roundNo + 1)
+        print("Pacemaker.advance_round_tc start ")
         return True
 
     def advance_round_qc(self, qc):
