@@ -3,10 +3,10 @@ import TC as Tc
 import threading
 
 class Pacemaker:
-    def __init__(self, safety, blocktree, replica):  # delta and f can be taken from config
+    def __init__(self, safety, blocktree, fCount):  # delta and f can be taken from config
         self._safety = safety
         self._blocktree = blocktree
-        self._replica = replica
+        self.fCount = fCount
         self._current_round = 0
         self._last_round_tc = None
         self._pending_timeouts = {}  #dict of
@@ -23,7 +23,7 @@ class Pacemaker:
         self._dict_of_timer[round] = threading.Timer(self.get_round_timer(), self._on_timeout())
         self._dict_of_timer[round].start()
         #output('Send local Timeout Message to self Replica')
-        self.local_timeout_round()  #send((""), to=self._replica)
+        self.local_timeout_round()
 
     def _stop_timer(self, round):
         #print(self._dict_of_timer.keys())
@@ -40,9 +40,6 @@ class Pacemaker:
         timeout_msg = timeoutmsg.TimeoutMsg()
         timeout_msg.tmo_info = timeout_info
         timeout_msg.last_round_tc = timeout_info
-        #output("Broadcasting messages to replicas")
-        #for _, replicaInfo in self._replica.replicaInfos.items():
-            #send(("process_timeout_message", timeout_msg), to=replicaInfo.process)
 
     def _check_if_sender_pending(self, sender, tmo_info):
         for pending_tmo_info in self._pending_timeouts[tmo_info.round]:
@@ -56,10 +53,10 @@ class Pacemaker:
             return None
         if not self._check_if_sender_pending(tmo_info.sender, tmo_info):
             self._pending_timeouts[tmo_info.round].append(tmo_info)
-        if len(self._pending_timeouts[tmo_info.round]) == self._replica.fCount + 1:
+        if len(self._pending_timeouts[tmo_info.round]) == self.fCount + 1:
             self._stop_timer(self._current_round)
             self.local_timeout_round()  #  Bracha timeout
-        if len(self._pending_timeouts[tmo_info.round]) == (2 * self._replica.fCount) + 1:
+        if len(self._pending_timeouts[tmo_info.round]) == (2 * self.fCount) + 1:
             tmo_high_qc_rounds = []
             tmo_signatures = []
             for _tmo_info in self._pending_timeouts[tmo_info.round]:
