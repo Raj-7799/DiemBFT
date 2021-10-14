@@ -4,6 +4,14 @@ import Ledger as Ledger
 import BlockTree as Blocktree
 
 
+
+import os
+from diembft_logger import get_logger
+
+diem_logger = get_logger(os.path.basename(__file__))
+
+
+
 class Safety():
 
     def __init__(self, blocktree: bt.BlockTree, public_keys, sender):

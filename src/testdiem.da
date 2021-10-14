@@ -5,8 +5,15 @@ import diem_replica
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
 import sys
-sys.path.insert(0,'/home/madara/sbu/cse535/distalgo/')
+
 print(sys.path)
+
+
+import os
+from diembft_logger import get_logger
+
+diem_logger = get_logger(os.path.basename(__file__))
+
 class RunDiemBFT(process): 
   def setup(config:dict): 
       self.faulty_replicas   = config['faultyReplicas']

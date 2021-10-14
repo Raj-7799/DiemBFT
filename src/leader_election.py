@@ -1,6 +1,12 @@
 from collections import OrderedDict
 import random
 
+import os
+from diembft_logger import get_logger
+
+diem_logger = get_logger(os.path.basename(__file__))
+
+
 class LeaderElection:
     def __init__(self, f, paceMaker, ledger, validators):
         self.validators = validators

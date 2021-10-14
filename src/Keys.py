@@ -6,6 +6,14 @@ import os
 
 
 
+import os
+from diembft_logger import get_logger
+
+diem_logger = get_logger(os.path.basename(__file__))
+
+
+
+
 absolute_path=os.path.dirname(os.path.abspath(__file__))
 CONF_FILE_PATH=absolute_path+"/../conf/"
 
