@@ -2,7 +2,10 @@ import TimeoutMsg as timeoutmsg
 import TC as Tc
 import threading
 from collections import defaultdict
+from diembft_logger import get_logger
+import os
 
+diem_logger = get_logger(os.path.basename(__file__))
 
 class Pacemaker:
     def __init__(self, safety, blocktree, delta, fCount, replica_broadcast):
