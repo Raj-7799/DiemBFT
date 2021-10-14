@@ -69,7 +69,7 @@ class Replica(process):
 
 
     def process_certificate(qc):
-        logger.debug("START: process_certificate {}".format(self.replicaID))
+        diem_logger.debug("START: process_certificate {}".format(self.replicaID))
         output("BlockTree processing qc {}".format(self.replicaID))
         self.blockTree.process_qc(qc)
         output("Leader Election updating leaders {}".format(self.replicaID))
@@ -77,7 +77,7 @@ class Replica(process):
         output("PaceMaker advancing round qc {}".format(self.replicaID))
         self.paceMaker.advance_round_qc(qc)
         output("PaceMaker advancing round qc ends {}".format(self.replicaID))
-        logger.debug("END: process_certificate {}".format(self.replicaID))
+        diem_logger.debug("END: process_certificate {}".format(self.replicaID))
 
     def process_next_round_event(last_tc):
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):

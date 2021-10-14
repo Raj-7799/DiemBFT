@@ -22,7 +22,7 @@ class Client(process):
       for _, replicaInfo in self.replicaInfos.items():
         send(("request", i), to=replicaInfo.process)
       
-    diem_logger(self.nReq == 0)
+    await(self.nReq == 0)
     diem_logger.debug("client END: run ")
 
 
