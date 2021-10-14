@@ -43,7 +43,9 @@ class Safety():
 
     def _commit_state_id_candidate(self, block_round, qc):
         if self._consecutive(block_round, qc.vote_info.roundNo):
-            return self.ledger.pending_state(qc.id)
+            #In Paper-> Ledger.pending state(qc.id)
+            # Qc has not attribute as id
+            return self.ledger.pending_state(qc.vote_info.parent_id)
         else:
             return None
     
@@ -56,12 +58,14 @@ class Safety():
     def make_vote(self, b, last_tc):
         qc_round = b.qc.vote_info.roundNo
         if self._validate_signatures(b, last_tc) and self._safe_to_vote(b.roundNo, qc_round, last_tc):
+            print("Signature good ")
             self._update_highest_qc_round(qc_round)
             self._increase_highest_vote_round(b.roundNo)
-            vote_info = bt.VoteInfo(b.id, b.roundNo, b.qc.vote_info.id, self.ledger.pending_state(b.id))
+
+            vote_info = bt.VoteInfo(id=b.id, roundNo=b.roundNo, parent_id=b.qc.vote_info.id, parent_round=b.qc.vote_info.roundNo,exec_state_id=self.ledger.pending_state(b.id))
             ledger_commit_info = bt.LedgerCommitInfo(self._commit_state_id_candidate(b.roundNo, b.qc), vote_info)
 
-            return bt.VoteMsg(vote_info, ledger_commit_info, self.blocktree.high_commit_qc)
+            return bt.VoteMsg(vote_info, ledger_commit_info, self.blocktree.high_commit_qc,self.sender,self.pvt_key,self.pbc_key)
         
         return None
 

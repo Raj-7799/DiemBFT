@@ -4,7 +4,8 @@ from nacl.public import PrivateKey, PublicKey,SealedBox,Box
 from nacl.signing import SigningKey,VerifyKey
 from nacl.exceptions import BadSignatureError
 from nacl.encoding import HexEncoder
-
+import bz2
+import sys
 import pickle
 
 
@@ -22,6 +23,11 @@ def hash(object):
     return digest
 
 def sign_object(obj, pvt_key, pbc_key):
+    print("object ",obj)
+    seralized_msg =  pickle.dumps(obj)
+    print("size of seralized message {} {} {}".format(sys.getsizeof(seralized_msg),sys.getsizeof(obj),obj))
+    compressed_msg = bz2.compress(seralized_msg,compresslevel=5)
+    print("size of compressed message {} ".format(sys.getsizeof(compressed_msg)))
     return sign_message(pickle.dumps(obj), pvt_key, pbc_key)
 
 def sign_message(pickled_msg, pvt_key, pbc_key):    
