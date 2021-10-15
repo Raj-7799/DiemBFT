@@ -39,9 +39,9 @@ class QC():
         self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
     
     def get_signers(self):
-        signers = []
+        signers = ()
         for voter in self.signatures:
-            signers.append(voter.sender)
+            signers.add(voter.sender)
         
         return signers
 
@@ -51,13 +51,13 @@ class VoteMsg:
         self.ledger_commit_info = ledger_commit_info
         self.high_commit_qc = high_commit_qc
         self.sender = sender
-        self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)#key.sign_message(self._ledger_commit_info) 
+        self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
         
     def verify_self_signature(self):
         return Util.check_authenticity(self.form_signature_object(), self.signature)
 
     def form_signature_object(self):
-        return [self.ledger_commit_info]
+        return self.ledger_commit_info
 
 
 class Block:
@@ -179,13 +179,13 @@ class BlockTree:
 
     def generate_block(self,txns,current_round):        
         new_block = Block(
-                                    author=self.author,
-                                    roundNo=current_round,
-                                    payload=txns,
-                                    qc=self.high_qc,
-                                    pvt_key=self.pvt_key,
-                                    pbc_key=self.pbc_key
-                                )
+                            author=self.author,
+                            roundNo=current_round,
+                            payload=txns,
+                            qc=self.high_qc,
+                            pvt_key=self.pvt_key,
+                            pbc_key=self.pbc_key
+                        )
 
         return new_block
         

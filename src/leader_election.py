@@ -60,7 +60,6 @@ class LeaderElection:
                 self.reputation_leaders[current_round + 1] = elected_leader
     
     def get_leader(self, roundNo):
-        print("LeaderElection.get_leader start")
         if roundNo in self.reputation_leaders:
             return self.reputation_leaders[roundNo]
         

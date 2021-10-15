@@ -58,7 +58,6 @@ class Safety():
     def make_vote(self, b, last_tc):
         qc_round = b.qc.vote_info.roundNo
         if self._validate_signatures(b, last_tc) and self._safe_to_vote(b.roundNo, qc_round, last_tc):
-            print("Signature good ")
             self._update_highest_qc_round(qc_round)
             self._increase_highest_vote_round(b.roundNo)
 

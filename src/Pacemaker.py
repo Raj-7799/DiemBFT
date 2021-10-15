@@ -26,17 +26,14 @@ class Pacemaker:
         self.local_timeout_round()
 
     def _start_timer(self, roundNo):
-        print("Starting new timer for round ", roundNo)
         self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout)
         self.dict_of_timer[roundNo].start()
-        print("Starting new timer for round ends ", roundNo)
 
     def _stop_timer(self, roundNo):
         if roundNo in self.dict_of_timer:
             self.dict_of_timer[roundNo].cancel()
 
     def start_timer(self, new_round):
-        print("Starting timer for round ", new_round)
         self._stop_timer(self.current_round)
         self.current_round = new_round
         self._start_timer(self.current_round)
@@ -53,7 +50,6 @@ class Pacemaker:
         return False
 
     def process_remote_timeout(self, tmo):
-        print("Processing remote timeout")
         tmo_info = tmo.tmo_info
         if tmo_info.roundNo < self.current_round:
             return None
@@ -74,12 +70,10 @@ class Pacemaker:
         return None
 
     def advance_round_tc(self, tc):
-        print("Pacemaker.advance_round_tc start ")
         if (tc is None) or (tc.roundNo < self.current_round):
             return False
         self.last_round_tc = tc
         self.start_timer(tc.roundNo + 1)
-        print("Pacemaker.advance_round_tc start ")
         return True
 
     def advance_round_qc(self, qc):

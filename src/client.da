@@ -11,11 +11,9 @@ class Client(process):
     self.private_key = private_key
   
   def run():
-    output("Yo running client!!!")
-    output("Broadcasting messages to replicas")
     logger.debug("client START: run ")
     
-    for i in ["abcd", "cdef", "xyzw", "ghfg"]:
+    for i in ["abcd"]:
       for _, replicaInfo in self.replicaInfos.items():
         send(("request", i), to=replicaInfo.process)
       
