@@ -73,10 +73,7 @@ class LeaderElection:
 
     
     def get_leader(self, roundNo):
-<<<<<<< HEAD
-=======
         diem_logger.info("[replicaID {}] START roundNo {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.paceMaker.current_round))
->>>>>>> bfeac231e060c57889b2cbd98af3b47ec26b98e7
         if roundNo in self.reputation_leaders:
             diem_logger.debug("[replicaID {}]  repuation_leaders for roundNo {} is {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.reputation_leaders[roundNo], self.paceMaker.current_round))
             return self.reputation_leaders[roundNo]
