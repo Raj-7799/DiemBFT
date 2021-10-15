@@ -168,18 +168,19 @@ class BlockTree:
         self._ledger.speculate(block.qc.vote_info.parent_id,block.id,block.payload)
         self.pending_block_tree.add(block.qc.vote_info.parent_id,block)  # forking is possible so we need to know which node to extend
     
-
-    
     def process_vote(self, vote):
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
-        self.pending_votes[vote_idx].add(vote.signature)
+        self.pending_votes[vote_idx].add((vote.signature[0], vote.signature[1]))
 
         if len(self.pending_votes[vote_idx])== 2*self.fCount+1:            
             self.qc = QC(
                 vote_info=vote.vote_info,
                 ledger_commit_info=vote.ledger_commit_info,
-                votes=self.pending_votes
+                votes=self.pending_votes,
+                author=self.author,
+                pvt_key=self.pvt_key,
+                pbc_key=self.pbc_key
                 )
             return self.qc
         return None
