@@ -46,10 +46,12 @@ class QC():
         self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
     
     def get_signers(self):
+        diem_logger.info("[QC][replicaID {}] START get_signers ".format(self.author))
         signers = []
         for voter in self.signatures:
             signers.append(voter.sender)
-        
+        diem_logger.info("[QC][replicaID {}] END get_signers ".format(self.author))
+
         return signers
 
 class VoteMsg:
@@ -61,6 +63,8 @@ class VoteMsg:
         self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)#key.sign_message(self._ledger_commit_info) 
         
     def verify_self_signature(self):
+        diem_logger.info("[VoteMsg][replicaID {}] START verify_self_signature ".format(self.author))
+
         return Util.check_authenticity(self.form_signature_object(), self.signature)
 
     def form_signature_object(self):
@@ -118,12 +122,14 @@ class BlockTree:
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
-        genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
+        self.author=author
+
+        genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key,self.author)
+        self._ledger = ld.Ledger(genesis_block, self.author)
+
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)
-        self.author=author
-        self._ledger = ld.Ledger(genesis_block, self.author)
         self.fCount=fCount
 
 
@@ -153,6 +159,8 @@ class BlockTree:
     
 
     def process_qc(self,qc):
+        diem_logger.info("[BlockTree][replicaID {}] START process_qc ".format(self.author))
+
         if qc.ledger_commit_info.commit_state_id != None:
             #Ledger.commit(qc['vote_info']['parent_id'])
             self._ledger.commit(qc.vote_info.parent_id)
@@ -160,15 +168,23 @@ class BlockTree:
             self._high_commit_qc=max_round_qc(qc,self.high_commit_qc) # max_rond high commit qc ← max round {qc, high commit qc} // max round need elaboration
         #high qc ← max round {qc, high qc}
         self._high_qc=max_round_qc(qc,self.high_qc)
+        diem_logger.info("[BlockTree][replicaID {}] END process_qc ".format(self.author))
+
 
   
     def execute_and_insert(self,block):
+        diem_logger.info("[BlockTree][replicaID {}] START execute_and_insert  ".format(self.author))
+
         ##In paper : Ledger.speculate(b.qc.block id, b.id, b.payload)
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.parent_id,block.id,block.payload)
         self.pending_block_tree.add(block.qc.vote_info.parent_id,block)  # forking is possible so we need to know which node to extend
+        diem_logger.info("[BlockTree][replicaID {}] START execute_and_insert  ".format(self.author))
+
     
     def process_vote(self, vote):
+        diem_logger.info("[BlockTree][replicaID {}] START process_vote  ".format(self.author))
+
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
         self.pending_votes[vote_idx].add((vote.signature[0], vote.signature[1]))
@@ -182,10 +198,18 @@ class BlockTree:
                 pvt_key=self.pvt_key,
                 pbc_key=self.pbc_key
                 )
+            diem_logger.debug("[BlockTree][replicaID {}] IN process_vote self.pending_vote {} ".format(self.author,self.pending_vote))
+
+            diem_logger.info("[BlockTree][replicaID {}] END process_vote qc.vote_info.roundNo {} ".format(self.author,qc.vote_info.roundNo))
+
             return self.qc
+        diem_logger.info("[BlockTree][replicaID {}] END process_vote  ".format(self.author))
+
         return None
 
-    def generate_block(self,txns,current_round):        
+    def generate_block(self,txns,current_round):      
+        diem_logger.info("[BlockTree][replicaID {}] START generate_block current_round {} txns {} ".format(self.author,current_round,txns))
+  
         new_block = Block(
                                     author=self.author,
                                     roundNo=current_round,
@@ -193,8 +217,8 @@ class BlockTree:
                                     qc=self.high_qc,
                                     pvt_key=self.pvt_key,
                                     pbc_key=self.pbc_key
-                                )
-
+                                )   
+        diem_logger.info("[BlockTree][replicaID {}] END generate_block current_round {} ".format(self.author,current_round))
         return new_block
         
         ## Creating genesis block for startup 
