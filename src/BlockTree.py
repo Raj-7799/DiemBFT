@@ -2,7 +2,7 @@ import Ledger as ld
 import Util
 from Util import max_round_qc,hash
 from collections import defaultdict
-
+import pickle
 
 import os
 from diembft_logger import get_logger
@@ -12,13 +12,13 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 ## Creating genesis block for startup 
 def create_genesis_object(pvt_key, pbc_key):
-    diem_logger.info("START: create_genesis_object ")
+    diem_logger.debug("START: create_genesis_object ")
     genesis_voteInfo = VoteInfo(id=0,roundNo=0,parent_id=0,parent_round=0,exec_state_id=0)
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
     genesis_block =  Block(0,0,"genesis",genesis_qc, pvt_key, pbc_key)
-    diem_logger.info("END: create_genesis_object ")
+    diem_logger.debug("END: create_genesis_object ")
 
     return genesis_qc , genesis_block
 
@@ -73,7 +73,7 @@ class Block:
         self.roundNo=roundNo
         self.payload=payload
         self.qc = qc 
-        self.id = Util.sign_object(self.get_block_identity_object(), pvt_key, pbc_key)
+        self.id = Util.hash(pickle.dumps(self.get_block_identity_object()))
     
     def get_block_identity_object(self):
         return [self.author, self.roundNo, self.payload, self.qc.vote_info.id, self.qc.signatures]

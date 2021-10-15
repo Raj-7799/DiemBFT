@@ -18,9 +18,11 @@ class Client(process):
     output("Broadcasting messages to replicas")
     diem_logger.debug("client START: run ")
     
-    for i in ["abcd", "cdef", "xyzw", "ghfg"]:
+    for j, i in enumerate(["abcd", "defg", "wxyz"]):
+      # TODO : Remove the round-robin implementation
       for _, replicaInfo in self.replicaInfos.items():
-        send(("request", i), to=replicaInfo.process)
+        if replicaInfo.replicaID == j:
+          send(("request", i), to=replicaInfo.process)
       
     await(self.nReq == 0)
     diem_logger.debug("client END: run ")
