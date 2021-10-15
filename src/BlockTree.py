@@ -182,20 +182,21 @@ class BlockTree:
         diem_logger.info("[BlockTree][replicaID {}] START execute_and_insert  ".format(self.author))
 
     
-
-    
     def process_vote(self, vote):
         diem_logger.info("[BlockTree][replicaID {}] START process_vote  ".format(self.author))
 
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
-        self.pending_votes[vote_idx].add(vote.signature)
+        self.pending_votes[vote_idx].add((vote.signature[0], vote.signature[1]))
 
         if len(self.pending_votes[vote_idx])== 2*self.fCount+1:            
             self.qc = QC(
                 vote_info=vote.vote_info,
                 ledger_commit_info=vote.ledger_commit_info,
-                votes=self.pending_votes
+                votes=self.pending_votes,
+                author=self.author,
+                pvt_key=self.pvt_key,
+                pbc_key=self.pbc_key
                 )
             diem_logger.debug("[BlockTree][replicaID {}] IN process_vote self.pending_vote {} ".format(self.author,self.pending_vote))
 

@@ -135,7 +135,7 @@ class Replica(process):
                     break
             
             output("Sending vote message to {} from {}", nextLeaderInfo.replicaID, self.replicaID)
-            send(("vote", vote_message), to=nextLeaderInfo.process)
+            send(("process_vote_msg", vote_message), to=nextLeaderInfo.process)
         output("process_proposal_msg END")
 
 
