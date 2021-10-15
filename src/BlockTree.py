@@ -118,12 +118,12 @@ class PendingBlockTree(dict):
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key):        
+    def __init__(self,fCount,author, pvt_key, pbc_key, delete_from_mempool_diem):
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
         self.author=author
-
+        self.delete_from_mempool_diem = delete_from_mempool_diem
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key,self.author)
         self._ledger = ld.Ledger(genesis_block, self.author)
 
@@ -136,8 +136,7 @@ class BlockTree:
     @property
     def pending_block_tree(self):
         return self._pending_block_tree
-    
-     
+
         
     # @property
     # def qc(self):
@@ -178,6 +177,7 @@ class BlockTree:
         ##In paper : Ledger.speculate(b.qc.block id, b.id, b.payload)
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.parent_id,block.id,block.payload)
+        self.delete_from_mempool_diem(block.payload)
         self.pending_block_tree.add(block.qc.vote_info.parent_id,block)  # forking is possible so we need to know which node to extend
         diem_logger.info("[BlockTree][replicaID {}] START execute_and_insert  ".format(self.author))
 

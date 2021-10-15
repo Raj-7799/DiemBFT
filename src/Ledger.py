@@ -48,7 +48,7 @@ class Ledger():
         entry = self._db_speculate.get(block_id)        
         if  entry is not None:
             self._db.put(block_id,entry)
-            self._db_speculate.delete(block_id)      
+            self._db_speculate.delete(block_id)
         diem_logger.info("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
              
 
