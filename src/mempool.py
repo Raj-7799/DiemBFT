@@ -29,6 +29,13 @@ class MemPool:
             self.queue.append(command)
             self.locator[command] = client
     
+    def delete_command(self, command):
+        if command in self.locator:
+            del self.locator[command]
+    
+    def remove_transaction(self, command):
+        self.delete_command(command)
+
     def validate_command(self, command):
         return command in self.locator
     
