@@ -8,7 +8,7 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 
 class LeaderElection:
-    def __init__(self, f, paceMaker, ledger, validators,replicaID):
+    def __init__(self, f, paceMaker, ledger, validators, replicaID):
         self.validators = validators
         self.window_size = f + 1
         self.exclude_size = f + 1
@@ -77,6 +77,8 @@ class LeaderElection:
 
     
     def get_leader(self, roundNo):
+        if roundNo < 0:
+            return 0
         print("[replicaID {}] START roundNo {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.paceMaker.current_round))
         if roundNo in self.reputation_leaders:
             print("[replicaID {}]  repuation_leaders for roundNo {} is {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.reputation_leaders[roundNo], self.paceMaker.current_round))
