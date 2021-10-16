@@ -57,13 +57,15 @@ class Ledger:
 
     def pending_state(self,bk_id):
 
-        if self.specluate_ledger.cache[bk_id] is not None:
+        if bk_id in self.specluate_ledger.cache.keys() or bk_id == 0 or bk_id=="0":
             return bk_id 
         return None
 
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,bk_id):
+        self.print_ledger()
+        self.specluate_ledger.print_cache()
         block_id = bytes(str(bk_id),'utf-8')
         #entry = self._db_speculate.get(block_id)
         entry = self.specluate_ledger.cache[bk_id]
@@ -95,4 +97,4 @@ class Ledger:
         it =  self._db.iterator()
         with self._db.iterator() as it:
             for k,v  in it:
-                print(k,v)
+                print("key: {}  value {}".format(k,pickle.loads(v)[1]))

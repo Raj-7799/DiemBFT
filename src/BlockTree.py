@@ -91,7 +91,7 @@ class Block:
         return [self.author, self.roundNo, self.payload, self.qc.vote_info.id, self.qc.signatures]
     
     def __str__(self):
-        return "{ Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {}}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
+        return " Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {} ".format(self.id, self.payload, self.author, self.roundNo, self.qc)
 
 class Node:
     def __init__(self,prev_node_id,block):
@@ -122,6 +122,7 @@ class PendingBlockTree:
         self.cache[block.id]=node.childNodes[block.id]
     
     def prune(self,id):
+        self.print_cache()
         curr_node =  self.get_node(id)
         self.root =  curr_node
         print("new root ",self.root.block.payload)
