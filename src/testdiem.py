@@ -8,8 +8,10 @@ import diem_replica
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
 import sys
-sys.path.insert(0, '/home/madara/sbu/cse535/distalgo/')
 print(sys.path)
+import os
+from diembft_logger import get_logger
+diem_logger = get_logger(os.path.basename(__file__))
 
 class RunDiemBFT(da.DistProcess):
 
@@ -17,8 +19,8 @@ class RunDiemBFT(da.DistProcess):
         super().__init__(procimpl, forwarder, **props)
         self._events.extend([])
 
-    def setup(self, config, **rest_471):
-        super().setup(config=config, **rest_471)
+    def setup(self, config, **rest_480):
+        super().setup(config=config, **rest_480)
         self._state.config = config
         self._state.faulty_replicas = self._state.config['faultyReplicas']
         self._state.replicas_required = ((3 * self._state.faulty_replicas) + 1)
