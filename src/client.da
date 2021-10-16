@@ -6,19 +6,21 @@ from diembft_logger import get_logger
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):#, f: int):
     self.pID          = clientID
     self.nReq         = requests
     self.timeout      = clientTimeout
     self.replicaInfos = replicaInfos
     self.private_key = private_key
+    #self.f            = f
+    #self.dict_of_response = {} #Map dictionary of Response with number of requests
   
   def run():
     output("Yo running client!!!")
     output("Broadcasting messages to replicas")
     diem_logger.debug("client START: run ")
     
-    for j, i in enumerate(["1", "2", "3", "4"]):
+    for j, i in enumerate(["1", "2", "3", "4", "5", "6"]):
       # TODO : Remove the round-robin implementation
       for _, replicaInfo in self.replicaInfos.items():
           # if replicaInfo.replicaID == j:
@@ -36,4 +38,16 @@ class Client(process):
       self.nReq -= 1
     else:
       output("Received unknown message")
+  # def receive(msg=("transaction_committed", msg), from_=source):
+  #   if source in self.replicaInfos:  
+  #     replicaInfo = self.replicaInfos[source]
+  #     output("Got message from replica ", replicaInfo.replicaID)
+  #     if msg in dict_of_response:
+  #       self.dict_of_response[msg] = self.dict_of_response[msg] + 1
+  #       if self.dict_of_response[msg] == (self.f + 1):
+  #         self.nReq = self.nReq - 1
+  #     else:
+  #       self.dict_of_response[msg] = 0
+  #   else:
+  #     output("Received unknown message")
       

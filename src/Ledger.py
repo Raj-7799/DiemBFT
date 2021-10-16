@@ -9,8 +9,9 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 class Ledger:
 
-    def __init__(self,genesis_block, replicaID):
+    def __init__(self,genesis_block, replicaID, memPool):
         self.replicaID = replicaID
+        self.memPool = memPool
         self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
         self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(self.replicaID), create_if_missing=True)
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
@@ -45,14 +46,19 @@ class Ledger:
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,bk_id):
+        print("[Ledger][replicaID {}] START commit the block {}".format(self.replicaID, bk_id)) 
         block_id = bytes(str(bk_id),'utf-8')
         entry = self._db_speculate.get(block_id)
         if  entry is not None:
             print("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
             self._db.put(block_id,entry)
-            # TODO : fix this
-            # self._db_speculate.delete(block_id)
+            block = self.committed_block(bk_id)
+            
+            print("Remove from Mempool block = " + str(block))
+            self.memPool.remove_transaction(block.payload)
 
+            # self._db_speculate.delete(block_id)      
+        print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
     #returns a committed block given its id
     def committed_block(self, bk_id):
