@@ -88,8 +88,6 @@ class Replica(process):
             while not transaction:
                 if not waiting:
                     diem_logger.info("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-                    output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-                    return
                 
                 waiting = True
                 transaction = memPool.get_transactions() 
