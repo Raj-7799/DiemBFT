@@ -20,26 +20,25 @@ class Ledger:
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):
-        print("[Ledger][replicaID {}] START speculate ".format(self.replicaID))
+        print("[Ledger][replicaID {}] Speculating for prev block {} and current block {} ".format(self.replicaID, prev_block_id, block_id))
         block_id=bytes(str(block_id),'utf-8')
         value = pickle.dumps([prev_block_id,txns])      
         self._db_speculate.put(block_id,value)
-        print("[Ledger][replicaID {}] END speculate ".format(self.replicaID))
-
 
 
     #find the pending state for the given block id or ⊥ if not present
     def pending_state(self,bk_id):
-        print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
+        print("[Ledger][replicaID {}] Attempting to find pending state for block id {}".format(self.replicaID, bk_id)) 
         block_id = bytes(str(bk_id),'utf-8')     
         entry = self._db_speculate.get(block_id)
         # Check this once
         if entry is not None:
-            print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
+            print("[Ledger][replicaID {}] Found pending state for block id {}".format(self.replicaID, bk_id)) 
             return bk_id
         
         # TODO : fix this implementation
         if bk_id == 0 or bk_id == "0":
+            print("[Ledger][replicaID {}] Received genesis block id {}".format(self.replicaID, bk_id)) 
             return bk_id
             
         return None                
@@ -49,7 +48,7 @@ class Ledger:
     def commit(self,bk_id):
         print("[Ledger][replicaID {}] START commit the block {}".format(self.replicaID, bk_id)) 
         block_id = bytes(str(bk_id),'utf-8')
-        entry = self._db_speculate.get(block_id)        
+        entry = self._db_speculate.get(block_id)
         if  entry is not None:
             print("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
             self._db.put(block_id,entry)
@@ -62,17 +61,19 @@ class Ledger:
         print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
     #returns a committed block given its id
-    def committed_block(self, block_id):
-        print("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
-        block_id=bytes(str(block_id),'utf-8')
-        print("[Ledger][replicaID {}] END committed_block ".format(self.replicaID))
+    def committed_block(self, bk_id):
+        print("[Ledger][replicaID {}] Attempting to fetch commited block {}.".format(self.replicaID, bk_id)) 
+        block_id=bytes(str(bk_id),'utf-8')
         entry = pickle.loads(self._db.get(block_id))
-
+        if entry[1]:
+            print("[Ledger][replicaID {}] Fetching commited block successfull {}.".format(self.replicaID, bk_id)) 
+        else:
+            print("[Ledger][replicaID {}] Failed fetching block {}.".format(self.replicaID, bk_id)) 
+        
         return entry[1]
 
 
     def print_ledger(self):
-        
         it =  self._db.iterator()
         with self._db.iterator() as it:
             for k,v  in it:
