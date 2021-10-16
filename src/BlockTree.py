@@ -132,7 +132,7 @@ class PendingBlockTree(dict):
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key):        
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
@@ -140,7 +140,7 @@ class BlockTree:
 
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
         genesis_block.id=0
-        self._ledger = ld.Ledger(genesis_block, self.author)
+        self._ledger = ld.Ledger(genesis_block, self.author, memPool)
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)

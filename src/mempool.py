@@ -28,7 +28,15 @@ class MemPool:
         if command not in self.locator:
             self.queue.append(command)
             self.locator[command] = client
-    
+    def delete_command(self, command):
+        print("Delete " + command + " from Mempool")
+        if command in self.locator:
+            print("Delete from Mempool Successfull")
+            del self.locator[command]
+
+    def remove_transaction(self, command):
+        self.delete_command(command)
+
     def validate_command(self, command):
         return command in self.locator
     
