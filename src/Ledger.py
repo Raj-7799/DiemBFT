@@ -19,43 +19,48 @@ class Ledger:
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):
-        diem_logger.debug("[Ledger][replicaID {}] START speculate ".format(self.replicaID))
+        print("[Ledger][replicaID {}] START speculate ".format(self.replicaID))
         block_id=bytes(str(block_id),'utf-8')
         value = pickle.dumps([prev_block_id,txns])      
         self._db_speculate.put(block_id,value)
-        diem_logger.debug("[Ledger][replicaID {}] END speculate ".format(self.replicaID))
+        print("[Ledger][replicaID {}] END speculate ".format(self.replicaID))
 
 
 
     #find the pending state for the given block id or ⊥ if not present
-    def pending_state(self,block_id):
-        diem_logger.debug("[Ledger][replicaID {}] START pending_state ".format(self.replicaID)) 
-        block_id = bytes(str(block_id),'utf-8')     
+    def pending_state(self,bk_id):
+        print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
+        block_id = bytes(str(bk_id),'utf-8')     
         entry = self._db_speculate.get(block_id)
         if entry is not None:
-            diem_logger.debug("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
+            print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
             return block_id
-        diem_logger.debug("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
+        
+        # TODO : fix this implementation
+        if bk_id == 0 or bk_id == "0":
+            return self._db.get(block_id)
+            
+        print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
         return None                
 
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,bk_id):
-        diem_logger.debug("[Ledger][replicaID {}] START commit ".format(self.replicaID)) 
+        print("[Ledger][replicaID {}] START commit ".format(self.replicaID)) 
         block_id = bytes(str(bk_id),'utf-8')
         entry = self._db_speculate.get(block_id)        
         if  entry is not None:
-            diem_logger.debug("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
+            print("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
             self._db.put(block_id,entry)
-            self._db_speculate.delete(block_id)      
-        diem_logger.debug("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
+            # self._db_speculate.delete(block_id)      
+        print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
 
     #returns a committed block given its id
     def committed_block(self, block_id):
-        diem_logger.debug("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
+        print("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
         block_id=bytes(str(block_id),'utf-8')
-        diem_logger.debug("[Ledger][replicaID {}] END committed_block ".format(self.replicaID))
+        print("[Ledger][replicaID {}] END committed_block ".format(self.replicaID))
         entry = pickle.loads(self._db.get(block_id))
 
         return entry[1]

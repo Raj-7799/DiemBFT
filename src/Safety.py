@@ -53,7 +53,9 @@ class Safety():
         if self._consecutive(block_round, qc.vote_info.roundNo):
             #In Paper-> Ledger.pending state(qc.id)
             # Qc has not attribute as id
-            return self.ledger.pending_state(qc.vote_info.parent_id)
+            pending_state = self.ledger.pending_state(qc.vote_info.parent_id)
+            print("Pending state returned for block_round {}".format(pending_state))
+            return pending_state
         else:
             return None
     

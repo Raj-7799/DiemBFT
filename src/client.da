@@ -21,8 +21,8 @@ class Client(process):
     for j, i in enumerate(["1", "2", "3", "4"]):
       # TODO : Remove the round-robin implementation
       for _, replicaInfo in self.replicaInfos.items():
-          if replicaInfo.replicaID == j:
-            send(("request", i), to=replicaInfo.process)
+          # if replicaInfo.replicaID == j:
+          send(("request", i), to=replicaInfo.process)
       
     await(self.nReq == 0)
     diem_logger.debug("client END: run ")

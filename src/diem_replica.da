@@ -25,6 +25,7 @@ class Replica(process):
         self.publicKey = get_replica_public_key(self.replicaID)
         self.clientInfos = clientInfos
         self.memPool = mempool.MemPool()
+        self.firstRequestProcess = False
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID))
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
@@ -68,12 +69,12 @@ class Replica(process):
     def process_certificate(qc):
         diem_logger.debug("[replicaID {}] START: process_certificate".format(self.replicaID))
         self.blockTree.process_qc(qc)
-        print("process_certificate qc ",qc, self)
         self.leaderElection.update_leaders(qc)
         self.paceMaker.advance_round_qc(qc)
         diem_logger.debug("[replicaID {}] END: process_certificate".format(self.replicaID))
 
     def process_next_round_event(last_tc):
+        # diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
             transaction = memPool.get_transactions()
             while not transaction:
@@ -87,11 +88,14 @@ class Replica(process):
 
     def receive(msg=("request", cmd), from_=source):
         diem_logger.info("[replicaID {}] Inserting cmd {} into mempool of replica".format(self.replicaID, cmd))
+
         self.memPool.insert_command(cmd, source)
-        if self.replicaID == 0:
-            self.paceMaker.advance_round_qc(self.blockTree._high_qc)
+        if not self.firstRequestProcess:
+            if self.replicaID == 0:
+                self.paceMaker.advance_round_qc(self.blockTree._high_qc)
         
-        process_next_round_event(None)
+            self.firstRequestProcess = True
+            process_next_round_event(None)
     
     def receive(msg=("process_proposal_msg", P), from_=source):
         diem_logger.info("[replicaID {}] Received proposal with Block payload is {}".format(self.replicaID, P.block.payload))

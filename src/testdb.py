@@ -4,13 +4,17 @@ import BlockTree
 import os 
 import glob
 import shutil
-replicaID=0
-_db = plyvel.DB('/tmp/diemLedger_{}/'.format(replicaID), create_if_missing=True)
+replicaID=[0, 1, 2, 3]
 
-with _db.iterator() as it:
-    for k,v in it:
-        #print(k,v)
-        print(k,pickle.loads(v))
+for i in replicaID:
+    _db = plyvel.DB('/tmp/diemLedger_{}/'.format(i), create_if_missing=True)
+    print("Commits for replica ", i)
+    with _db.iterator() as it:
+        for k,v in it:
+            #print(k,v)
+            print(k,pickle.loads(v))
+    
+    _db.close()
 
 
 _db.close()
