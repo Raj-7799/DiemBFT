@@ -12,7 +12,7 @@ for i in replicaID:
     
     with _db.iterator() as it:
         for k,v in it:
-            print(pickle.loads(v)[1].id, pickle.loads(v)[1].payload)
+            print(pickle.loads(v)[1].id, pickle.loads(v)[1].payload, pickle.loads(v)[1].qc.vote_info.id)
             #print(pickle.loads(v)[0].id, pickle.loads(v)[0].payload)
     
     _db.close()
