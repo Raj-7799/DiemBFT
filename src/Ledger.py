@@ -32,15 +32,15 @@ class Ledger:
         print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
         block_id = bytes(str(bk_id),'utf-8')     
         entry = self._db_speculate.get(block_id)
+        # Check this once
         if entry is not None:
             print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
-            return block_id
+            return bk_id
         
         # TODO : fix this implementation
         if bk_id == 0 or bk_id == "0":
-            return self._db.get(block_id)
+            return bk_id
             
-        print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
         return None                
 
 
