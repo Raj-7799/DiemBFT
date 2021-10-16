@@ -56,11 +56,8 @@ class QC:
     def get_signers(self):
         diem_logger.info("[QC][replicaID {}] START get_signers ".format(self.author))
         signers = []
-        print("get_signers ",self.signature,self.author)
-        for i in range(0,len(self.signature)-1):
-            print(self.signature[i])
-            deserialized_voter = pickle.loads(self.signature[i])
-            signers.append(self.signature[i].sender)
+        for voter in self.signatures:
+            signers.append(voter.sender)
         diem_logger.info("[QC][replicaID {}] END get_signers ".format(self.author))
 
         return signers
@@ -197,7 +194,7 @@ class BlockTree:
 
         self.process_qc(vote.high_commit_qc)
         vote_idx = hash(vote.ledger_commit_info)
-        self.pending_votes[vote_idx].add((vote.signature[0], vote.signature[1]))
+        self.pending_votes[vote_idx].add(vote)
 
         if len(self.pending_votes[vote_idx])== 2*self.fCount+1:
             # diem_logger.debug("Forming qc at {}".format(self.author))
@@ -205,7 +202,7 @@ class BlockTree:
             qc = QC(
                 vote_info=vote.vote_info,
                 ledger_commit_info=vote.ledger_commit_info,
-                votes=self.pending_votes,
+                votes=self.pending_votes[vote_idx],
                 author=self.author,
                 pvt_key=self.pvt_key,
                 pbc_key=self.pbc_key
