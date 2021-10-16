@@ -91,7 +91,7 @@ class Block:
         return [self.author, self.roundNo, self.payload, self.qc.vote_info.id, self.qc.signatures]
     
     def __str__(self):
-        return "{ Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {}}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
+        return " Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
 
 class PendingBlockTree(dict):
 
