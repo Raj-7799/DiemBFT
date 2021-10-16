@@ -75,8 +75,10 @@ class Replica(process):
     def process_next_round_event(last_tc):
         # diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
+            # Change
             transaction = memPool.get_transactions()
             waiting = False
+            # TODO : needs to be changed
             while not transaction:
                 if not waiting:
                     diem_logger.info("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
@@ -119,6 +121,8 @@ class Replica(process):
         sourceReplica = self.replicaInfos[source]
 
         if P.block.roundNo != current_round or sourceReplica.replicaID != current_leader or P.block.author != sourceReplica.replicaID:
+
+            diem_logger.info("[replicaID {}] Inconsistency {} {} {} {} {} {} {}".format(self.replicaID, P.block.id, P.block.roundNo, current_round, sourceReplica.replicaID, current_leader, P.block.author, sourceReplica.replicaID))
             diem_logger.info("[replicaID {}] Inconsistency in round no or message source or block author for block {}".format(self.replicaID, P.block.id))
             return
         
@@ -137,7 +141,7 @@ class Replica(process):
             diem_logger.info("[replicaID {}] Sending vote message to next leader : {} for block ID {} at round {}".format(self.replicaID, nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
             send(("process_vote_msg", vote_message), to=nextLeaderInfo.process)
         else:
-            diem_logger.info("[replicaID {}] Unable to make vote for block {}".format(self.replicaID, P.block.payload))
+            diem_logger.info("[replicaID {}] Unable to make vote for block {}".format(self.replicaID, P.block.id))
 
 
     def receive(msg=("process_vote_msg", M), from_=source):
