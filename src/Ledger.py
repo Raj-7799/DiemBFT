@@ -9,10 +9,11 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 class Ledger:
 
-    def __init__(self,genesis_block, replicaID):
+    def __init__(self,genesis_block, replicaID,specluate_ledger):
         self.replicaID = replicaID
         self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
         self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(self.replicaID), create_if_missing=True)
+        self.specluate_ledger = specluate_ledger
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
         
@@ -28,20 +29,26 @@ class Ledger:
 
 
     #find the pending state for the given block id or ⊥ if not present
-    def pending_state(self,bk_id):
-        print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
-        block_id = bytes(str(bk_id),'utf-8')     
-        entry = self._db_speculate.get(block_id)
-        # Check this once
-        if entry is not None:
-            print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
-            return bk_id
+    # def pending_state(self,bk_id):
+    #     print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
+    #     block_id = bytes(str(bk_id),'utf-8')     
+    #     entry = self._db_speculate.get(block_id)
+    #     # Check this once
+    #     if entry is not None:
+    #         print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
+    #         return bk_id
         
-        # TODO : fix this implementation
-        if bk_id == 0 or bk_id == "0":
-            return bk_id
+    #     # TODO : fix this implementation
+    #     if bk_id == 0 or bk_id == "0":
+    #         return bk_id
             
-        return None                
+    #     return None        
+
+    def pending_state(self,bk_id):
+
+        if self.specluate_ledger.cache[bk_id] is not None:
+            return bk_id 
+        return None
 
 
     #commit the pending prefix of the given block id and prune other branches
