@@ -9,9 +9,10 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 
 class MemPool:
-    def __init__(self):
+    def __init__(self, broadcast_client_commited):
         self.queue = deque([])
         self.locator = {}
+        self.broadcast_client_commited = broadcast_client_commited
     
     def get_transactions(self):
         # currently only sends one transaction
@@ -30,8 +31,10 @@ class MemPool:
             self.locator[command] = client
     def delete_command(self, command):
         print("Delete " + command + " from Mempool")
+        #self.broadcast_client_commited(command, self.locator[command])
         if command in self.locator:
             print("Delete from Mempool Successfull")
+            self.broadcast_client_commited(command, self.locator[command])
             del self.locator[command]
 
     def remove_transaction(self, command):

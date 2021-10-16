@@ -66,6 +66,7 @@ class RunDiemBFT(process):
         self.clientTimeout,
         replicaInfos,
         KeySets[-1].private_key,
+        self.faulty_replicas
       ))
     
     start(clients)

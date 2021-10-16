@@ -47,7 +47,7 @@ class Ledger:
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,bk_id):
-        print("[Ledger][replicaID {}] START commit ".format(self.replicaID)) 
+        print("[Ledger][replicaID {}] START commit the block {}".format(self.replicaID, bk_id)) 
         block_id = bytes(str(bk_id),'utf-8')
         entry = self._db_speculate.get(block_id)        
         if  entry is not None:
