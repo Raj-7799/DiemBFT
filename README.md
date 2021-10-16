@@ -3,8 +3,8 @@ Implementation of DiemBFT : State Machine Replication in Diem Bloackchain as men
 
 
 ## Setup 
-- Step 1 - **Install conda** :: Install Linux script for conda from https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh and Run the command bash Anaconda-latest-Linux-x86_64.sh to install. Follow https://www.digitalocean.com/community/tutorials/how-to-install-anaconda-on-ubuntu-18-04-quickstart to refer for step-by-step installation
-- Step 2 - **Clone the repo** :: git clone git@github.com:Raj-7799/DiemBFT.git
+- Step 1 - **Install conda** :: Install Linux script for conda from https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh and Run the command ```bash Anaconda-latest-Linux-x86_64.sh``` to install. Follow https://www.digitalocean.com/community/tutorials/how-to-install-anaconda-on-ubuntu-18-04-quickstart to refer for step-by-step installation
+- Step 2 - **Clone the repo** :: ``` git clone git@github.com:Raj-7799/DiemBFT.git ```
 - Step 3 - **cd DIEMBFT**
 - Step 4  - **Create Conda Environment** :: ``` conda create --name <env> --file requirement.txt ```
 ### Alternate way is to manuall run the following pip
