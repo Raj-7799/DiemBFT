@@ -1,5 +1,5 @@
 # DiemBFT
-Implementation of DiemBFT
+Implementation of DiemBFT : State Machine Replication in Diem Bloackchain
 
 
 ## Setup 
