@@ -1,0 +1,22 @@
+2021-10-16 01:08:38,310 — 93 — Safety.py —         make_timeout() — INFO — [Safety][replicaID 0] START make_timeout with roundNo 1 and high_qc.vote_info.roundNo 0
+2021-10-16 01:08:38,313 — 56 — Safety.py —     _safe_to_timeout() — INFO — [Safety][replicaID 0] START _safe_to_timeout with roundNo 1 and qc_round 0
+2021-10-16 01:08:38,313 — 59 — Safety.py —     _safe_to_timeout() — INFO — [Safety][replicaID 0] END _safe_to_timeout with roundNo 1 and qc_round 0
+2021-10-16 01:08:38,313 — 40 — Safety.py —         _consecutive() — INFO — [Safety][replicaID 0] START _consecutive with block_round 1 and roundNo 0
+2021-10-16 01:08:38,313 — 30 — Safety.py — _increase_highest_vote_round() — INFO — [Safety][replicaID 0] START _increase_highest_vote_round for roundNo 1
+2021-10-16 01:08:38,313 — 32 — Safety.py — _increase_highest_vote_round() — INFO — [Safety][replicaID 0] END _increase_highest_vote_round for roundNO 1
+2021-10-16 01:08:38,314 — 98 — Safety.py —         make_timeout() — INFO — [Safety][replicaID 0] END make_timeout with roundNo 1 and high_qc.vote_info.roundNo 0
+2021-10-16 01:08:38,319 — 93 — Safety.py —         make_timeout() — INFO — [Safety][replicaID 0] START make_timeout with roundNo 1 and high_qc.vote_info.roundNo 0
+2021-10-16 01:08:38,319 — 56 — Safety.py —     _safe_to_timeout() — INFO — [Safety][replicaID 0] START _safe_to_timeout with roundNo 1 and qc_round 0
+2021-10-16 01:08:38,319 — 59 — Safety.py —     _safe_to_timeout() — INFO — [Safety][replicaID 0] END _safe_to_timeout with roundNo 1 and qc_round 0
+2021-10-16 01:08:38,319 — 40 — Safety.py —         _consecutive() — INFO — [Safety][replicaID 0] START _consecutive with block_round 1 and roundNo 0
+2021-10-16 01:08:38,319 — 30 — Safety.py — _increase_highest_vote_round() — INFO — [Safety][replicaID 0] START _increase_highest_vote_round for roundNo 1
+2021-10-16 01:08:38,319 — 32 — Safety.py — _increase_highest_vote_round() — INFO — [Safety][replicaID 0] END _increase_highest_vote_round for roundNO 1
+2021-10-16 01:08:38,320 — 98 — Safety.py —         make_timeout() — INFO — [Safety][replicaID 0] END make_timeout with roundNo 1 and high_qc.vote_info.roundNo 0
+2021-10-16 01:08:48,330 — 93 — Safety.py —         make_timeout() — INFO — [Safety][replicaID 0] START make_timeout with roundNo 2 and high_qc.vote_info.roundNo 0
+2021-10-16 01:08:48,330 — 56 — Safety.py —     _safe_to_timeout() — INFO — [Safety][replicaID 0] START _safe_to_timeout with roundNo 2 and qc_round 0
+2021-10-16 01:08:48,330 — 59 — Safety.py —     _safe_to_timeout() — INFO — [Safety][replicaID 0] END _safe_to_timeout with roundNo 2 and qc_round 0
+2021-10-16 01:08:48,330 — 40 — Safety.py —         _consecutive() — INFO — [Safety][replicaID 0] START _consecutive with block_round 2 and roundNo 0
+2021-10-16 01:08:48,330 — 40 — Safety.py —         _consecutive() — INFO — [Safety][replicaID 0] START _consecutive with block_round 2 and roundNo 1
+2021-10-16 01:08:48,330 — 30 — Safety.py — _increase_highest_vote_round() — INFO — [Safety][replicaID 0] START _increase_highest_vote_round for roundNo 2
+2021-10-16 01:08:48,330 — 32 — Safety.py — _increase_highest_vote_round() — INFO — [Safety][replicaID 0] END _increase_highest_vote_round for roundNO 2
+2021-10-16 01:08:48,331 — 98 — Safety.py —         make_timeout() — INFO — [Safety][replicaID 0] END make_timeout with roundNo 2 and high_qc.vote_info.roundNo 0

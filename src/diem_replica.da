@@ -37,7 +37,7 @@ class Replica(process):
             send((method, message), to=replicaInfo.process)
     
     def delete_from_mempool(cmd):
-        self.mempool.remove_transaction(cmd)
+        self.memPool.remove_transaction(cmd)
     
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
