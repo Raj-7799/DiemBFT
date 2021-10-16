@@ -6,19 +6,22 @@ from diembft_logger import get_logger
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, commandList: list, f: int):
     self.pID          = clientID
-    self.nReq         = requests
+    self.nReq         = len(commandList)#requests
     self.timeout      = clientTimeout
     self.replicaInfos = replicaInfos
     self.private_key = private_key
+    self.commandList = commandList
+    self.f = f
+    self.receivedRequest = {}
   
   def run():
     output("Yo running client!!!")
     output("Broadcasting messages to replicas")
     diem_logger.debug("client START: run ")
     
-    for i in ["abcd", "cdef", "xyzw", "ghfg"]:
+    for i in self.commandList:#["abcd", "efgh"]:
       for _, replicaInfo in self.replicaInfos.items():
         send(("request", i), to=replicaInfo.process)
       
@@ -26,12 +29,18 @@ class Client(process):
     diem_logger.debug("client END: run ")
 
 
-  def receive(msg=("Yo bro",), from_=source):
+  def receive(msg=("Yo bro", msg), from_=source):
     
     if source in self.replicaInfos:  
       replicaInfo = self.replicaInfos[source]
       output("Got message from replica ", replicaInfo.replicaID)
-      self.nReq -= 1
+      if msg in self.receivedRequest :
+          self.receivedRequest[msg] += 1
+          if self.receivedRequest[msg] == (self.f + 1):
+            self.nReq -= 1
+      else :
+          self.receivedRequest[msg] = 1
+      
     else:
       output("Received unknown message")
       
