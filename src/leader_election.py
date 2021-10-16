@@ -27,6 +27,9 @@ class LeaderElection:
 
         while i < self.window_size or len(last_authors) < self.exclude_size:
             current_block = self.ledger.committed_block(current_qc.vote_info.parent_id)
+            # Change if block is the genesis block stop iteration
+            if current_block.id == 0:
+                break
 
             block_author = current_block.author
 
