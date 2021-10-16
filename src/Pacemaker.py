@@ -15,7 +15,7 @@ class Pacemaker:
         self.fCount = fCount
         self.replica_broadcast = replica_broadcast
         self.replicaID = replicaID
-        self.current_round = 0
+        self.current_round = -1
         self.last_round_tc = None
         self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
         self.dict_of_timer = {} # dict of timer for a round

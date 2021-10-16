@@ -50,3 +50,5 @@ def verify_message(signed_msg):
         return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
     except BadSignatureError:
         return None
+
+

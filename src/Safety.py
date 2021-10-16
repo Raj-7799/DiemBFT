@@ -20,13 +20,14 @@ class Safety():
         self.private_key = self.blocktree.pvt_key
         self.public_keys = public_keys
         
-        self.highest_vote_round = 0
-        self.highest_qc_round = 0
+        self.highest_vote_round = -1
+        self.highest_qc_round = -1
         self.sender = sender
         self.pvt_key = self.private_key
         self.pbc_key = self.blocktree.pbc_key
 
     def _increase_highest_vote_round(self, roundNo):
+        # print("[replicaID {}] Block round {} is less than qc_round {} or high vote round {}".format(self.sender, block_round, qc_round, self.highest_vote_round))
         self.highest_vote_round = max(roundNo, self.highest_vote_round)
 
     def _update_highest_qc_round(self, qc_round):
@@ -41,6 +42,7 @@ class Safety():
 
     def _safe_to_vote(self, block_round, qc_round, tc):
         if (block_round <= max(self.highest_vote_round, qc_round)):
+            print("[replicaID {}] Block round {} is less than qc_round {} or high vote round {}".format(self.sender, block_round, qc_round, self.highest_vote_round))
             return False
         return self._consecutive(block_round, qc_round) or self._safe_to_extend(block_round, qc_round, tc)
 
@@ -53,7 +55,7 @@ class Safety():
         if self._consecutive(block_round, qc.vote_info.roundNo):
             #In Paper-> Ledger.pending state(qc.id)
             # Qc has not attribute as id
-            pending_state = self.ledger.pending_state(qc.vote_info.parent_id)
+            pending_state = self.ledger.pending_state(qc.vote_info.id)
             print("Pending state returned for block_round {}".format(pending_state))
             return pending_state
         else:
