@@ -27,7 +27,9 @@ class LeaderElection:
 
         while i < self.window_size or len(last_authors) < self.exclude_size:
             current_block = self.ledger.committed_block(current_qc.vote_info.parent_id)
+
             block_author = current_block.author
+
             
             if i < self.window_size:
                 signers = current_qc.get_signers()

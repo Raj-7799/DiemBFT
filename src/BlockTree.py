@@ -18,6 +18,7 @@ def create_genesis_object(pvt_key, pbc_key):
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
     genesis_block =  Block(0,0,"genesis",genesis_qc, pvt_key, pbc_key)
+    genesis_block.qc.vote_info.parent_id=genesis_block.id
     diem_logger.debug("END: create_genesis_object ")
 
     return genesis_qc , genesis_block
@@ -55,8 +56,11 @@ class QC:
     def get_signers(self):
         diem_logger.info("[QC][replicaID {}] START get_signers ".format(self.author))
         signers = []
-        for voter in self.signatures:
-            signers.append(voter.sender)
+        print("get_signers ",self.signature,self.author)
+        for i in range(0,len(self.signature)-1):
+            print(self.signature[i])
+            deserialized_voter = pickle.loads(self.signature[i])
+            signers.append(self.signature[i].sender)
         diem_logger.info("[QC][replicaID {}] END get_signers ".format(self.author))
 
         return signers
@@ -76,6 +80,9 @@ class VoteMsg:
 
     def form_signature_object(self):
         return [self.ledger_commit_info]
+    
+    def __str__(self):
+        return "{} ".format(self.sender)
 
 
 class Block:
@@ -90,7 +97,7 @@ class Block:
         return [self.author, self.roundNo, self.payload, self.qc.vote_info.id, self.qc.signatures]
     
     def __str__(self):
-        return "Block- {} Author - {} Round- {} QC- {}".format(self.payload, self.author, self.roundNo, self.qc)
+        return "block id {} Block- {} Author - {} Round- {} QC- {}".format(self.id,self.payload, self.author, self.roundNo, self.qc)
 
 class PendingBlockTree(dict):
 
@@ -135,8 +142,8 @@ class BlockTree:
         self.author=author
 
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
+        genesis_block.id=0
         self._ledger = ld.Ledger(genesis_block, self.author)
-
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)

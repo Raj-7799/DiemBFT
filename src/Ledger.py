@@ -1,6 +1,5 @@
 import plyvel
-
-
+import pickle
 
 import os
 from diembft_logger import get_logger
@@ -23,7 +22,7 @@ class Ledger():
     def speculate(self,prev_block_id, block_id, txns):
         diem_logger.debug("[Ledger][replicaID {}] START speculate ".format(self.replicaID))
         block_id=bytes(str(block_id),'utf-8')
-        value = bytes(str([prev_block_id,txns]),'utf-8')        
+        value = pickle.dumps([prev_block_id,txns])      
         self._db_speculate.put(block_id,value)
         diem_logger.debug("[Ledger][replicaID {}] END speculate ".format(self.replicaID))
 
@@ -57,8 +56,10 @@ class Ledger():
     def committed_block(self,block_id):
         diem_logger.debug("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
         block_id=bytes(str(block_id),'utf-8')
-        diem_logger.debug("[Ledger][replicaID {}] END committed_block ".format(self.replicaID)) 
-        return self._db_speculate.get(block_id)        
+        diem_logger.debug("[Ledger][replicaID {}] END committed_block ".format(self.replicaID))
+        entry = pickle.loads(self._db.get(block_id))
+
+        return entry[1]
 
 
     def print_ledger(self):

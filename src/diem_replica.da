@@ -68,6 +68,7 @@ class Replica(process):
     def process_certificate(qc):
         diem_logger.debug("[replicaID {}] START: process_certificate".format(self.replicaID))
         self.blockTree.process_qc(qc)
+        print("process_certificate qc ",qc, self)
         self.leaderElection.update_leaders(qc)
         self.paceMaker.advance_round_qc(qc)
         diem_logger.debug("[replicaID {}] END: process_certificate".format(self.replicaID))
