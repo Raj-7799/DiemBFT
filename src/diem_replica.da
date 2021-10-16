@@ -92,7 +92,8 @@ class Replica(process):
                 transaction = memPool.get_transactions() 
             
             block = blockTree.generate_block(transaction, paceMaker.current_round)
-            diem_logger.info("[replicaID {}] Generated block with block_id {} at round {}".format(self.replicaID, block.id, paceMaker.current_round))
+            diem_logger.info("[replicaID {}] Generated block with block_id {} for transaction {} at round {}".format(self.replicaID, block.id, transaction, paceMaker.current_round))
+            diem_logger.info("[replicaID {}] Mempool state {}".format(self.replicaID, self.memPool))
             proposal_msg = plm.ProposalMsg(block, last_tc, blockTree.high_commit_qc, self.privateKey, self.publicKey)
             diem_logger.info("[replicaID {}] Broadcasting proposal message for block with block_id {} at round {}".format(self.replicaID, block.id, paceMaker.current_round))
             for _, replicaInfo in replicaInfos.items():
