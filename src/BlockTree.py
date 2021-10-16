@@ -12,11 +12,11 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 ## Creating genesis block for startup 
 def create_genesis_object(pvt_key, pbc_key):
-    genesis_voteInfo = VoteInfo(id=0,roundNo=0,parent_id=0,parent_round=0,exec_state_id=0)
+    genesis_voteInfo = VoteInfo(id=0,roundNo=-1,parent_id=0,parent_round=-1,exec_state_id=0)
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
-    genesis_block =  Block(0, 0, "genesis",genesis_qc, pvt_key, pbc_key)
+    genesis_block =  Block(0, -1, "genesis",genesis_qc, pvt_key, pbc_key)
     genesis_block.id = 0
 
     return genesis_qc , genesis_block
@@ -55,7 +55,7 @@ class QC:
         diem_logger.info("[QC][replicaID {}] START get_signers ".format(self.author))
         signers = []
         for voter in self.signatures:
-            signers.append(voter.sender)
+            signers.append(voter)
         diem_logger.info("[QC][replicaID {}] END get_signers ".format(self.author))
 
         return signers
@@ -164,6 +164,7 @@ class BlockTree:
 
         if qc.ledger_commit_info.commit_state_id != None:
             #Ledger.commit(qc['vote_info']['parent_id'])
+            print("Leger commit info replicaID {} {}".format(qc.ledger_commit_info.commit_state_id, self.author))
             self._ledger.commit(qc.vote_info.parent_id)
             self.pending_block_tree.prune(qc.vote_info.parent_id)
             # print("[BlockTree][replicaID {}] Before HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
@@ -191,11 +192,12 @@ class BlockTree:
 
         if len(self.pending_votes[vote_idx]) == 2 * self.fCount + 1:
             # print("Forming qc at {}".format(self.author))
-            
+            voters = [x.sender for x in self.pending_votes[vote_idx]]
+
             qc = QC(
                 vote_info=vote.vote_info,
                 ledger_commit_info=vote.ledger_commit_info,
-                votes=self.pending_votes[vote_idx],
+                votes= voters,
                 author=self.author,
                 pvt_key=self.pvt_key,
                 pbc_key=self.pbc_key
