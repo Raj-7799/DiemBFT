@@ -13,7 +13,6 @@ import pickle
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 def max_round_qc(current_qc,high_qc):
     qc_round =  current_qc.vote_info.roundNo

@@ -6,7 +6,6 @@ from BlockTree import QC
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 
 # TODO : add a comparator operator to see if two messages are equal

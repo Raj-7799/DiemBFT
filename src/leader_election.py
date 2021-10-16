@@ -4,7 +4,6 @@ import random
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 
 class LeaderElection:
@@ -16,9 +15,10 @@ class LeaderElection:
         self.paceMaker = paceMaker
         self.ledger = ledger
         self.replicaID = replicaID
+        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
 
     def elect_reputation_leaders(self, qc):
-        diem_logger.info("[replicaID {}] START qc.vote_info.roundNo {}".format(self.replicaID,qc.vote_info.roundNo))
+        self.diem_logger.info("[replicaID {}] START qc.vote_info.roundNo {}".format(self.replicaID,qc.vote_info.roundNo))
 
         active_validators = OrderedDict()
         last_authors = OrderedDict()
@@ -51,12 +51,12 @@ class LeaderElection:
             return None
         
         random.seed(qc.vote_info.roundNo)
-        diem_logger.info("[replicaID {}] END qc.vote_info.roundNo {}".format(self.replicaID,qc.vote_info.roundNo))
+        self.diem_logger.info("[replicaID {}] END qc.vote_info.roundNo {}".format(self.replicaID,qc.vote_info.roundNo))
         return active_validators[random.randint(0, len(active_validators) - 1)]
 
         
     def update_leaders(self, qc):
-        diem_logger.info("[replicaID {}] START qc.vote_info.roundNo {} self.paceMaker.current_round {}".format(self.replicaID, qc.vote_info.roundNo, self.paceMaker.current_round))
+        self.diem_logger.info("[replicaID {}] START qc.vote_info.roundNo {} self.paceMaker.current_round {}".format(self.replicaID, qc.vote_info.roundNo, self.paceMaker.current_round))
         extended_round = qc.vote_info.parent_round
         qc_round = qc.vote_info.roundNo
         current_round = self.paceMaker.current_round
@@ -69,13 +69,13 @@ class LeaderElection:
             # This will return no elected_leader
             if elected_leader is not None:
                 self.reputation_leaders[current_round + 1] = elected_leader
-        diem_logger.info("[replicaID {}] END qc.vote_info.roundNo {}".format(self.replicaID, qc.vote_info.roundNo))
+        self.diem_logger.info("[replicaID {}] END qc.vote_info.roundNo {}".format(self.replicaID, qc.vote_info.roundNo))
 
     
     def get_leader(self, roundNo):
-        diem_logger.info("[replicaID {}] START roundNo {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.paceMaker.current_round))
+        self.diem_logger.info("[replicaID {}] START roundNo {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.paceMaker.current_round))
         if roundNo in self.reputation_leaders:
-            diem_logger.debug("[replicaID {}]  repuation_leaders for roundNo {} is {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.reputation_leaders[roundNo], self.paceMaker.current_round))
+            self.diem_logger.debug("[replicaID {}]  repuation_leaders for roundNo {} is {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.reputation_leaders[roundNo], self.paceMaker.current_round))
             return self.reputation_leaders[roundNo]
-        diem_logger.info("[replicaID {}] END roundNo {} self.paceMaker.current_round {}".format(self.replicaID, roundNo, self.paceMaker.current_round))
+        self.diem_logger.info("[replicaID {}] END roundNo {} self.paceMaker.current_round {}".format(self.replicaID, roundNo, self.paceMaker.current_round))
         return self.validators[(roundNo // 2) % len(self.validators)]

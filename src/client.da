@@ -3,7 +3,6 @@
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
   def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):
@@ -14,16 +13,18 @@ class Client(process):
     self.private_key = private_key
   
   def run():
+    self.diem_logger = get_logger(os.path.basename(__file__),self.pID)
+
     output("Yo running client!!!")
     output("Broadcasting messages to replicas")
-    diem_logger.debug("client START: run ")
+    self.diem_logger.debug("client START: run ")
     
     for i in ["abcd", "cdef", "xyzw", "ghfg"]:
       for _, replicaInfo in self.replicaInfos.items():
         send(("request", i), to=replicaInfo.process)
       
     await(self.nReq == 0)
-    diem_logger.debug("client END: run ")
+    self.diem_logger.debug("client END: run ")
 
 
   def receive(msg=("Yo bro",), from_=source):

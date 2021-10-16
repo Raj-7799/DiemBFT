@@ -6,9 +6,6 @@ from BlockTree import QC
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
-
-
 class TimeoutInfo():
     def __init__(self, roundNo: int, high_qc: QC, sender: int, pvt_key, pbc_key):
         self.roundNo = roundNo
