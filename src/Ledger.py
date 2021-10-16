@@ -1,9 +1,6 @@
 import plyvel
-<<<<<<< HEAD
 import pickle
 
-=======
->>>>>>> 276aa353ed2a8273df346c9e991366865dc0592f
 import os
 from diembft_logger import get_logger
 
