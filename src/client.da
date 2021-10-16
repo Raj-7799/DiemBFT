@@ -6,14 +6,14 @@ from diembft_logger import get_logger
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, f: int):
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):#, f: int):
     self.pID          = clientID
     self.nReq         = requests
     self.timeout      = clientTimeout
     self.replicaInfos = replicaInfos
     self.private_key = private_key
-    self.f            = f
-    self.dict_of_response = {} #Map dictionary of Response with number of requests
+    #self.f            = f
+    #self.dict_of_response = {} #Map dictionary of Response with number of requests
   
   def run():
     output("Yo running client!!!")
@@ -30,16 +30,24 @@ class Client(process):
     diem_logger.debug("client END: run ")
 
 
-  def receive(msg=("transaction_committed", msg), from_=source):
+  def receive(msg=("Yo bro",), from_=source):
+    
     if source in self.replicaInfos:  
       replicaInfo = self.replicaInfos[source]
       output("Got message from replica ", replicaInfo.replicaID)
-      if msg in dict_of_response:
-        self.dict_of_response[msg] = self.dict_of_response[msg] + 1
-        if self.dict_of_response[msg] == (self.f + 1):
-          self.nReq = self.nReq - 1
-      else:
-        self.dict_of_response[msg] = 0
+      self.nReq -= 1
     else:
       output("Received unknown message")
+  # def receive(msg=("transaction_committed", msg), from_=source):
+  #   if source in self.replicaInfos:  
+  #     replicaInfo = self.replicaInfos[source]
+  #     output("Got message from replica ", replicaInfo.replicaID)
+  #     if msg in dict_of_response:
+  #       self.dict_of_response[msg] = self.dict_of_response[msg] + 1
+  #       if self.dict_of_response[msg] == (self.f + 1):
+  #         self.nReq = self.nReq - 1
+  #     else:
+  #       self.dict_of_response[msg] = 0
+  #   else:
+  #     output("Received unknown message")
       

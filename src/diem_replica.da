@@ -24,7 +24,8 @@ class Replica(process):
         self.privateKey = privateKey
         self.publicKey = get_replica_public_key(self.replicaID)
         self.clientInfos = clientInfos
-        self.memPool = mempool.MemPool(broadcast_client_commited)
+        #self.memPool = mempool.MemPool(broadcast_client_commited)
+        self.memPool = mempool.MemPool()
         self.firstRequestProcess = False
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool)
@@ -37,9 +38,9 @@ class Replica(process):
             send((method, message), to=replicaInfo.process)
     
 
-    def broadcast_client_commited(command, client):
-        output("Broadcast client committed")
-        send(("transaction_committed", command), to=client)
+    # def broadcast_client_commited(command, client):
+    #     output("Broadcast client committed")
+    #     send(("transaction_committed", command), to=client)
 
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
