@@ -1,14 +1,11 @@
 import plyvel
-
-
-
 import os
 from diembft_logger import get_logger
 
 diem_logger = get_logger(os.path.basename(__file__))
 
 
-class Ledger():
+class Ledger:
 
     def __init__(self,genesis_block, replicaID):
         self.replicaID = replicaID
@@ -17,7 +14,6 @@ class Ledger():
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
         
-
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):
@@ -42,23 +38,24 @@ class Ledger():
 
 
     #commit the pending prefix of the given block id and prune other branches
-    def commit(self,block_id):
+    def commit(self,bk_id):
         diem_logger.debug("[Ledger][replicaID {}] START commit ".format(self.replicaID)) 
-        block_id = bytes(str(block_id),'utf-8')
+        block_id = bytes(str(bk_id),'utf-8')
         entry = self._db_speculate.get(block_id)        
         if  entry is not None:
+            diem_logger.debug("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
             self._db.put(block_id,entry)
             self._db_speculate.delete(block_id)      
         diem_logger.debug("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
-             
 
 
     #returns a committed block given its id
-    def committed_block(self,block_id):
+    def committed_block(self, block_id):
         diem_logger.debug("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
         block_id=bytes(str(block_id),'utf-8')
         diem_logger.debug("[Ledger][replicaID {}] END committed_block ".format(self.replicaID)) 
-        return self._db_speculate.get(block_id)        
+        
+        return self._db.get(block_id)        
 
 
     def print_ledger(self):
