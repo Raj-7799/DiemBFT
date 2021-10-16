@@ -1,5 +1,5 @@
 # DiemBFT
-Implementation of DiemBFT : State Machine Replication in Diem Bloackchain
+Implementation of DiemBFT : State Machine Replication in Diem Bloackchain as mentioned in https://developers.diem.com/papers/diem-consensus-state-machine-replication-in-the-diem-blockchain/2021-08-17.pdf
 
 
 ## Setup 
