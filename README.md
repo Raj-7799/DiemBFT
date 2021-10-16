@@ -24,13 +24,13 @@ DiemBFT has been tested on GNU/Linux only.
 - Step 2 - **Clone the repo** :: ``` git clone git@github.com:Raj-7799/DiemBFT.git ```
 - Step 3 - **Enter src folder** :: ``` cd DIEMBFT/src ```
 - Step 4  - **Create Conda Environment** :: ``` conda create --name <env> --file requirement.txt ```
-### Alternate way is toinstall dependencies is to manuall run the following commands
+### Alternate way is to install dependencies is to manuall run the following commands
 ``` bash
 conda create --name diem python=3.7
 conda activate diem
 pip install --pre pyDistAlgo
+pip install pickle
 pip install pynacl
-pip install bz2file
 pip install plyvel
 ```
 ## 2. Running Diem 
