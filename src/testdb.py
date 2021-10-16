@@ -11,8 +11,7 @@ for i in replicaID:
     print("Commits for replica ", i)
     with _db.iterator() as it:
         for k,v in it:
-            #print(k,v)
-            print(k,pickle.loads(v))
+            print(pickle.loads(v)[1].payload)
     
     _db.close()
 
