@@ -47,7 +47,7 @@ class Ledger:
     def commit(self,bk_id):
         block_id = bytes(str(bk_id),'utf-8')
         entry = self._db_speculate.get(block_id)
-        if  entry is not None and bk_id != 0:
+        if  entry is not None:
             print("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
             self._db.put(block_id,entry)
             # TODO : fix this
@@ -56,6 +56,7 @@ class Ledger:
 
     #returns a committed block given its id
     def committed_block(self, bk_id):
+        print("[Ledger][replicaID {}] Attempting to fetch commited block {}.".format(self.replicaID, bk_id)) 
         block_id=bytes(str(bk_id),'utf-8')
         entry = pickle.loads(self._db.get(block_id))
         if entry[1]:
