@@ -22,7 +22,6 @@ class RunDiemBFT(process):
       self.clients           = config['clients']
       self.requests          = config['requests']
       self.clientTimeout     = config['clientTimeout']
-      self.commandList       = config['commandList']
       
 
   def run():
@@ -67,8 +66,6 @@ class RunDiemBFT(process):
         self.clientTimeout,
         replicaInfos,
         KeySets[-1].private_key,
-        self.commandList,
-        self.faulty_replicas
       ))
     
     start(clients)
@@ -88,8 +85,7 @@ def main():
       'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
       'processByzantine' : False,
-      'processByzantineSeed' : 20,
-      'commandList' : ["abdd", "efgh", "ijkl", "mnop"]
+      'processByzantineSeed' : 20
     }
   ]
 
