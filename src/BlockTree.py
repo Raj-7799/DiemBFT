@@ -17,9 +17,10 @@ def create_genesis_object(pvt_key, pbc_key):
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
-    genesis_block =  Block(0,0,"genesis",genesis_qc, pvt_key, pbc_key)
-    diem_logger.debug("END: create_genesis_object ")
+    genesis_block =  Block(0, 0, "genesis",genesis_qc, pvt_key, pbc_key)
+    genesis_block.id = 0
 
+    diem_logger.debug("END: create_genesis_object ")
     return genesis_qc , genesis_block
 
 
@@ -90,7 +91,7 @@ class Block:
         return [self.author, self.roundNo, self.payload, self.qc.vote_info.id, self.qc.signatures]
     
     def __str__(self):
-        return "Block- {} Author - {} Round- {} QC- {}".format(self.payload, self.author, self.roundNo, self.qc)
+        return "Block ID - {} Payload- {} Author - {} Round- {} QC- {}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
 
 class PendingBlockTree(dict):
 
@@ -162,7 +163,6 @@ class BlockTree:
     
 
     def process_qc(self,qc):
-        print("Processing qc : ", qc)
         # diem_logger.debug("[BlockTree][replicaID {}] START process_qc ".format(self.author))
 
         if qc.ledger_commit_info.commit_state_id != None:
@@ -207,7 +207,6 @@ class BlockTree:
             
             diem_logger.debug("[BlockTree][replicaID {}] IN process_vote self.pending_vote {} ".format(self.author,self.pending_votes))
             diem_logger.debug("[BlockTree][replicaID {}] END process_vote qc.vote_info.roundNo {} ".format(self.author,qc.vote_info.roundNo))
-            print("Forming qc ", qc)
             return qc
         
         diem_logger.debug("[BlockTree][replicaID {}] END process_vote  ".format(self.author))
