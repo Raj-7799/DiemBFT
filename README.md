@@ -1,5 +1,5 @@
 # DiemBFT
-Implementation of DiemBFT : State Machine Replication in Diem Bloackchain as mentioned in https://developers.diem.com/papers/diem-consensus-state-machine-replication-in-the-diem-blockchain/2021-08-17.pdf
+Implementation of DiemBFT : State Machine Replication in Diem Bloackchain as mentioned in https://developers.diem.com/papers/diem-consensus-state-machine-replication-in-the-diem-blockchain/2021-08-17.pdf . We have used DistAlgo high level language for implementation. DistAlgo's Github respository can be found on https://github.com/DistAlgo/distalgo and the Home Page for the same can be found on http://distalgo.cs.stonybrook.edu/.
 
 
 ## Setup 
