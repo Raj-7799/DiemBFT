@@ -1,16 +1,16 @@
 # DiemBFT
 Implementation of DiemBFT : State Machine Replication in Diem Bloackchain as mentioned in 
 https://developers.diem.com/papers/diem-consensus-state-machine-replication-in-the-diem-blockchain/2021-08-17.pdf .
-We have used **DistAlgo** high level language for implementation. DistAlgo's Github respository can be found on
-https://github.com/DistAlgo/distalgo and the Home Page for the same can be found on http://distalgo.cs.stonybrook.edu/.
+We have used **DistAlgo** high level language for implementation. DistAlgo's respository can be found on
+https://github.com/DistAlgo/distalgo and the home page for the same can be found on http://distalgo.cs.stonybrook.edu/.
 
 # 1. Requirements
 ## Python
 DiemBFT required python version 3.7.11 which can be obtained from http://www.python.org.
-3.7.11 is mostly recommended since the latest version(Pre-Release) of DistAlgo runs smoothly on this version
-It is mandatory to make sure that the default Python used by the system is python 3.7.11. 
+3.7.11 is mostly recommended since the latest version(Pre-Release) of DistAlgo runs smoothly on this version.
+Please note that it is mandatory to make sure that the default Python used by the system is python 3.7.11. 
 This can be checked easily with the help of ``` python --version ``` command. It is highly 
-recommended to used Anaconda virtual environment for manaaging different versions of python in 
+recommended to use Anaconda(conda) virtual environment for managing different versions of python in 
 a system. The steps for Anaconda installation is provided in Setup below
 
 ## Operating system
