@@ -9,9 +9,11 @@ replicaID=[0, 1, 2, 3]
 for i in replicaID:
     _db = plyvel.DB('/tmp/diemLedger_{}/'.format(i), create_if_missing=True)
     print("Commits for replica ", i)
+    
     with _db.iterator() as it:
         for k,v in it:
             print(pickle.loads(v)[1].id, pickle.loads(v)[1].payload)
+            #print(pickle.loads(v)[0].id, pickle.loads(v)[0].payload)
     
     _db.close()
 

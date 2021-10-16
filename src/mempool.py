@@ -33,7 +33,7 @@ class MemPool:
         print("Delete " + command + " from Mempool")
         #self.broadcast_client_commited(command, self.locator[command])
         if command in self.locator:
-            print("Delete from Mempool Successfull")
+            print("Delete " + command + " from Mempool Successfull")
             #self.broadcast_client_commited(command, self.locator[command])
             del self.locator[command]
 
