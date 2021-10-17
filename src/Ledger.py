@@ -10,6 +10,7 @@ diem_logger = get_logger(os.path.basename(__file__))
 class Ledger:
 
     def __init__(self,genesis_block, replicaID, memPool, specluate_ledger, clientResponseHandler):
+        print("LEDGER for replica {}".format(replicaID))
         self.replicaID = replicaID
         self.memPool = memPool
         self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
