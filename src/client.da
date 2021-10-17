@@ -11,7 +11,7 @@ class Client(process):
   def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int, runner_process):
     self.pID                 = clientID
     self.nReq                = requests
-    self.verified = 1
+    self.verified            = requests
     self.timeout             = clientTimeout
     self.replicaInfos        = replicaInfos
     self.private_key         = private_key
@@ -19,8 +19,8 @@ class Client(process):
     self.f                   = f
     self.responses           = defaultdict(list)
     self.pendingVerification = {}
-    self.transactionMap = {}
-    self.runner_process = runner_process
+    self.transactionMap      = {}
+    self.runner_process      = runner_process
 
   
   def run():
