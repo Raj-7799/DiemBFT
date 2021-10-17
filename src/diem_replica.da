@@ -30,6 +30,7 @@ class Replica(process):
         self.waiting = False
         self.timedOut = False
 
+
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
@@ -81,14 +82,15 @@ class Replica(process):
     def process_next_round_event(last_tc):
         # diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
-            # Change
             transaction = memPool.get_transactions()
 
             if not transaction:
                 self.waiting = True
                 self.timedOut = False
                 output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-                await(self.waiting)
+                output("[replicaID {}] Mempoool state {}".format(self.replicaID, self.memPool.print()))
+                --request
+                await(self.waiting == False)
             
             if self.timedOut:
                 output("[replicaID {}] Timed out while waiting for transaction".format(self.replicaID))
@@ -100,17 +102,6 @@ class Replica(process):
                 transaction = memPool.get_transactions()
                 output("[replicaID {}] Transaction after waiting {}".format(self.replicaID, transaction))
 
-
-            # TODO : needs to be changed
-            # while not transaction:
-            #     if not waiting:
-            #         diem_logger.info("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-            #         output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-            #         # return
-
-            #     waiting = True
-            #     transaction = memPool.get_transactions() 
-            
             block = blockTree.generate_block(transaction, paceMaker.current_round)
             diem_logger.info("[replicaID {}] Generated block with block_id {} for transaction {} at round {}".format(self.replicaID, block.id, transaction, paceMaker.current_round))
             diem_logger.info("[replicaID {}] Mempool state {}".format(self.replicaID, self.memPool))
@@ -139,6 +130,7 @@ class Replica(process):
             diem_logger.info("[replicaID {}] Received a null proposal".format(self.replicaID))
             return
         
+        self.memPool.markState(P.block.payload)
         self.process_certificate(P.block.qc)
         self.process_certificate(P.high_commit_qc)
         self.paceMaker.advance_round_tc(P.last_round_tc)
@@ -182,8 +174,10 @@ class Replica(process):
 
     def receive(msg=("process_timeout_msg", M), from_=source):
         diem_logger.info("[replicaID {}] Received process_timeout_msg at replica".format(self.replicaID))
-        self.waiting = False
-        self.timedOut = True
+
+        if self.waiting:
+            self.waiting = False
+            self.timedOut = True
 
         self.process_certificate(M.tmo_info.high_qc)
         self.process_certificate(M.high_commit_qc)
