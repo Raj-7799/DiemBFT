@@ -76,8 +76,8 @@ class RunDiemBFT(process):
     await(self.clientNo == 0)
 
     for _,replicaInfo in replicaInfos.items():
-      output("closing replica {}".format(replicaInfo.replicaID))
-      end(replicaInfo.process)    
+      output("sending close message to replica {}".format(replicaInfo.replicaID))
+      send(("client_end"), to=replicaInfo.process)
 
   def receive(msg=("client_done",), from_=source):
     output("Received client done message ")

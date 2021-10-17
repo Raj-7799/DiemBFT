@@ -67,7 +67,7 @@ class Replica(process):
         return keys
 
     def run():
-        await(some(received(("Yo bro",))))
+        await(some(received(("client_end"))))
 
 
     def process_certificate(qc):
@@ -87,6 +87,7 @@ class Replica(process):
                 if not waiting:
                     diem_logger.info("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
                     output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
+                    # return
 
                 waiting = True
                 transaction = memPool.get_transactions() 
@@ -174,3 +175,6 @@ class Replica(process):
             # it should be Pacemaker.adbance_round_tc(tc)
             self.paceMaker.advance_round_tc(tc)
             self.process_next_round_event(tc)
+    
+    def receive(msg=("client_end"), from_=source):
+        output("Received message to close the replica")
