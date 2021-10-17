@@ -27,6 +27,8 @@ class Replica(process):
         self.clientInfos = clientInfos
         self.memPool = mempool.MemPool()
         self.firstRequestProcess = False
+        self.waiting = False
+        self.timedOut = False
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
@@ -81,16 +83,33 @@ class Replica(process):
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
             # Change
             transaction = memPool.get_transactions()
-            waiting = False
-            # TODO : needs to be changed
-            while not transaction:
-                if not waiting:
-                    diem_logger.info("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-                    output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-                    # return
 
-                waiting = True
-                transaction = memPool.get_transactions() 
+            if not transaction:
+                self.waiting = True
+                self.timedOut = False
+                output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
+                await(self.waiting)
+            
+            if self.timedOut:
+                output("[replicaID {}] Timed out while waiting for transaction".format(self.replicaID))
+                return
+
+            if transaction is None:
+                self.waiting = False
+                self.timedOut = False
+                transaction = memPool.get_transactions()
+                output("[replicaID {}] Transaction after waiting {}".format(self.replicaID, transaction))
+
+
+            # TODO : needs to be changed
+            # while not transaction:
+            #     if not waiting:
+            #         diem_logger.info("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
+            #         output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
+            #         # return
+
+            #     waiting = True
+            #     transaction = memPool.get_transactions() 
             
             block = blockTree.generate_block(transaction, paceMaker.current_round)
             diem_logger.info("[replicaID {}] Generated block with block_id {} for transaction {} at round {}".format(self.replicaID, block.id, transaction, paceMaker.current_round))
@@ -102,6 +121,8 @@ class Replica(process):
 
     def receive(msg=("request", cmd), from_=source):
         diem_logger.info("[replicaID {}] Received client request. Inserting cmd {} into mempool of replica".format(self.replicaID, cmd))
+        output("[replicaID {}] Waiting state {}".format(self.replicaID, self.waiting))
+        self.waiting = False
 
         self.memPool.insert_command(cmd, source)
         if not self.firstRequestProcess:
@@ -161,6 +182,8 @@ class Replica(process):
 
     def receive(msg=("process_timeout_msg", M), from_=source):
         diem_logger.info("[replicaID {}] Received process_timeout_msg at replica".format(self.replicaID))
+        self.waiting = False
+        self.timedOut = True
 
         self.process_certificate(M.tmo_info.high_qc)
         self.process_certificate(M.high_commit_qc)

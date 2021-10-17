@@ -3,6 +3,7 @@ import os
 from diembft_logger import get_logger
 from collections import defaultdict
 import client_request as cr
+import Util
 
 diem_logger = get_logger(os.path.basename(__file__))
 
@@ -38,17 +39,19 @@ class Client(process):
     for block_id, info in self.transactionMap.items():
       replica_id = info["replicas"][0]
       block_id = info["block_id"]
-      send(("validate", block_id), to=get_replica_info(replica_id))
+      output("Checking validation for {} and {}".format(replica_id, block_id))
+      send(("validate", block_id), to=get_replica_info(replica_id).process)
 
+    await(self.verified == 0)
     output(self.transactionMap,"Exit client")
 
     send(("client_done",), to=self.runner_process)
 
 
   def get_replica_info(replicaID):
-        for _, replicaInfo in self.replicaInfos.items():
-            if replicaInfo.replicaID == replicaID:
-                return replicaInfo
+    for _, replicaInfo in self.replicaInfos.items():
+      if replicaInfo.replicaID == replicaID:
+          return replicaInfo
 
   def receive(msg=("Yo bro",), from_=source):    
     if source in self.replicaInfos:  
@@ -63,7 +66,7 @@ class Client(process):
     if block is None:
       return
     
-    if block.payload.signature == Util.sign_object(block.payload.payload, self.private_key, pbc_key):
+    if block.payload.signature == Util.sign_object(block.payload.payload, self.private_key, self.public_key):
       output("Verified signature for block with id {}".format(block.id))
       self.verified -= 1
     else:
