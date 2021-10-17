@@ -134,7 +134,7 @@ class Replica(process):
             diem_logger.info("[replicaID {}] Inconsistency in round no or message source or block author for block {}".format(self.replicaID, P.block.id))
             return
         
-        blockTree.execute_and_insert(P.block)
+        blockTree.execute_and_insert(P.block,self.paceMaker.current_round)
         vote_message = self.safety.make_vote(P.block, P.last_round_tc)
         if vote_message:
             nextLeaderID = self.leaderElection.get_leader(current_round + 1)

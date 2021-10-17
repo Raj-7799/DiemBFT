@@ -25,7 +25,7 @@ class Ledger:
         print("[Ledger][replicaID {}] Speculating for prev block {} and current block {} ".format(self.replicaID, prev_block_id, block_id))
         block_id=bytes(str(block_id),'utf-8')
         value = pickle.dumps([prev_block_id,txns])      
-        self._db_speculate.put(block_id,value)
+        self._db_speculate.put(block_id,value,sync=True)
 
 
     #find the pending state for the given block id or ⊥ if not present
