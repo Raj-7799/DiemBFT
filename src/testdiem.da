@@ -67,11 +67,22 @@ class RunDiemBFT(process):
         replicaInfos,
         KeySets[-1].private_key,
         KeySets[-1].public_key,
-        self.faulty_replicas
+        self.faulty_replicas,
+        self
       ))
     
     start(clients)
-      
+    await(self.clients == 0)
+
+    for _,replicaInfo in replicaInfo.items():
+      output("closing replica {}".format(replicaInfo.replicaID))
+      end(replicaInfo.process)    
+
+  def receive(msg=("client_done",), from_=source):
+    output("Received client done message ")
+    self.clients-=1
+
+
 def main():
   config(clock='Lamport')
   config(channel='reliable')

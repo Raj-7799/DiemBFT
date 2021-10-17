@@ -7,7 +7,7 @@ import client_request as cr
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int):
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int, runner_process):
     self.pID                 = clientID
     self.nReq                = requests
     self.timeout             = clientTimeout
@@ -18,6 +18,9 @@ class Client(process):
     self.responses           = defaultdict(list)
     self.pendingVerification = {}
     self.transactionMap = {}
+    self.runner_process = runner_process
+
+
   
   def run():
     output("Broadcasting messages to replicas")
@@ -32,7 +35,8 @@ class Client(process):
       
     await(self.nReq == 0)
     output(self.transactionMap,"Exit client")
-
+    ## TODO need to verify 
+    send(("client_done"), to=self.runner_process)
 
 
   def receive(msg=("Yo bro",), from_=source):    
