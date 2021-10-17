@@ -11,6 +11,7 @@ import pickle
 import sys
 import os
 from diembft_logger import get_logger
+import time
 
 diem_logger = get_logger(os.path.basename(__file__))
 
@@ -24,11 +25,10 @@ class Replica(process):
         self.privateKey = privateKey
         self.publicKey = get_replica_public_key(self.replicaID)
         self.clientInfos = clientInfos
-        #self.memPool = mempool.MemPool(broadcast_client_commited)
         self.memPool = mempool.MemPool()
         self.firstRequestProcess = False
 
-        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool)
+        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
@@ -36,11 +36,9 @@ class Replica(process):
     def broadcast_helper(method, message):
         for _, replicaInfo in self.replicaInfos.items():
             send((method, message), to=replicaInfo.process)
-    
 
-    # def broadcast_client_commited(command, client):
-    #     output("Broadcast client committed")
-    #     send(("transaction_committed", command), to=client)
+    def client_response_handler(request):
+        send(("transaction_committed", request), to=request.source)
 
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
