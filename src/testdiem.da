@@ -91,7 +91,7 @@ def main():
 
   configs = [
     {
-      'faultyReplicas': 2,    # number of replicas which can go faulty
+      'faultyReplicas': 1,    # number of replicas which can go faulty
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
       'requests'      : 10,
