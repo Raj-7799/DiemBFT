@@ -2,38 +2,42 @@
 
 import os
 from diembft_logger import get_logger
+from collections import defaultdict
+import client_request as cr
 
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):
-    self.pID          = clientID
-    self.nReq         = requests
-    self.timeout      = clientTimeout
-    self.replicaInfos = replicaInfos
-    self.private_key = private_key
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int):
+    self.pID                 = clientID
+    self.nReq                = requests
+    self.timeout             = clientTimeout
+    self.replicaInfos        = replicaInfos
+    self.private_key         = private_key
+    self.public_key          = public_key
+    self.f                   = f
+    self.responses           = defaultdict(list)
+    self.pendingVerification = {}
   
   def run():
-    output("Yo running client!!!")
     output("Broadcasting messages to replicas")
-    diem_logger.debug("client START: run ")
-    
-    for j, i in enumerate(["1", "2", "3", "4"]):
-      # TODO : Remove the round-robin implementation
+    for j, i in enumerate(range(1, self.nReq + 1)):
+      client_request = cr.ClientRequest(str(i), self, self.private_key, self.public_key)
+      pendingVerification[client_request] = True
+      
       for _, replicaInfo in self.replicaInfos.items():
-          # if replicaInfo.replicaID == j:
-          send(("request", i), to=replicaInfo.process)
+        send(("request", client_request), to=replicaInfo.process)
       
     await(self.nReq == 0)
-    diem_logger.debug("client END: run ")
 
 
-  def receive(msg=("Yo bro",), from_=source):
-    
+  def receive(msg=("Yo bro",), from_=source):    
     if source in self.replicaInfos:  
       replicaInfo = self.replicaInfos[source]
       output("Got message from replica ", replicaInfo.replicaID)
       self.nReq -= 1
     else:
       output("Received unknown message")
-      
+
+  def receive(msg=("transaction_committed", obj), from_=source):
+    output("Received transaction", obj)
