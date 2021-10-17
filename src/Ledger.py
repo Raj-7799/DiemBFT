@@ -56,7 +56,7 @@ class Ledger:
             block = self.committed_block(bk_id)
             
             client = self.memPool.remove_transaction(block.payload)
-            self.clientResponseHandler(block.payload)
+            self.clientResponseHandler([bk_id, block.payload])
             # self._db_speculate.delete(block_id)      
         print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
