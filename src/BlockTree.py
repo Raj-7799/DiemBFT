@@ -210,7 +210,6 @@ class BlockTree:
 
         self.fCount=fCount
 
-
     @property
     def pending_block_tree(self):
         return self._pending_block_tree
@@ -247,13 +246,21 @@ class BlockTree:
 
 
   
-    def execute_and_insert(self,block):
+    def execute_and_insert(self,block,current_round):
+
+        print("execute_and_insert block.roundNo {} current_round {}".format(block.roundNo,current_round))
+
+        if block.roundNo >  current_round + 1:
+            #Sync node 
+            self.sync_replica(current_round,block.roundNo)
         ##In paper : Ledger.speculate(b.qc.block id, b.id, b.payload)
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.id,block.id,block)
         self.pending_block_tree.add(block.qc.vote_info.id,block)  # forking is possible so we need to know which node to extend
 
-    
+    def sync_replica(self,current_round,block_round):
+
+        pass 
     def process_vote(self, vote):
 
         self.process_qc(vote.high_commit_qc)
