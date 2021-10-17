@@ -101,7 +101,7 @@ class Replica(process):
                 send(("process_proposal_msg", proposal_msg), to=replicaInfo.process)
 
     def receive(msg=("request", cmd), from_=source):
-        # diem_logger.info("[replicaID {}] Received client request. Inserting cmd {} into mempool of replica".format(self.replicaID, cmd))
+        diem_logger.info("[replicaID {}] Received client request. Inserting cmd {} into mempool of replica".format(self.replicaID, cmd))
 
         self.memPool.insert_command(cmd, source)
         if not self.firstRequestProcess:
@@ -111,8 +111,6 @@ class Replica(process):
             self.firstRequestProcess = True
             process_next_round_event(None)
         
-
-    
     def receive(msg=("process_proposal_msg", P), from_=source):
         diem_logger.info("[replicaID {}] Received proposal msg with Block ID : {} at round {}".format(self.replicaID, P.block.id, self.paceMaker.current_round))
 
@@ -152,7 +150,6 @@ class Replica(process):
         else:
             diem_logger.info("[replicaID {}] Unable to make vote for block {}".format(self.replicaID, P.block.id))
 
-
     def receive(msg=("process_vote_msg", M), from_=source):
         diem_logger.info("[replicaID {}] Received vote message from {} for block {} at round {}".format(self.replicaID, M.sender, M.vote_info.id, self.paceMaker.current_round))
         qc = self.blockTree.process_vote(M)
@@ -178,3 +175,8 @@ class Replica(process):
     
     def receive(msg=("client_end"), from_=source):
         output("Received message to close the replica")
+    
+    def receive(msg=("validate", block_id), from_=source):
+        output("[replicaID {}] Received validate at replica".format(self.replicaID))
+        block = self.blockTree._ledger.committed_block(block_id)
+        send(("validation_block", block), to=source)
