@@ -134,14 +134,15 @@ class PendingBlockTree:
         #logger.debug("PendingBlockTree END: init")
         
     def get_node(self,block_id):
-    
-        return self.cache[block_id] if block_id in self.cache.keys() else None
+        if block_id in self.cache.keys():
+            return self.cache[block_id]
+        return None
 
     def add(self,prev_node_id,block):
         print("Block {} added to {} ".format(block.id,prev_node_id))
         node =  self.get_node(prev_node_id)
         if node is None:
-            return
+            return 
         node.childNodes[block.id]=Node(prev_node_id,block)
         self.cache[block.id]=node.childNodes[block.id]
     
@@ -150,8 +151,7 @@ class PendingBlockTree:
         self.print_cache()
         curr_node =  self.get_node(id)
         if curr_node is None:
-            print("Node is either commited or was never here")
-            return 
+            return
         self.root =  curr_node
         print("new root ",self.root.block.payload)
         self.cache_cleanup(id)

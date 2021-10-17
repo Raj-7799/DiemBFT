@@ -22,7 +22,13 @@ class RunDiemBFT(process):
       self.clientNo           = config['clients']
       self.requests          = config['requests']
       self.clientTimeout     = config['clientTimeout']
-      
+      self.networkByzantine  =  config['networkByzantine']
+      self.networkByzantineSeed =  config['networkByzantineSeed']
+      self.processByzantine = config['processByzantine']
+      self.processByzantineSeed =  config['processByzantineSeed']
+      self.byzantineNodes = config['byzantineNodes']
+      self.degreeOfByzantine = config['degreeOfByzantine']
+
 
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
@@ -48,6 +54,14 @@ class RunDiemBFT(process):
       clientInfo[i] = ClientInfo(KeySets[-1].public_key, i)
 
     for i, replica in enumerate(replicas):
+      
+      is_current_process_byzantine = False
+      is_current_network_byzantine = False
+      
+      if i in self.byzantineNodes:
+          is_current_process_byzantine=self.processByzantine
+          is_current_network_byzantine=self.networkByzantine  
+            
       setup(replica, (
           i,
           replicaInfos, 
@@ -55,7 +69,13 @@ class RunDiemBFT(process):
           self.replicas_required,
           self.delta,
           replicaToPvtKeys[i],
-          clientInfo
+          clientInfo,
+          is_current_network_byzantine,
+          self.networkByzantineSeed,
+          is_current_process_byzantine,
+          self.processByzantineSeed,
+          degreeOfByzantine
+
       ))
 
     start(replicas)
@@ -84,6 +104,8 @@ class RunDiemBFT(process):
     self.clientNo -= 1
 
 
+
+
 def main():
   config(clock='Lamport')
   config(channel='fifo')
@@ -98,8 +120,10 @@ def main():
       'clientTimeout' : 5000,
       'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
-      'processByzantine' : False,
-      'processByzantineSeed' : 20
+      'processByzantine' : True,
+      'processByzantineSeed' : 20,
+      "byzantineNodes": [1],
+      "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
     }
   ]
 
@@ -107,3 +131,5 @@ def main():
     runner = new(RunDiemBFT)
     setup(runner, (configuration,))
     start(runner)
+
+  
