@@ -12,7 +12,7 @@ class Client(process):
   def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int, runner_process):
     self.pID                 = clientID
     self.nReq                = requests
-    self.verified = 1
+    self.verified            = 1
     self.timeout             = clientTimeout
     self.replicaInfos        = replicaInfos
     self.private_key         = private_key
@@ -20,14 +20,13 @@ class Client(process):
     self.f                   = f
     self.responses           = defaultdict(list)
     self.pendingVerification = {}
-    self.transactionMap = {}
-    self.runner_process = runner_process
-    #self.dict_of_timer = {} # dict of timer for each Request
+    self.transactionMap      = {}
+    self.runner_process      = runner_process
 
   def run():
     output("Broadcasting messages to replicas")
     ## Adding two nodes to commit qc.vote_info.parent_id block 
-    client_request = [ str(x) for x in range(1,self.nReq + 1)]+["dummy1","dummy2"]
+    client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)] + ["dummy1" + str(self.pID),"dummy2" + str(self.pID)]
     for  i in  client_request:
       client_request = cr.ClientRequest(i, self, self.private_key, self.public_key)
       pendingVerification[client_request] = True
@@ -64,15 +63,6 @@ class Client(process):
     for _, replicaInfo in self.replicaInfos.items():
       if replicaInfo.replicaID == replicaID:
           return replicaInfo
-
-  def receive(msg=("Yo bro",), from_=source):    
-    if source in self.replicaInfos:  
-      replicaInfo = self.replicaInfos[source]
-      output("Got message from replica ", replicaInfo.replicaID)
-      self.nReq -= 1
-    else:
-      output("Received unknown message")
-    
   
   def receive(msg=("validation_block", block), from_=source):
     if block is None:
