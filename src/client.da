@@ -52,15 +52,6 @@ class Client(process):
     for _, replicaInfo in self.replicaInfos.items():
       if replicaInfo.replicaID == replicaID:
           return replicaInfo
-
-  def receive(msg=("Yo bro",), from_=source):    
-    if source in self.replicaInfos:  
-      replicaInfo = self.replicaInfos[source]
-      output("Got message from replica ", replicaInfo.replicaID)
-      self.nReq -= 1
-    else:
-      output("Received unknown message")
-    
   
   def receive(msg=("validation_block", block), from_=source):
     if block is None:

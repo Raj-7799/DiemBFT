@@ -27,7 +27,7 @@ class MemPool:
         self.state.add(command)
     
     def insert_command(self, command, client):
-        if command not in self.locator:
+        if command not in self.locator and command not in self.state:
             self.queue.append(command)
             self.locator[command] = client
 
