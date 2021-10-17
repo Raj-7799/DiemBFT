@@ -35,16 +35,6 @@ class Replica(process):
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
 
-        MSG = "Hi for verification"
-        output(" Trial Signing using private key " + MSG)
-        output(type(self.privateKey))
-        output(type(self.publicKey))
-        SIGNED_MSG = Util.sign_object_dup(MSG, self.privateKey)
-        output("After Signing ")
-        output(SIGNED_MSG)
-        if Util.verify_message_dup(SIGNED_MSG, self.publicKey):
-            output("Trial Verification Succesfull")
-
     def broadcast_helper(method, message):
         for _, replicaInfo in self.replicaInfos.items():
             send((method, message), to=replicaInfo.process)
