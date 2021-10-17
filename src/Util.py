@@ -7,7 +7,7 @@ from nacl.encoding import HexEncoder
 import bz2
 import sys
 import pickle
-
+import random
 
 
 import os
@@ -50,3 +50,8 @@ def verify_message(signed_msg):
         return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
     except BadSignatureError:
         return None
+
+def get_random(seed,degree):
+    random.seed(seed)
+    #value_generated = random.randrange(degree)
+    return int(random.uniform(0,degree))
