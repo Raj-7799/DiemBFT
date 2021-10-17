@@ -55,8 +55,9 @@ class Ledger:
             self._db.put(block_id,entry)
             block = self.committed_block(bk_id)
             
-            client = self.memPool.remove_transaction(block.payload)
-            self.clientResponseHandler([bk_id, block.payload])
+            self.memPool.remove_transaction(block.payload)
+            # returning tuple to client ,given tuples are immutatble it ensure object is untrampered
+            self.clientResponseHandler((bk_id, block.payload,self.replicaID))
             # self._db_speculate.delete(block_id)      
         print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 

@@ -32,7 +32,7 @@ class Client(process):
       
     await(self.nReq == 0)
     output(self.transactionMap,"Exit client")
-    
+
 
 
   def receive(msg=("Yo bro",), from_=source):    
@@ -43,16 +43,26 @@ class Client(process):
     else:
       output("Received unknown message")
     
+  
   def check_block_state(transaction):
-    transaction_counts = Counter(self.responses[transaction])
+    transaction_counts = defaultdict(int)
+    for entry in self.responses[transaction]:
+      transaction_counts[entry[0]]+=1
+    
     for bk_id, count in transaction_counts.items():
       if count == self.f + 1:
+        replicaIds=[]
         output("Received f + 1 = {} messages for transaction {} and block_id {}".format(self.f + 1, transaction, bk_id))
-        self.transactionMap[transaction] = bk_id
+        for x in self.responses[transaction]:
+          if x[0]==bk_id:
+            replicaIds.append(x[1])
+                    
+        self.transactionMap[transaction] = {"block_id":bk_id,"replicas":replicaIds}
+
         self.nReq -= 1
         break
 
   def receive(msg=("transaction_committed", obj), from_=source):
-    block_id, block = obj
-    self.responses[block].append(block_id)
+    block_id, block, author = obj
+    self.responses[block].append([block_id,author])
     check_block_state(block)
