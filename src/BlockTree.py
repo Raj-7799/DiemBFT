@@ -69,10 +69,10 @@ class VoteMsg:
         self.sender = sender
         #self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.form_signature_object(), pvt_key)
-        if self.verify_self_signature(pbc_key):
-            print("VoteMsg Validtion successfull")
-        else:
-            print("VoteMsg Validtion failed")
+        # if self.verify_self_signature(pbc_key):
+        #     print("VoteMsg Validtion successfull")
+        # else:
+        #     print("VoteMsg Validtion failed")
     
     # def verify_self_signature(self):
 
