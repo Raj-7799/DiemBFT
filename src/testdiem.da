@@ -66,6 +66,8 @@ class RunDiemBFT(process):
         self.clientTimeout,
         replicaInfos,
         KeySets[-1].private_key,
+        KeySets[-1].public_key,
+        self.faulty_replicas
       ))
     
     start(clients)
@@ -80,7 +82,7 @@ def main():
       'faultyReplicas': 1,    # number of replicas which can go faulty
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
-      'requests'      : 4,
+      'requests'      : 8,
       'clientTimeout' : 5000,
       'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
