@@ -38,7 +38,7 @@ class Replica(process):
             send((method, message), to=replicaInfo.process)
 
     def client_response_handler(request):
-        send(("transaction_committed", request), to=request.source)
+        send(("transaction_committed", request), to=request[1].source)
 
     def get_replica_info(replicaID):
         for _, replicaInfo in self.replicaInfos.items():
