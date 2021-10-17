@@ -18,7 +18,7 @@ for i in replicaID:
             block = pickle.loads(v)[1]
             ledger.append([block.qc.vote_info.id, block.payload, block.id])
     
-    ledger.sort(key=lambda x: x[1])
+    ledger.sort(key=lambda x: x[1].payload)
 
     print(tabulate(ledger, headers=["Parent Block ID", "Block transaction", "Block ID"]))
     

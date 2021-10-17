@@ -9,20 +9,25 @@ class MemPool:
     def __init__(self):
         self.queue = deque([])
         self.locator = {}
+        self.state = set()
     
     def get_transactions(self):
         # currently only sends one transaction
         if self.queue:
             command = self.queue.popleft()
-            if command in self.locator:
+            if command in self.locator and command not in self.state:
+                self.state.add(command)
                 return command
             else:
-                self.get_transactions()
+                return self.get_transactions()
         else:
             return None
 
+    def markState(self, command):
+        self.state.add(command)
+    
     def insert_command(self, command, client):
-        if command not in self.locator:
+        if command not in self.locator and command not in self.state:
             self.queue.append(command)
             self.locator[command] = client
 
@@ -40,3 +45,10 @@ class MemPool:
     
     def __str__(self):
         return "{} {}".format(self.queue, self.locator)
+    
+    def print(self):
+        output = ""
+        for q in self.queue:
+            output += str(q)
+        
+        return output
