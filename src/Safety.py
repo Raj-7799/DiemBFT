@@ -63,13 +63,19 @@ class Safety():
     
     '''Safety: Private'''
     #validate function currently always returns true
-    def _validate_signatures(self, b, last_tc):
+    def _validate_signatures(self, qc, last_tc):
         #TODO
-        return True
+        #print("Safety validation" + str(type(qc)))
+        if qc.verify_self_signature_qc():
+            print("Safety validation successsful")
+            return True
+        else:
+            print("Safety validation failed")
+            return False
 
     def make_vote(self, b, last_tc):
         qc_round = b.qc.vote_info.roundNo
-        if self._validate_signatures(b, last_tc) and self._safe_to_vote(b.roundNo, qc_round, last_tc):
+        if self._validate_signatures(b.qc, last_tc) and self._safe_to_vote(b.roundNo, qc_round, last_tc):
             self._update_highest_qc_round(qc_round)
             self._increase_highest_vote_round(b.roundNo)
 

@@ -1,0 +1,131 @@
+2021-10-17 00:09:45,931 — 139 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Received proposal msg with Block ID : b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' at round -1
+2021-10-17 00:09:45,932 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - 0 
+ RoundNo - -1 
+ ParentID - 0 
+ ParentRound - -1 
+ ExecStateID - 0 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0bfcd0> 
+ author - 0 for vote_info 0 at round -1
+2021-10-17 00:09:45,932 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - 0 
+ RoundNo - -1 
+ ParentID - 0 
+ ParentRound - -1 
+ ExecStateID - 0 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0bfcd0> 
+ author - 0 for vote_info 0 at round 0
+2021-10-17 00:09:45,933 — 164 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Next leader for the round 1 is at replica 0
+2021-10-17 00:09:45,933 — 172 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Sending vote message to next leader : 0 for block ID b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' at round 0
+2021-10-17 00:09:45,948 — 139 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Received proposal msg with Block ID : b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' at round 0
+2021-10-17 00:09:45,948 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' 
+ RoundNo - 0 
+ ParentID - 0 
+ ParentRound - -1 
+ ExecStateID - b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1250> 
+ author - 0 for vote_info b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' at round 0
+2021-10-17 00:09:45,951 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' 
+ RoundNo - 0 
+ ParentID - 0 
+ ParentRound - -1 
+ ExecStateID - b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1250> 
+ author - 0 for vote_info b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' at round 1
+2021-10-17 00:09:45,951 — 164 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Next leader for the round 2 is at replica 1
+2021-10-17 00:09:45,952 — 172 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Sending vote message to next leader : 1 for block ID b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' at round 1
+2021-10-17 00:09:45,967 — 139 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Received proposal msg with Block ID : b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' at round 1
+2021-10-17 00:09:45,968 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' 
+ RoundNo - 1 
+ ParentID - b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' 
+ ParentRound - 0 
+ ExecStateID - b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1190> 
+ author - 1 for vote_info b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' at round 1
+2021-10-17 00:09:45,968 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' 
+ RoundNo - 1 
+ ParentID - b'82986d14cb3a5f1ea9a5f8be8baf2237b4e0aa7914a4909272d3628f860bf2c9' 
+ ParentRound - 0 
+ ExecStateID - b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1190> 
+ author - 1 for vote_info b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' at round 2
+2021-10-17 00:09:45,970 — 164 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Next leader for the round 3 is at replica 1
+2021-10-17 00:09:45,970 — 172 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Sending vote message to next leader : 1 for block ID b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' at round 2
+2021-10-17 00:09:45,986 — 139 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Received proposal msg with Block ID : b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' at round 2
+2021-10-17 00:09:45,986 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' 
+ RoundNo - 2 
+ ParentID - b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' 
+ ParentRound - 1 
+ ExecStateID - b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1810> 
+ author - 1 for vote_info b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' at round 2
+2021-10-17 00:09:45,987 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' 
+ RoundNo - 2 
+ ParentID - b'0f6428a021164c2954ccb665ea72a316dfb6d8dea7dc75fbf9c9403036b9abb9' 
+ ParentRound - 1 
+ ExecStateID - b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1810> 
+ author - 1 for vote_info b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' at round 3
+2021-10-17 00:09:45,988 — 164 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Next leader for the round 4 is at replica 1
+2021-10-17 00:09:45,988 — 172 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Sending vote message to next leader : 1 for block ID b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' at round 3
+2021-10-17 00:09:45,999 — 139 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Received proposal msg with Block ID : b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 3
+2021-10-17 00:09:45,999 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ RoundNo - 3 
+ ParentID - b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' 
+ ParentRound - 2 
+ ExecStateID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1b10> 
+ author - 1 for vote_info b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' at round 3
+2021-10-17 00:09:46,000 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ RoundNo - 3 
+ ParentID - b'c9e7f1807c12f141fc2160dbd266f854ae1abdc4a28791d33445c67572bef943' 
+ ParentRound - 2 
+ ExecStateID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d1b10> 
+ author - 1 for vote_info b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' at round 4
+2021-10-17 00:09:46,001 — 164 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Next leader for the round 5 is at replica 2
+2021-10-17 00:09:46,001 — 172 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Sending vote message to next leader : 2 for block ID b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 4
+2021-10-17 00:09:46,003 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 0 for block b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 4
+2021-10-17 00:09:46,004 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 2 for block b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 4
+2021-10-17 00:09:46,006 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 1 for block b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 4
+2021-10-17 00:09:46,006 — 190 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Formed QC from votes at round 4
+2021-10-17 00:09:46,006 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ RoundNo - 4 
+ ParentID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ ParentRound - 3 
+ ExecStateID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f114d0d6310> 
+ author - 2 for vote_info b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 4
+2021-10-17 00:09:46,007 — 104 — diem_replica.da — process_next_round_event() — INFO — [replicaID 2] Waiting for transactions in mempool
+2021-10-17 00:09:46,007 — 110 — diem_replica.da — process_next_round_event() — INFO — [replicaID 2] Generated block with block_id b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' for transaction 6 at round 5
+2021-10-17 00:09:46,007 — 111 — diem_replica.da — process_next_round_event() — INFO — [replicaID 2] Mempool state deque([]) {'5': <Client:28c07>, '6': <Client:28c07>}
+2021-10-17 00:09:46,007 — 113 — diem_replica.da — process_next_round_event() — INFO — [replicaID 2] Broadcasting proposal message for block with block_id b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,010 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 3 for block b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 5
+2021-10-17 00:09:46,011 — 139 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Received proposal msg with Block ID : b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,012 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ RoundNo - 4 
+ ParentID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ ParentRound - 3 
+ ExecStateID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f113ffc3490> 
+ author - 2 for vote_info b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 5
+2021-10-17 00:09:46,012 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ RoundNo - 4 
+ ParentID - b'5e88603074db5e83b6934729287a66cbd90d48b8f2dce8cad912a0ffe8d109ed' 
+ ParentRound - 3 
+ ExecStateID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f113ffc3490> 
+ author - 2 for vote_info b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' at round 5
+2021-10-17 00:09:46,013 — 164 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Next leader for the round 6 is at replica 2
+2021-10-17 00:09:46,013 — 172 — diem_replica.da — _Replica_handler_836() — INFO — [replicaID 2] Sending vote message to next leader : 2 for block ID b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,015 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 0 for block b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,016 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 2 for block b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,016 — 186 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Received vote message from 3 for block b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,016 — 190 — diem_replica.da — _Replica_handler_1136() — INFO — [replicaID 2] Formed QC from votes at round 5
+2021-10-17 00:09:46,017 — 90 — diem_replica.da —  process_certificate() — INFO — [replicaID 2] Processing QC VoteInfo - ID - b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' 
+ RoundNo - 5 
+ ParentID - b'8d25ad3a211123106181ce4be4156c1cb4e9272bce234421c2d8a629995c0621' 
+ ParentRound - 4 
+ ExecStateID - b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' 
+ LedgerCommitInfo - <BlockTree.LedgerCommitInfo object at 0x7f113ffc33d0> 
+ author - 2 for vote_info b'8cd04dad707e101ced5b399ce1b66cfd858fd924263ba6c98aa3c8f999a1afcb' at round 5
+2021-10-17 00:09:46,017 — 104 — diem_replica.da — process_next_round_event() — INFO — [replicaID 2] Waiting for transactions in mempool
+2021-10-17 00:09:56,018 — 69 — diem_replica.da — pacemaker_broadcast_timeout() — DEBUG — [replicaID 2] Pacemaker broadcasting timeout.
