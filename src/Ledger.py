@@ -9,11 +9,12 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 class Ledger:
 
-    def __init__(self,genesis_block, replicaID, memPool):
+    def __init__(self,genesis_block, replicaID, memPool, clientResponseHandler):
         self.replicaID = replicaID
         self.memPool = memPool
         self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
         self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(self.replicaID), create_if_missing=True)
+        self.clientResponseHandler = clientResponseHandler
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
         
@@ -54,9 +55,8 @@ class Ledger:
             self._db.put(block_id,entry)
             block = self.committed_block(bk_id)
             
-            print("Remove from Mempool block = " + str(block))
-            self.memPool.remove_transaction(block.payload)
-
+            client = self.memPool.remove_transaction(block.payload)
+            self.clientResponseHandler(block.payload)
             # self._db_speculate.delete(block_id)      
         print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
