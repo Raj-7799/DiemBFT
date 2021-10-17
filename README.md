@@ -31,11 +31,11 @@ a system. The steps for Anaconda installation is provided in Setup below
 ## 6. Code Size
 
 ## 7. Language Feature usage
-- List Comprehensions
-- Dictionary Comprehensions
-- set comprehensions
-- aggregations
-- quantifications = 
+- List Comprehensions = Todo
+- Dictionary Comprehensions = Todo
+- set comprehensions = 0
+- aggregations  = 0
+- quantifications = 1 Quantification(some) in  diem_replica.da 
 - await statements = 1 in diem_replica.da
 - receive handlers = Total 5 : 4 in diem_replica.da and 1 in client.da
 
