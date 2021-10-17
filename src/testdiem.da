@@ -118,7 +118,7 @@ def main():
       'clients'       : 1,
       'requests'      : 10,
       'clientTimeout' : 5000,
-      'networkByzantine'     : True,
+      'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
       'processByzantine' : False,
       'processByzantineSeed' : 20,
