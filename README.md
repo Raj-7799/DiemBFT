@@ -4,7 +4,10 @@ https://developers.diem.com/papers/diem-consensus-state-machine-replication-in-t
 We have used **DistAlgo** high level language for implementation. DistAlgo's respository can be found on
 https://github.com/DistAlgo/distalgo and the home page for the same can be found on http://distalgo.cs.stonybrook.edu/.
 
-# 1. Requirements
+# 1. Platform
+## Operating system
+DiemBFT has been tested on GNU/Linux only.
+
 ## Python
 DiemBFT required python version 3.7.11 which can be obtained from http://www.python.org.
 3.7.11 is mostly recommended since the latest version(Pre-Release) of DistAlgo runs smoothly on this version.
@@ -12,9 +15,6 @@ Please note that it is mandatory to make sure that the default Python used by th
 This can be checked easily with the help of ``` python --version ``` command. It is highly 
 recommended to use Anaconda(conda) virtual environment for managing different versions of python in 
 a system. The steps for Anaconda installation is provided in Setup below
-
-## Operating system
-DiemBFT has been tested on GNU/Linux only.
 
 ## 2. Setup 
 
@@ -32,7 +32,36 @@ pip install --pre pyDistAlgo
 pip install pickle
 pip install pynacl
 pip install plyvel
+pip install tabulate
 ```
-## 2. Running Diem 
+## 3. Running Diem 
 ### Command to run the driver code from the source folder
 - ``` python -m da --message-buffer-size 1024000 testdiem.da &> out.log  ```
+
+## 4. Workload generation
+
+## 5. Timeouts
+- For get_round_timer in Pacemaker, We use the Hardcoded delta value in the formula 4* *delta* as timeout value
+
+## 6. Bugs and Limitations
+
+## 7. Main files
+- DiemBFT/src/diem_replica.da : Replica code . It mainly contains the Main fucntion as mentioned in the Pseudocode
+- DiemBFT/src/testdiem.da : The Driver code that spawns the Clients and Replicas as per the configuaration. This is the **Run** class as mentioned in the phase doc 
+- DiemBFT/src/client.da : The client code which send and receives commans from the replica's
+
+## 8. Code Size
+
+## 9. Language Feature usage
+- List Comprehensions
+- Dictionary Comprehensions
+- set comprehensions
+- aggregations
+- quantifications
+- await statements
+- receive handlers
+
+## 10. Contributions
+
+## 11. Other
+
