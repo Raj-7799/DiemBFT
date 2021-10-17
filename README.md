@@ -35,9 +35,9 @@ a system. The steps for Anaconda installation is provided in Setup below
 - Dictionary Comprehensions
 - set comprehensions
 - aggregations
-- quantifications
-- await statements
-- receive handlers
+- quantifications = 
+- await statements = 1 in diem_replica.da
+- receive handlers = Total 5 : 4 in diem_replica.da and 1 in client.da
 
 ## 8. Contributions
 
