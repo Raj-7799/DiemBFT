@@ -1,7 +1,4 @@
 from collections import deque
-
-
-
 import os
 from diembft_logger import get_logger
 
@@ -9,10 +6,9 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 
 class MemPool:
-    def __init__(self):#, broadcast_client_commited):
+    def __init__(self):
         self.queue = deque([])
         self.locator = {}
-        #self.broadcast_client_commited = broadcast_client_commited
     
     def get_transactions(self):
         # currently only sends one transaction
@@ -29,12 +25,11 @@ class MemPool:
         if command not in self.locator:
             self.queue.append(command)
             self.locator[command] = client
+
     def delete_command(self, command):
-        print("Delete " + command + " from Mempool")
-        #self.broadcast_client_commited(command, self.locator[command])
+        print("Delete {} from Mempool".format(command))
         if command in self.locator:
-            print("Delete " + command + " from Mempool Successfull")
-            #self.broadcast_client_commited(command, self.locator[command])
+            print("Delete {} from Mempool Successfull".format(command))
             del self.locator[command]
 
     def remove_transaction(self, command):

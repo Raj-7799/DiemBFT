@@ -3,6 +3,7 @@ import Util
 from Util import max_round_qc,hash
 from collections import defaultdict
 import pickle
+import client_request as cr
 
 import os
 from diembft_logger import get_logger
@@ -16,7 +17,7 @@ def create_genesis_object(pvt_key, pbc_key):
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
-    genesis_block =  Block(0, -1, "genesis",genesis_qc, pvt_key, pbc_key)
+    genesis_block =  Block(0, -1, cr.ClientRequest("0", None, pvt_key, pbc_key), genesis_qc, pvt_key, pbc_key)
     genesis_block.id = 0
 
     return genesis_qc , genesis_block
@@ -113,41 +114,82 @@ class Block:
     def verify_block(self):
         return self.qc.verify_self_signature_qc()
 
-class PendingBlockTree(dict):
+class Node:
+    def __init__(self,prev_node_id,block):
+        self.prev_node_id = prev_node_id
+        self.block = block
+        self.childNodes = dict()
+
+class PendingBlockTree:
 
     def __init__(self,genesis_block):
         super()
-
+        self.root = Node(0,genesis_block)
+        
+        self.cache = dict()
+        self.cache[genesis_block.id]=self.root
         self.add(genesis_block.id,genesis_block)
+
+
+        #logger.debug("PendingBlockTree END: init")
         
-        
+    def get_node(self,block_id):
+        return self.cache[block_id]
+
+    def add(self,prev_node_id,block):
+        print("Block {} added to {} ".format(block.id,prev_node_id))
+        node =  self.get_node(prev_node_id)
+        node.childNodes[block.id]=Node(prev_node_id,block)
+        self.cache[block.id]=node.childNodes[block.id]
     
-    def __setitem__(self, key, value):
-        # #logger.debug("PendingBlockTree START: __setitem__",key)
+    def prune(self,id):
+        print("PRUNING {}".format(id))
+        self.print_cache()
+        curr_node =  self.get_node(id)
+        self.root =  curr_node
+        print("new root ",self.root.block.payload)
+        self.cache_cleanup(id)
+        self.print_cache()
+        # parent_node = self.get_node(curr_node.prev_node_id)
+        # parent_node.childNodes[id]=None
+        # del parent_node.childNodes[id]
+
+    def cache_cleanup(self,id):
+        self.cache=dict()
+        self.prune_helper(self.root)
+         
+
+    def prune_helper(self,node):
         
-        if value in self:
-            del self[value]            
-        super().__setitem__(value,key)
-                        
-        if len(self) == 1:     
-            super().__setitem__("root",key)       
+        if node is None:
+            return 
+        self.cache[node.block.id]=node
+        for block_id in node.childNodes.keys():
+            self.cache[block_id] = node.childNodes[block_id]
+            self.prune_helper(node.childNodes[block_id])
+        
 
-        # #logger.debug("PendingBlockTree END: __setitem__",key)     
+    def helper(self,temp):
+        
+        if temp is None:
+            return
+        print("helper ",temp.block.payload)
+        for i in temp.childNodes.keys():            
+            print("parent node : {} childNode: id {} ,node {} ".format(temp.childNodes[i].prev_node_id,i,temp.childNodes[i].block.payload))
+            self.helper(temp.childNodes[i])
 
-    
-    def prune(self,id):        
-        #use prev root to trace and delete the nodes that not child of id node or id nodes it self    
-        # #logger.debug("PendingBlockTree START: prune  ")         
-        super().__setitem__("root",id)
-        # #logger.debug("PendingBlockTree EMD: prune  ")      
-
-                     
-    def add(self,prev_block_id,block):
-        self.__setitem__(prev_block_id,block)   
+    def print_nodes(self):
+        temp = self.root
+        self.helper(temp)
+        
+    def print_cache(self):
+        print("PRINTING CACHE ")
+        for i in self.cache.keys():
+            print("key {} ,value {} block payload {} ".format(i,self.cache[i],self.cache[i].block.payload))
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key, memPool):      
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
@@ -155,10 +197,11 @@ class BlockTree:
 
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
         genesis_block.id=0
-        self._ledger = ld.Ledger(genesis_block, self.author, memPool)
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)
+        self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler)
+
         self.fCount=fCount
 
 
@@ -186,6 +229,7 @@ class BlockTree:
             #Ledger.commit(qc['vote_info']['parent_id'])
             print("Leger commit info replicaID {} {}".format(qc.ledger_commit_info.commit_state_id, self.author))
             self._ledger.commit(qc.vote_info.parent_id)
+            print("qc.vote_info.parent_id {} replica {} ".format(qc.vote_info.parent_id,self.author))
             self.pending_block_tree.prune(qc.vote_info.parent_id)
             # print("[BlockTree][replicaID {}] Before HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
             self._high_commit_qc=max_round_qc(qc,self.high_commit_qc) # max_rond high commit qc ← max round {qc, high commit qc} // max round need elaboration
