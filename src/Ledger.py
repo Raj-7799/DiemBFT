@@ -95,7 +95,7 @@ class Ledger:
         print("[Ledger][replicaID {}] Attempting to fetch commited block {}.".format(self.replicaID, bk_id)) 
         block_id=bytes(str(bk_id),'utf-8')
         print("committed_block {}".format(bk_id))
-        self.print_ledger()
+        # self.print_ledger()
         entry = pickle.loads(self._db.get(block_id))
         if entry[1]:
             print("[Ledger][replicaID {}] Fetching commited block successfull {}.".format(self.replicaID, bk_id)) 

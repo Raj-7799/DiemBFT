@@ -189,6 +189,7 @@ class PendingBlockTree:
         self.helper(temp)
         
     def print_cache(self):
+        return
         print("PRINTING CACHE ")
         for i in self.cache.keys():
             print("key {} ,value {} block payload {} ".format(i,self.cache[i],self.cache[i].block.payload))
