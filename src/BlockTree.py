@@ -46,8 +46,13 @@ class QC:
         self.ledger_commit_info = ledger_commit_info
         self.signatures         = votes
         self.author             = author
+        self.pbc_key             = pbc_key
         #self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
+        # if self.verify_self_signature():
+        #     print("QuoromCertificate Validtion successfull")
+        # else:
+        #     print("QuoromCertificate Validtion failed")
     
     def __str__(self):
         return "VoteInfo - {} \n LedgerCommitInfo - {} \n author - {}".format(self.vote_info, self.ledger_commit_info, self.author)
@@ -60,6 +65,9 @@ class QC:
         diem_logger.info("[QC][replicaID {}] END get_signers ".format(self.author))
 
         return signers
+    
+    def verify_self_signature_qc(self):
+        return Util.check_authenticity_dup(self.signatures, self.signature, self.pbc_key)
 
 class VoteMsg:
     def __init__(self, vote_info: VoteInfo, ledger_commit_info: LedgerCommitInfo, high_commit_qc: QC, sender: int, pvt_key, pbc_key):
@@ -79,7 +87,6 @@ class VoteMsg:
     #     return Util.check_authenticity_dup(self.form_signature_object(), self.signature)
 
     def verify_self_signature(self, pbc_key):
-
         return Util.check_authenticity_dup(self.form_signature_object(), self.signature, pbc_key)
 
     def form_signature_object(self):
@@ -102,6 +109,9 @@ class Block:
     
     def __str__(self):
         return " Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
+
+    def verify_block(self):
+        return self.qc.verify_self_signature_qc()
 
 class PendingBlockTree(dict):
 

@@ -136,6 +136,7 @@ class Replica(process):
         else:
             output("Validation Successful")
         P=P[0]
+        output("type of process_proposal_msg = " + str(type(P.block)))
         diem_logger.info("[replicaID {}] Received proposal msg with Block ID : {} at round {}".format(self.replicaID, P.block.id, self.paceMaker.current_round))
 
         if P is None:
