@@ -28,61 +28,61 @@ def hash(object):
     digest = hasher(pickle.dumps(object), encoder=nacl.encoding.HexEncoder)
     return digest
 
-def sign_object(obj, pvt_key, pbc_key):
-    seralized_msg =  pickle.dumps(obj)
-    return sign_message(seralized_msg, pvt_key, pbc_key)
-
-def sign_message(pickled_msg, pvt_key, pbc_key):    
-    
-    print("Start Signing")
-    signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
-    verify_key = pbc_key
-    print("Signed Successful")
-    verify_key_hex = verify_key.encode(encoder=HexEncoder)
-    
-    print("Encoding Successful")     
-    return [signed_hex,verify_key_hex]
-
-def check_authenticity(obj, signed_msg):
-    objIdentity = verify_message(signed_msg)
-    return pickle.dumps(obj) == objIdentity
-
-def verify_message(signed_msg):
-    signed_hex, verify_key_hex=signed_msg
-    signature_bytes = HexEncoder.decode(signed_hex.signature)
-    verify_key = VerifyKey(verify_key_hex,encoder=HexEncoder)
-    try:
-        return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
-    except BadSignatureError:
-        return None
-
-
-# def sign_object(obj, pvt_key):
+# def sign_object(obj, pvt_key, pbc_key):
 #     seralized_msg =  pickle.dumps(obj)
-#     return sign_message(seralized_msg, pvt_key)
+#     return sign_message(seralized_msg, pvt_key, pbc_key)
 
-# def sign_message(pickled_msg, pvt_key):
+# def sign_message(pickled_msg, pvt_key, pbc_key):    
+    
 #     print("Start Signing")
 #     signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
+#     verify_key = pbc_key
 #     print("Signed Successful")
-#     return signed_hex
+#     verify_key_hex = verify_key.encode(encoder=HexEncoder)
+    
+#     print("Encoding Successful")     
+#     return [signed_hex,verify_key_hex]
 
-# def encode_key(key):
-#     print("Start Encoding")
-#     key_hex = key.encode(encoder=HexEncoder)
-#     print("End Encoding")
-#     return key_hex
-
-# def check_authenticity(obj, signed_msg, pbc_key):
-#     objIdentity = verify_message(signed_msg, pbc_key)
+# def check_authenticity(obj, signed_msg):
+#     objIdentity = verify_message(signed_msg)
 #     return pickle.dumps(obj) == objIdentity
 
-# def verify_message(signed_msg, pbc_key):
-#     signed_hex = signed_msg
-#     verify_key_hex = encode_key(pbc_key)
+# def verify_message(signed_msg):
+#     signed_hex, verify_key_hex=signed_msg
 #     signature_bytes = HexEncoder.decode(signed_hex.signature)
 #     verify_key = VerifyKey(verify_key_hex,encoder=HexEncoder)
 #     try:
 #         return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
 #     except BadSignatureError:
 #         return None
+
+
+def sign_object_dup(obj, pvt_key):
+    seralized_msg =  pickle.dumps(obj)
+    return sign_message_dup(seralized_msg, pvt_key)
+
+def sign_message_dup(pickled_msg, pvt_key):
+    print("Start Signing")
+    signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
+    print("Signed Successful")
+    return signed_hex
+
+def encode_key_dup(key):
+    print("Start Encoding")
+    key_hex = key.encode(encoder=HexEncoder)
+    print("End Encoding")
+    return key_hex
+
+def check_authenticity_dup(obj, signed_msg, pbc_key):
+    objIdentity = verify_message_dup(signed_msg, pbc_key)
+    return pickle.dumps(obj) == objIdentity
+
+def verify_message_dup(signed_msg, pbc_key):
+    signed_hex = signed_msg
+    verify_key_hex = encode_key_dup(pbc_key)
+    signature_bytes = HexEncoder.decode(signed_hex.signature)
+    verify_key = VerifyKey(verify_key_hex,encoder=HexEncoder)
+    try:
+        return verify_key.verify(signed_hex.message,signature_bytes,encoder=HexEncoder)
+    except BadSignatureError:
+        return None

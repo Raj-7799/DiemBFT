@@ -46,7 +46,8 @@ class QC:
         self.ledger_commit_info = ledger_commit_info
         self.signatures         = votes
         self.author             = author
-        self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
+        #self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
+        self.signature = Util.sign_object_dup(self.signatures, pvt_key)
     
     def __str__(self):
         return "VoteInfo - {} \n LedgerCommitInfo - {} \n author - {}".format(self.vote_info, self.ledger_commit_info, self.author)
@@ -66,11 +67,20 @@ class VoteMsg:
         self.ledger_commit_info = ledger_commit_info
         self.high_commit_qc = high_commit_qc
         self.sender = sender
-        self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
-        
-    def verify_self_signature(self):
+        #self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
+        self.signature = Util.sign_object_dup(self.form_signature_object(), pvt_key)
+        if self.verify_self_signature(pbc_key):
+            print("VoteMsg Validtion successfull")
+        else:
+            print("VoteMsg Validtion failed")
+    
+    # def verify_self_signature(self):
 
-        return Util.check_authenticity(self.form_signature_object(), self.signature)
+    #     return Util.check_authenticity_dup(self.form_signature_object(), self.signature)
+
+    def verify_self_signature(self, pbc_key):
+
+        return Util.check_authenticity_dup(self.form_signature_object(), self.signature, pbc_key)
 
     def form_signature_object(self):
         return [self.ledger_commit_info]
