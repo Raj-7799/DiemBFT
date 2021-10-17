@@ -108,7 +108,7 @@ class RunDiemBFT(process):
 
 def main():
   config(clock='Lamport')
-  config(channel='reliable')
+  config(channel='fifo')
   
 
   configs = [
@@ -116,7 +116,7 @@ def main():
       'faultyReplicas': 2,    # number of replicas which can go faulty
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
-      'requests'      : 8,
+      'requests'      : 10,
       'clientTimeout' : 5000,
       'networkByzantine'     : True,
       'networkByzantineSeed' : 10,

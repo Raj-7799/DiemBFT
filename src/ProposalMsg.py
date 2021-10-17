@@ -14,7 +14,8 @@ class ProposalMsg:
         self.block = block
         self.last_round_tc = last_round_tc
         self.high_commit_qc = high_commit_qc
-        self.signature = Util.sign_object(self.block.id, pvt_key, pbc_key)
+        #self.signature = Util.sign_object(self.block.id, pvt_key, pbc_key)
+        self.signature = Util.sign_object_dup(self.block.id, pvt_key)
     
     def __str__(self):
         return "{ Block - {} \n Last_round_tc - {} \n High_commit_qc - {} }".format(self.block, self.last_round_tc, self.high_commit_qc)
