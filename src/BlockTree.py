@@ -17,7 +17,7 @@ def create_genesis_object(pvt_key, pbc_key):
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
-    genesis_block =  Block(0, -1, cr.ClientRequest("0", None, pvt_key, pbc_key), genesis_qc, pvt_key, pbc_key)
+    genesis_block =  Block(0, -1, cr.ClientRequest("0", None, pvt_key), genesis_qc, pvt_key, pbc_key)
     genesis_block.id = 0
 
     return genesis_qc , genesis_block

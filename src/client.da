@@ -28,7 +28,7 @@ class Client(process):
     ## Adding two nodes to commit qc.vote_info.parent_id block 
     client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)] + ["dummy1" + "-" + str(self.pID),"dummy2" + "-" + str(self.pID)]
     for  i in  client_request:
-      client_request = cr.ClientRequest(i, self, self.private_key, self.public_key)
+      client_request = cr.ClientRequest(i, self, self.private_key)
       pendingVerification[client_request] = True
       
       for _, replicaInfo in self.replicaInfos.items():
@@ -57,7 +57,7 @@ class Client(process):
     if block is None:
       return
     
-    if block.payload.signature == Util.sign_object(block.payload.payload, self.private_key, self.public_key):
+    if block.payload.signature == Util.sign_object_dup(block.payload.payload, self.private_key):
       output("Verified signature for block with id {}".format(block.id))
       self.verified -= 1
     else:

@@ -139,6 +139,12 @@ class Replica(process):
 
     def receive(msg=("request", cmd), from_=source):
         diem_logger.info("[replicaID {}] Received client request. Inserting cmd {} into mempool of replica".format(self.replicaID, cmd))
+        if not Util.verify_message_dup(cmd.signature, self.clientInfos[source].public_key):
+            output("[replicaID {}] Received forged client signature".format(self.replicaID))
+            return
+        else:
+            output("[replicaID {}] Client signature looks good".format(self.replicaID))
+        
         output("[replicaID {}] Waiting state {}".format(self.replicaID, self.waiting))
         self.waiting = False
 
