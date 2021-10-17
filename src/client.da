@@ -36,7 +36,7 @@ class Client(process):
     await(self.nReq == 0)
     output(self.transactionMap,"Exit client")
     ## TODO need to verify 
-    send(("client_done"), to=self.runner_process)
+    send(("client_done",), to=self.runner_process)
 
 
   def receive(msg=("Yo bro",), from_=source):    

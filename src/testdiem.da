@@ -19,7 +19,7 @@ class RunDiemBFT(process):
       self.faulty_replicas   = config['faultyReplicas']
       self.replicas_required = 3 * faulty_replicas + 1
       self.delta             = config['timeoutDelta']
-      self.clients           = config['clients']
+      self.clientNo           = config['clients']
       self.requests          = config['requests']
       self.clientTimeout     = config['clientTimeout']
       
@@ -28,7 +28,7 @@ class RunDiemBFT(process):
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
     
     replicas = new(diem_replica.Replica, num=self.replicas_required)
-    clients = new(Client, num=self.clients)
+    clients = new(Client, num=self.clientNo)
     output("Generating keys ")
     GenerateKey(self.replicas_required + 1).write_config()
     KeySets = [ Keys(i) for i in range(self.replicas_required + 1)]
@@ -37,13 +37,14 @@ class RunDiemBFT(process):
     replicaToPvtKeys = {}
 
     clientInfo = {}
+    current_runner_process = self
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
       replicaInfos[replica] = ReplicaInfo(replica, KeySet.public_key, i)
       replicaToPvtKeys[i] = KeySet.private_key
 
-    for i in self.clients:
+    for i in clients:
       clientInfo[i] = ClientInfo(KeySets[-1].public_key, i)
 
     for i, replica in enumerate(replicas):
@@ -68,19 +69,19 @@ class RunDiemBFT(process):
         KeySets[-1].private_key,
         KeySets[-1].public_key,
         self.faulty_replicas,
-        self
+        current_runner_process
       ))
     
     start(clients)
-    await(self.clients == 0)
+    await(self.clientNo == 0)
 
-    for _,replicaInfo in replicaInfo.items():
+    for _,replicaInfo in replicaInfos.items():
       output("closing replica {}".format(replicaInfo.replicaID))
       end(replicaInfo.process)    
 
   def receive(msg=("client_done",), from_=source):
     output("Received client done message ")
-    self.clients-=1
+    self.clientNo -= 1
 
 
 def main():
