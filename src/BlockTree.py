@@ -3,6 +3,7 @@ import Util
 from Util import max_round_qc,hash
 from collections import defaultdict
 import pickle
+import client_request as cr
 
 import os
 from diembft_logger import get_logger
@@ -16,7 +17,7 @@ def create_genesis_object(pvt_key, pbc_key):
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
-    genesis_block =  Block(0, -1, "genesis",genesis_qc, pvt_key, pbc_key)
+    genesis_block =  Block(0, -1, cr.ClientRequest("0", None, pvt_key, pbc_key), genesis_qc, pvt_key, pbc_key)
     genesis_block.id = 0
 
     return genesis_qc , genesis_block
@@ -97,10 +98,7 @@ class PendingBlockTree(dict):
 
     def __init__(self,genesis_block):
         super()
-
         self.add(genesis_block.id,genesis_block)
-        
-        
     
     def __setitem__(self, key, value):
         # #logger.debug("PendingBlockTree START: __setitem__",key)
@@ -127,7 +125,7 @@ class PendingBlockTree(dict):
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key, memPool):      
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
@@ -135,7 +133,7 @@ class BlockTree:
 
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
         genesis_block.id=0
-        self._ledger = ld.Ledger(genesis_block, self.author, memPool)
+        self._ledger = ld.Ledger(genesis_block, self.author, memPool, responseHandler)
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)
