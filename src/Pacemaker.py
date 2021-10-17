@@ -75,7 +75,7 @@ class Pacemaker:
                 tmo_high_qc_rounds.append(_tmo_info.high_qc.vote_info.roundNo)
                 tmo_signatures.append(_tmo_info.signature)
             
-            tc = Tc.TC(tmo_info.roundNo, tmo_high_qc_rounds, tmo_signatures)
+            tc = Tc.TC(tmo_info.roundNo, tmo_high_qc_rounds, tmo_signatures, self.blocktree.pvt_key, self.blocktree.pbc_key)
             print("[Pacemaker][replicaID {}] END process_remote_timeout of tmo.tmo_info.roundNo {} with tc {}".format(self.replicaID, tmo.tmo_info.roundNo, tc.roundNo))
             return tc
         print("[Pacemaker][replicaID {}] END process_remote_timeout of tmo.tmo_info.roundNo {}".format(self.replicaID, tmo.tmo_info.roundNo))
