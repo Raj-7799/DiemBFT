@@ -14,11 +14,14 @@ class TimeoutInfo():
         self.roundNo = roundNo
         self.high_qc = high_qc
         self.sender = sender
-        self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
+        #self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
+        self.signature = Util.sign_object_dup(self.form_signature_object(), pvt_key)
     
-    def verify_self_signature(self):
-        return Util.check_authenticity(self.form_signature_object(), self.signature)
+    # def verify_self_signature(self):
+    #     return Util.check_authenticity(self.form_signature_object(), self.signature)
 
+    def verify_self_signature(self, pbc_key):
+        return Util.check_authenticity_dup(self.form_signature_object(), self.signature, pbc_key)
     def form_signature_object(self):
         return [self.roundNo, self.high_qc.vote_info.roundNo]
 
