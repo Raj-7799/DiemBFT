@@ -8,13 +8,14 @@ import os
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Pacemaker:
-    def __init__(self, safety, blocktree, delta, fCount, replica_broadcast, replicaID):
+    def __init__(self, safety, blocktree, delta, fCount, replica_broadcast, replicaID, memPool):
         self.safety = safety
         self.blocktree = blocktree
         self.delta = delta
         self.fCount = fCount
         self.replica_broadcast = replica_broadcast
         self.replicaID = replicaID
+        self.memPool = memPool
         self.current_round = -1
         self.last_round_tc = None
         self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
@@ -29,9 +30,12 @@ class Pacemaker:
         self.local_timeout_round()
 
     def _start_timer(self, roundNo):
-        print("[Pacemaker][replicaID {}] Starting timer for round {}".format(self.replicaID, roundNo))
-        self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout)
-        self.dict_of_timer[roundNo].start()
+        if(self.memPool.safe_to_start_timer()):
+            print("[Pacemaker][replicaID {}] Starting timer for round {}".format(self.replicaID, roundNo))
+            self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout)
+            self.dict_of_timer[roundNo].start()
+        else:
+            print("Pacemaker not starting Timer")
 
     def _stop_timer(self, roundNo):
         if roundNo in self.dict_of_timer:
