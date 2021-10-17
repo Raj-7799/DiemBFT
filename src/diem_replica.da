@@ -5,7 +5,9 @@ import mempool
 import Message
 from replica_info import ReplicaInfo
 import Pacemaker as PM
+import PacemakerByz as pmbyz
 import Safety as sf
+import SafetyByz as sfbyz
 import leader_election as le
 import ProposalMsg as plm
 import pickle
@@ -18,7 +20,7 @@ import time
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Replica(process):
-    def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]"):
+    def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]",networkByzantine,networkByzantineSeed,processByzantine,processByzantineSeed,degreeOfByzantine):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
         self.fCount = faulty_replica_count
@@ -33,10 +35,30 @@ class Replica(process):
         self.timedOut = False
 
 
+        self.networkByzantine = networkByzantine
+        self.networkByzantineSeed = networkByzantineSeed
+        self.processByzantine  = processByzantine
+        self.processByzantineSeed=processByzantineSeed
+        self.degreeOfByzantine=degreeOfByzantine
+
+        
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
-        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
-        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
+        
+        if not self.processByzantine:
+            self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
+        else:
+            self.safety = sfbyz.SafetyByz(blockTree, get_replica_public_keys(), self.replicaID,self.processByzantineSeed,self.degreeOfByzantine)
+
+        if not self.networkByzantine:
+            self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
+        else:
+            self.paceMaker = pmbyz.PacemakerByz(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID, self.networkByzantineSeed,self.degreeOfByzantine)
+
+
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
+
+ 
+
 
     def broadcast_helper(method, message):
         for _, replicaInfo in self.replicaInfos.items():
@@ -218,9 +240,11 @@ class Replica(process):
             self.process_next_round_event(tc)
     
     def receive(msg=("client_end"), from_=source):
+         
         output("Received message to close the replica")
     
     def receive(msg=("validate", block_id), from_=source):
+         
         output("[replicaID {}] Received validate at replica".format(self.replicaID))
         block = self.blockTree._ledger.committed_block(block_id)
         send(("validation_block", block), to=source)
