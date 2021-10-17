@@ -29,12 +29,8 @@ class MemPool:
     def delete_command(self, command):
         print("Delete {} from Mempool".format(command))
         if command in self.locator:
-            print("Delete {} from Mempool Successfull. Retrieved client {}".format(command, client))
+            print("Delete {} from Mempool Successfull".format(command))
             del self.locator[command]
-            print("Deleted {} from Mempool. Retrieved client {}".format(command, client))
-            return client
-        
-        return None
 
     def remove_transaction(self, command):
         self.delete_command(command)
