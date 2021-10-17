@@ -9,71 +9,104 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 class Ledger:
 
-    def __init__(self,genesis_block, replicaID, memPool):
+    def __init__(self,genesis_block, replicaID, memPool, specluate_ledger, clientResponseHandler):
         self.replicaID = replicaID
         self.memPool = memPool
         self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
         self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(self.replicaID), create_if_missing=True)
+        self.specluate_ledger = specluate_ledger
+        self.clientResponseHandler = clientResponseHandler
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
         
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):
-        print("[Ledger][replicaID {}] START speculate ".format(self.replicaID))
+        print("[Ledger][replicaID {}] Speculating for prev block {} and current block {} ".format(self.replicaID, prev_block_id, block_id))
         block_id=bytes(str(block_id),'utf-8')
         value = pickle.dumps([prev_block_id,txns])      
         self._db_speculate.put(block_id,value)
-        print("[Ledger][replicaID {}] END speculate ".format(self.replicaID))
-
 
 
     #find the pending state for the given block id or ⊥ if not present
-    def pending_state(self,bk_id):
-        print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
-        block_id = bytes(str(bk_id),'utf-8')     
-        entry = self._db_speculate.get(block_id)
-        # Check this once
-        if entry is not None:
-            print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
-            return bk_id
+    # def pending_state(self,bk_id):
+    #     print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
+    #     block_id = bytes(str(bk_id),'utf-8')     
+    #     entry = self._db_speculate.get(block_id)
+    #     # Check this once
+    #     if entry is not None:
+    #         print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
+    #         return bk_id
         
-        # TODO : fix this implementation
-        if bk_id == 0 or bk_id == "0":
-            return bk_id
+    #     # TODO : fix this implementation
+    #     if bk_id == 0 or bk_id == "0":
+    # #         return bk_id
+    # def pending_state(self,bk_id):
+    #     print("[Ledger][replicaID {}] Attempting to find pending state for block id {}".format(self.replicaID, bk_id)) 
+    #     block_id = bytes(str(bk_id),'utf-8')     
+    #     entry = self._db_speculate.get(block_id)
+    #     # Check this once
+    #     if entry is not None:
+    #         print("[Ledger][replicaID {}] Found pending state for block id {}".format(self.replicaID, bk_id)) 
+    #         return bk_id
+        
+    #     # TODO : fix this implementation
+    #     if bk_id == 0 or bk_id == "0":
+    #         print("[Ledger][replicaID {}] Received genesis block id {}".format(self.replicaID, bk_id)) 
+    #         return bk_id
             
-        return None                
+    # #     return None        
+
+    def pending_state(self,bk_id):
+
+        if bk_id in self.specluate_ledger.cache.keys() or bk_id == 0 or bk_id=="0":
+            return bk_id 
+        return None
 
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,bk_id):
         print("[Ledger][replicaID {}] START commit the block {}".format(self.replicaID, bk_id)) 
+        #self.print_ledger()
+        self.specluate_ledger.print_cache()
         block_id = bytes(str(bk_id),'utf-8')
-        entry = self._db_speculate.get(block_id)        
+        #entry = self._db_speculate.get(block_id)
+        
+        entry =  self.specluate_ledger.cache[bk_id] if bk_id in self.specluate_ledger.cache.keys() else None
+        
+
+        print("TRYING TO COMMIT {} {} ".format(bk_id,entry))
         if  entry is not None:
             print("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
-            self._db.put(block_id,entry)
+            #self._db.put(block_id,entry)
+            # TODO : fix this
+            # self._db_speculate.delete(block_id)
+            self._db.put(block_id,pickle.dumps([entry.prev_node_id,entry.block]))
             block = self.committed_block(bk_id)
             
-            print("Remove from Mempool block = " + str(block))
-            self.memPool.remove_transaction(block.payload)
-
+            client = self.memPool.remove_transaction(block.payload)
+            self.clientResponseHandler(block.payload)
             # self._db_speculate.delete(block_id)      
         print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
     #returns a committed block given its id
-    def committed_block(self, block_id):
-        print("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
-        block_id=bytes(str(block_id),'utf-8')
-        print("[Ledger][replicaID {}] END committed_block ".format(self.replicaID))
+    def committed_block(self, bk_id):
+        print("[Ledger][replicaID {}] Attempting to fetch commited block {}.".format(self.replicaID, bk_id)) 
+        block_id=bytes(str(bk_id),'utf-8')
+        print("committed_block {}".format(bk_id))
+        self.print_ledger()
         entry = pickle.loads(self._db.get(block_id))
-
+        if entry[1]:
+            print("[Ledger][replicaID {}] Fetching commited block successfull {}.".format(self.replicaID, bk_id)) 
+        else:
+            print("[Ledger][replicaID {}] Failed fetching block {}.".format(self.replicaID, bk_id)) 
+        
         return entry[1]
 
 
     def print_ledger(self):
-        
+        print("PRINTING LEDGER {} ".format(self.replicaID))
         it =  self._db.iterator()
         with self._db.iterator() as it:
             for k,v  in it:
-                print(k,v)
+                print("key: {}  value {}".format(k,pickle.loads(v)[1]))
