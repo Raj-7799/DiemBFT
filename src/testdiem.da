@@ -69,7 +69,8 @@ class RunDiemBFT(process):
         KeySets[-1].private_key,
         KeySets[-1].public_key,
         self.faulty_replicas,
-        current_runner_process
+        current_runner_process,
+        self.clientTimeout
       ))
     
     start(clients)
@@ -95,7 +96,7 @@ def main():
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
       'requests'      : 10,
-      'clientTimeout' : 5000,
+      'clientTimeout' : 3,    #client timeout in seconds
       'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
       'processByzantine' : False,
