@@ -4,6 +4,7 @@ from diembft_logger import get_logger
 from collections import defaultdict
 import client_request as cr
 import Util
+import threading
 
 diem_logger = get_logger(os.path.basename(__file__))
 
@@ -21,8 +22,8 @@ class Client(process):
     self.pendingVerification = {}
     self.transactionMap = {}
     self.runner_process = runner_process
+    #self.dict_of_timer = {} # dict of timer for each Request
 
-  
   def run():
     output("Broadcasting messages to replicas")
     ## Adding two nodes to commit qc.vote_info.parent_id block 
@@ -47,6 +48,17 @@ class Client(process):
 
     send(("client_done",), to=self.runner_process)
 
+  # def _on_client_timeout(command):
+  #   del self.dict_of_timer[command]
+  #   for _, replicaInfo in self.replicaInfos.items():
+  #       send(("request", client_request), to=replicaInfo.process)
+
+
+  # def _start_timer_for_command(command):
+  #   if command in self.dict_of_timer:
+  #     self.dict_of_timer[command].cancel()
+  #     del self.dict_of_timer[command]
+  #     self.dict_of_timer[command] = threading.Timer(self.get_client_timer(), self._on_client_timeout(command))
 
   def get_replica_info(replicaID):
     for _, replicaInfo in self.replicaInfos.items():
