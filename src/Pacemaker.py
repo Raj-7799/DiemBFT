@@ -21,7 +21,7 @@ class Pacemaker:
         self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
         self.diem_logger.info("Hello ")
         self.OutputLogger=OutputLogger
-        self.OutputLogger("Pacemaker from OutputLogger")
+        self.OutputLogger("__init__")
 
 
     def get_round_timer(self):
@@ -32,37 +32,51 @@ class Pacemaker:
         self.local_timeout_round()
 
     def _start_timer(self, roundNo):
-        print("[Pacemaker][replicaID {}] Starting timer for round {}".format(self.replicaID, roundNo))
+        self.OutputLogger("[_start_timer] Starting timer for round {}".format( roundNo))
         self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout)
         self.dict_of_timer[roundNo].start()
 
     def _stop_timer(self, roundNo):
+        self.OutputLogger("[_stop_timer] Entry for round {}".format(roundNo))
+
+        self.OutputLogger("[_stop_timer] Start timer for round {}".format( roundNo))
+
         if roundNo in self.dict_of_timer:
-            print("[Pacemaker][replicaID {}] Stopping timer for roundNo {}".format(self.replicaID, roundNo))
+            self.OutputLogger(" Stopping timer for roundNo {}".format( roundNo))
             self.dict_of_timer[roundNo].cancel()
+        self.OutputLogger("[_stop_timer] Exit for round {}".format(roundNo))
+
 
     def start_timer(self, new_round):
+        self.OutputLogger("[start_timer] Entry for round {}".format(self.current_round))
+
         self._stop_timer(self.current_round)
-        print("[Pacemaker][replicaID {}] Updating current_round {} to new_round {}".format(self.replicaID, self.current_round, new_round))
+        self.OutputLogger("[Updating current_round {} to new_round {}".format( self.current_round, new_round))
         self.current_round = new_round
         self._start_timer(self.current_round)
+        self.OutputLogger("[start_timer] Exit for round {}".format(self.current_round))
 
     def local_timeout_round(self):
+        self.OutputLogger("[local_timeout_round] Entry for round {}".format(self.current_round))
+
         timeout_info = self.safety.make_timeout(self.current_round, self.blocktree.high_qc, self.last_round_tc)
-        print("[Pacemaker][replicaID {}] Local Timeout round called at round {} ".format(self.replicaID, self.current_round))
+        self.OutputLogger(" Local Timeout round called at round {} ".format( self.current_round))
         timeout_msg = timeoutmsg.TimeoutMsg(timeout_info, self.last_round_tc, self.blocktree.high_qc)
         self.replica_broadcast(timeout_msg)
+        self.OutputLogger("[local_timeout_round] Exit for round {}".format(self.current_round))
+
 
     def _check_if_sender_pending(self, sender, tmo_info):
         for pending_tmo_info in self.pending_timeouts[tmo_info.roundNo]:
             if sender == pending_tmo_info.sender:
-                print("[Pacemaker][replicaID {}] Sender is pending {} of tmo_info.roundNo {}".format(self.replicaID, sender, tmo_info.roundNo))
+                self.OutputLogger(" Sender is pending {} of tmo_info.roundNo {}".format( sender, tmo_info.roundNo))
                 return True
-        print("[Pacemaker][replicaID {}] Sender {} is not pending for tmo_info.roundNo {}".format(self.replicaID, sender, tmo_info.roundNo))
+        self.OutputLogger(" Sender {} is not pending for tmo_info.roundNo {}".format( sender, tmo_info.roundNo))
         return False
 
     def process_remote_timeout(self, tmo):
-        print("[Pacemaker][replicaID {}] START process_remote_timeout of tmo.tmo_info.roundNo {}".format(self.replicaID, tmo.tmo_info.roundNo))
+        self.OutputLogger("[process_remote_timeout] Entry for round {}".format(self.current_round))
+        self.OutputLogger(" START process_remote_timeout of tmo.tmo_info.roundNo {}".format( tmo.tmo_info.roundNo))
         tmo_info = tmo.tmo_info
         if tmo_info.roundNo < self.current_round:
             return None
@@ -79,26 +93,31 @@ class Pacemaker:
                 tmo_signatures.append(_tmo_info.signature)
             
             tc = Tc.TC(tmo_info.roundNo, tmo_high_qc_rounds, tmo_signatures, self.blocktree.pvt_key, self.blocktree.pbc_key)
-            print("Formed timeout certificate")
-            print("[Pacemaker][replicaID {}] END process_remote_timeout of tmo.tmo_info.roundNo {} with tc {}".format(self.replicaID, tmo.tmo_info.roundNo, tc.roundNo))
+            self.OutputLogger("[process_remote_timeout] Exit for round {} returning TC tmo.tmo_info.roundNo {} with tc {}".format(self.current_round,tmo.tmo_info.roundNo, tc.roundNo))
             return tc
-        print("[Pacemaker][replicaID {}] END process_remote_timeout of tmo.tmo_info.roundNo {}".format(self.replicaID, tmo.tmo_info.roundNo))
+        self.OutputLogger(" END process_remote_timeout of tmo.tmo_info.roundNo {}".format( tmo.tmo_info.roundNo))
+        self.OutputLogger("[process_remote_timeout] Exit for round {} returning None".format(self.current_round))
+
         return None
 
     def advance_round_tc(self, tc):
+        self.OutputLogger("[advance_round_tc] Entry for round {} returning None".format(self.current_round))
         if (tc is None) or (tc.roundNo < self.current_round):
-            print("[Pacemaker][replicaID {}] Either tc is None {}  or self.current_round {}".format(self.replicaID, tc, self.current_round))
+            self.OutputLogger(" Either tc is None {}  or self.current_round {}".format( tc, self.current_round))
             return False
         self.last_round_tc = tc
         self.start_timer(tc.roundNo + 1)
+        self.OutputLogger("[advance_round_tc] Exit for round {} returning None".format(self.current_round))
         return True
 
     def advance_round_qc(self, qc):
-        print("[Pacemaker][replicaID {}] Attempting to advance round for qc {} from {}".format(self.replicaID, qc.vote_info.roundNo, self.current_round))
+        self.OutputLogger("[advance_round_qc] Entry for round {} returning None".format(self.current_round))
+        self.OutputLogger(" Attempting to advance round for qc {} from {}".format( qc.vote_info.roundNo, self.current_round))
         if qc.vote_info.roundNo < self.current_round:
-            print("[Pacemaker][replicaID {}] VoteInfo round {} is less than current round {}".format(self.replicaID, qc.vote_info.roundNo, self.current_round))
+            self.OutputLogger(" VoteInfo round {} is less than current round {}".format( qc.vote_info.roundNo, self.current_round))
             return False
         
         self.last_round_tc = None
         self.start_timer(qc.vote_info.roundNo + 1)
+        self.OutputLogger("[advance_round_qc] Exit for round {} returning True".format(self.current_round))
         return True

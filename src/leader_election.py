@@ -15,20 +15,18 @@ class LeaderElection:
         self.paceMaker = paceMaker
         self.ledger = ledger
         self.replicaID = replicaID
-        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
-        self.diem_logger.info("Hello ")
         self.OutputLogger=OutputLogger
-        self.OutputLogger("Hello")
+        self.OutputLogger("__init__")
 
 
     def elect_reputation_leaders(self, qc):
+        self.OutputLogger("[elect_reputation_leaders] Entry for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
         active_validators = OrderedDict()
         last_authors = OrderedDict()
         current_qc = qc
         i = 0
 
         while i < self.window_size or len(last_authors) < self.exclude_size:
-            print("[replicaID {}] LeaderElection finding for block {}".format(self.replicaID, current_qc.vote_info.parent_id))
             current_block = self.ledger.committed_block(current_qc.vote_info.parent_id)
             # Change if block is the genesis block stop iteration
             if current_block.id == 0:
@@ -59,12 +57,12 @@ class LeaderElection:
             return None
         
         random.seed(qc.vote_info.roundNo)
-        print("[replicaID {}] END qc.vote_info.roundNo {}".format(self.replicaID,qc.vote_info.roundNo))
+        self.OutputLogger("[elect_reputation_leaders] Entry for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
         return active_validators[random.randint(0, len(active_validators) - 1)]
 
         
     def update_leaders(self, qc):
-        print("[replicaID {}] START qc.vote_info.roundNo {} self.paceMaker.current_round {}".format(self.replicaID, qc.vote_info.roundNo, self.paceMaker.current_round))
+        self.OutputLogger("[update_leaders] Entry for qc.info.roundNo {} self.paceMaker.current_round {} ".format(qc.vote_info.roundNo, self.paceMaker.current_round))
         extended_round = qc.vote_info.parent_round
         qc_round = qc.vote_info.roundNo
         current_round = self.paceMaker.current_round
@@ -77,15 +75,18 @@ class LeaderElection:
             # This will return no elected_leader
             if elected_leader is not None:
                 self.reputation_leaders[current_round + 1] = elected_leader
-        print("[replicaID {}] END qc.vote_info.roundNo {}".format(self.replicaID, qc.vote_info.roundNo))
+        self.OutputLogger("[update_leaders] Exit for qc.info.roundNo {} self.paceMaker.current_round {} ".format(qc.vote_info.roundNo, self.paceMaker.current_round))
+
 
     
     def get_leader(self, roundNo):
+        self.OutputLogger("[get_leader] Entry roundNo {} ".format(roundNo))
         if roundNo < 0:
+            self.OutputLogger("[get_leader] Exit roundNo {} leader {} ".format(roundNo,0))
             return 0
-        print("[replicaID {}] START roundNo {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.paceMaker.current_round))
         if roundNo in self.reputation_leaders:
-            print("[replicaID {}]  repuation_leaders for roundNo {} is {} self.paceMaker.current_round {}".format(self.replicaID,roundNo, self.reputation_leaders[roundNo], self.paceMaker.current_round))
+            self.OutputLogger("[get_leader] Exit roundNo {} leader {}".format(roundNo,self.reputation_leaders[roundNo]))
             return self.reputation_leaders[roundNo]
-        print("[replicaID {}] END roundNo {} self.paceMaker.current_round {}".format(self.replicaID, roundNo, self.paceMaker.current_round))
+        
+        self.OutputLogger("[get_leader] Exit roundNo {} leader {}".format(roundNo,self.validators[(roundNo // 2) % len(self.validators)]))
         return self.validators[(roundNo // 2) % len(self.validators)]
