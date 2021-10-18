@@ -249,7 +249,6 @@ class Replica(process):
 
     
     def receive(msg=("BlockSyncMessage",M), from_=source):
-
         if source==self.replicaID:
             self.pending_blocks[M[0].id]+=1
             self.candidate_block_to_commit[M[0].id]=M.next_block
@@ -264,7 +263,6 @@ class Replica(process):
 
 
     def receive(msg=("SyncMsgRequest",M), from_=source):
-
         if source != M[1]:
             next_block =  self.blockTree._ledger.get_next_block(M[0])
             last_committed_block=self.blockTree._ledger.last_committed_block
