@@ -22,7 +22,7 @@ from diem_replica import Replica
 diem_logger = get_logger(os.path.basename(__file__))
 
 class ReplicaByz(process,Replica):
-    def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]"):#,networkByzantine,networkByzantineSeed,processByzantine,processByzantineSeed,degreeOfByzantine):
+    def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs):#,networkByzantine,networkByzantineSeed,processByzantine,processByzantineSeed,degreeOfByzantine):
         output("Spwaning process for replica {}".format(replicaID))
         
 

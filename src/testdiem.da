@@ -27,33 +27,47 @@ class RunDiemBFT(process):
       self.clientNo           = config['clients']
       self.requests          = config['requests']
       self.clientTimeout     = config['clientTimeout']
-      self.scenario =  config['testcase']
+      self.scenario =  config['testcase']['type']
+      self.specialArguments = config['testcase']['specialArguments']
 
 
   def getReplicafromConfiguration(scenario):
-
-    if scenario["type"]=="delay":
-      replicas =  new(diem_replica_byz.ReplicaByz,num=self.replicas_required)
-    elif scenario["type"]=="normal":
-      replicas =  new(diem_replica.Replica,num=self.replicas_required)
+    if scenario == "omission":
+      return new(diem_replica_byz.ReplicaByz), self.specialArguments
+    elif scenario == "normal":
+      return new(diem_replica.Replica), {}
     
     return replicas
 
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
-    replicas=self.getReplicafromConfiguration(self.scenario)
 
     clients = new(Client, num=self.clientNo)
     output("Generating keys ")
     GenerateKey(self.replicas_required + 1).write_config()
     KeySets = [ Keys(i) for i in range(self.replicas_required + 1)]
-
+    
+    replicas = []
     replicaInfos = {}
     replicaToPvtKeys = {}
-
     clientInfo = {}
     current_runner_process = self
+    specialArgs = {}
     
+    i = 0
+    # spawning faulty replicas
+    while i < self.faulty_replicas:
+      replica, special = self.getReplicafromConfiguration(self.scenario)
+      specialArgs[i] = special
+      replicas.append(replica)
+      i += 1
+    
+    # spawning normal replicas
+    while i < replicas_required:
+      replica, special = self.getReplicafromConfiguration("normal")
+      specialArgs[i] = special
+      replicas.append(replica)
+      i += 1
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -64,7 +78,6 @@ class RunDiemBFT(process):
       clientInfo[i] = ClientInfo(KeySets[-1].public_key, i)
 
     for i, replica in enumerate(replicas):
-
       setup(replica, (
             i,
             replicaInfos, 
@@ -72,9 +85,9 @@ class RunDiemBFT(process):
             self.replicas_required,
             self.delta,
             replicaToPvtKeys[i],
-            clientInfo
+            clientInfo,
+            specialArgs[i]
         ))
-      
 
     start(replicas)
 
@@ -107,24 +120,57 @@ def getConfigs():
   configList = []
   configs = [
     {
+      'Name' : "Normal Replicas", 
       'faultyReplicas': 1,    # number of replicas which can go faulty
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
       'requests'      : 10,
-      'clientTimeout' : 5000,
+      'clientTimeout' : 5,
       'testcase':{
-        "type":"delay"
+        "type":"normal",
+        "specialArguments": []
       }
     },
+    {
+      'Name' : "Normal Replicas with multiple clients", 
+      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,  # milliseconds
+      'clients'       : 2,
+      'requests'      : 10,
+      'clientTimeout' : 5,
+      'testcase':{
+        "type":"normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name' : "Client small timeout with request resubmission and handling de-deuplication", 
+      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 0.5,
+      'testcase':{
+        "type":"normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name' : "Faulty replica having omission failures", 
+      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 5,
+      'testcase':{
+        "type":"omission",
+        "specialArguments": {}
+      },
+    }
   ]
 
   return configs[0:1]
 
-
-
-
-
-  
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
   for i in replicaIDs:
