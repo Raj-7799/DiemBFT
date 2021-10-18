@@ -16,7 +16,7 @@ config/*
 
 *.conf
 
-
+.DS_Store
 .idea
 
 *.log
