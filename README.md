@@ -36,20 +36,20 @@ a system. The steps for Anaconda installation is provided in Setup below
 ## 4. Bugs and Limitations
 
 ## 5. Main files
-- DiemBFT/src/diem_replica.da : Replica code . It mainly contains the Main fucntion as mentioned in the Pseudocode
-- DiemBFT/src/testdiem.da : The Driver code that spawns the Clients and Replicas as per the configuaration. This is the **Run** class as mentioned in the phase doc 
-- DiemBFT/src/client.da : The client code which send and receives commans from the replica's
+- **DiemBFT/src/diem_replica.da :** Replica code . It mainly contains the Main fucntion as mentioned in the Pseudocode
+- **DiemBFT/src/testdiem.da :** The Driver code that spawns the Clients and Replicas as per the configuaration. This is the **Run** class as mentioned in the phase doc 
+- **DiemBFT/src/client.da :** The client code which send and receives commans from the replica's
 
 ## 6. Code Size
 
 ## 7. Language Feature usage
-- List Comprehensions = Todo
-- Dictionary Comprehensions = Todo
-- set comprehensions = 0
-- aggregations  = 0
-- quantifications = 1 Quantification(some) in  diem_replica.da 
-- await statements = Total 5: 2 each in diem_replica.da and client.da respectively and 1 in testdiem.da 
-- receive handlers = Total 5 : 4 in diem_replica.da and 1 in client.da
+- **List Comprehensions =** Todo
+- **Dictionary Comprehensions =** Todo
+- **set comprehensions =** 0
+- **aggregations  =** 0
+- **quantifications =** 1 Quantification(some) in  diem_replica.da 
+- **await statements =** Total 5: 2 each in diem_replica.da and client.da respectively and 1 in testdiem.da 
+- **receive handlers =** Total 5 : 4 in diem_replica.da and 1 in client.da
 
 ## 8. Contributions
 
