@@ -22,14 +22,15 @@ class Client(process):
     self.pendingVerification = {}
     self.transactionMap      = {}
     self.runner_process      = runner_process
-    self.timeoutHandler = rth.RequestTimeoutHandler(broadcast, self.pID)
+    self.timeoutHandler = rth.RequestTimeoutHandler(broadcast, self.pID,self.OutputRequestTimeOutHandler)
 
   
   def OutputClient(log):
-      output("[Client][ClientID-{}][{}]".format(self.pID,log))
+    output("[Client][ClientID-{}][{}]".format(self.pID,log))
 
     
-
+  def OutputRequestTimeOutHandler(log):
+      output("[RequestTimeOutHandler][ClientID-{}][{}]".format(self.pID,log))
 
   def broadcast(transaction):
     processes = [r.process for _, r in self.replicaInfos.items()]

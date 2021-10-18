@@ -17,6 +17,8 @@ import Util
 from diembft_logger import get_logger
 import time
 
+from collections import defaultdict
+
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Replica_forged(process):
@@ -234,6 +236,9 @@ class Replica_forged(process):
         if qc:
             self.OutputReplica("[process_vote_msg] Formed QC from votes at round {}".format( self.paceMaker.current_round))
             qc.signatures = ["abc"]
+            self.OutputReplica("[process_vote_msg]Modifying qc {}".format(self.replicaID))
+            self.OutputReplica("[process_vote_msg]QC signature state {}".format(qc.verify_self_signature_qc()))
+            self.OutputReplica("[process_vote_msg]QC formed is {}".format(qc))
             self.process_certificate(qc)
             self.process_next_round_event(None)
             self.OutputReplica("[process_vote_msg] Exit")
