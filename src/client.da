@@ -25,12 +25,18 @@ class Client(process):
     self.timeoutHandler = rth.RequestTimeoutHandler(broadcast, self.pID)
 
   
+    def OutputClient(log):
+        output("[Client][ClientID-{}][{}]".format(self.pID,log))
+
+    
+
+
   def broadcast(transaction):
     processes = [r.process for _, r in self.replicaInfos.items()]
     send(("request", transaction), to=processes)
   
   def run():
-    output("Broadcasting messages to replicas")
+    self.OutputClient("Broadcasting messages to replicas")
     ## Adding two nodes to commit qc.vote_info.parent_id block 
     client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)] + ["dummy1" + "-" + str(self.pID),"dummy2" + "-" + str(self.pID)]
     for  i in  client_request:
@@ -45,11 +51,11 @@ class Client(process):
     for block_id, info in self.transactionMap.items():
       replica_id = info["replicas"][0]
       block_id = info["block_id"]
-      output("Checking validation for {} and {}".format(replica_id, block_id))
+      self.OutputClient("Checking validation for {} and {}".format(replica_id, block_id))
       send(("validate", block_id), to=get_replica_info(replica_id).process)
 
     await(self.verified == 0)
-    output(self.transactionMap,"Exit client")
+    self.OutputClient(self.transactionMap,"Exit client")
 
     send(("client_done",), to=self.runner_process)
 
@@ -64,10 +70,10 @@ class Client(process):
       return
     
     if block.payload.signature == Util.sign_object_dup(block.payload.payload, self.private_key):
-      output("Verified signature for block with id {}".format(block.id))
+      self.OutputClient("Verified signature for block with id {}".format(block.id))
       self.verified -= 1
     else:
-      output("Unable to verify signature")
+      self.OutputClient("Unable to verify signature")
     
   
   def check_block_state(transaction):
@@ -78,7 +84,7 @@ class Client(process):
     for bk_id, count in transaction_counts.items():
       if count == self.f + 1:
         replicaIds=[]
-        output("Received f + 1 = {} messages for transaction {} and block_id {}".format(self.f + 1, transaction, bk_id))
+        self.OutputClient("Received f + 1 = {} messages for transaction {} and block_id {}".format(self.f + 1, transaction, bk_id))
         for x in self.responses[transaction]:
           if x[0]==bk_id:
             replicaIds.append(x[1])

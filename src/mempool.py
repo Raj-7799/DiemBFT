@@ -6,37 +6,44 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 
 class MemPool:
-    def __init__(self):
+    def __init__(self,OutputMempool):
         self.queue = deque([])
         self.locator = {}
         self.state = set()
+        self.OutputMempool=OutputMempool
     
     def get_transactions(self):
         # currently only sends one transaction
+        self.OutputMempool("[get_transactions] Entry ")
         if self.queue:
             command = self.queue.popleft()
             if command in self.locator and command not in self.state:
                 self.state.add(command)
+                self.OutputMempool("[get_transactions] Exit with command {} from queue  ".format(command))
                 return command
             else:
                 return self.get_transactions()
         else:
+            self.OutputMempool("[get_transactions] Exit queue empty ")
+
             return None
 
     def markState(self, command):
         self.state.add(command)
     
     def insert_command(self, command, client):
+        self.OutputMempool("[insert_command] command {}".format(command))
+
         if command not in self.locator and command not in self.state:
             self.queue.append(command)
             self.locator[command] = client
         else:
-            print("Command already present in mempool")
+            self.OutputMempool("[insert_command] Command already present in mempool")
 
     def delete_command(self, command):
-        print("Delete {} from Mempool".format(command))
+        self.OutputMempool("[delete_command] Delete {} from Mempool".format(command))
         if command in self.locator:
-            print("Delete {} from Mempool Successfull".format(command))
+            self.OutputMempool("[delete_command] Delete {} from Mempool Successfull".format(command))
             del self.locator[command]
 
     def remove_transaction(self, command):

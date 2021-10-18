@@ -39,7 +39,7 @@ class RunDiemBFT(process):
     elif scenario == "normal":
       return new(diem_replica.Replica), {}
     elif scenario == "forge_signature":
-      return new(diem_replica_forge.Replica), self.specialArguments
+      return new(diem_replica_forge.Replica_forged), self.specialArguments
     elif scenario == "delay":
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
         

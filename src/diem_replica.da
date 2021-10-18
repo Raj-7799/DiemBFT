@@ -17,10 +17,6 @@ import Util
 from diembft_logger import get_logger
 import time
 from collections import defaultdict
-
-
-
-
 class Replica(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
