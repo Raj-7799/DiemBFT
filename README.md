@@ -18,7 +18,7 @@ a system. The steps for Anaconda installation is provided in Setup below
 
 ## 2. Workload generation
 - In testdiem.da, we have included a dictionary which consists of the Workload generations parameters as mentioned in the example below
-    {
+    ```{
       'Name' : "Normal Replicas", 
       'faultyReplicas': 1,    # number of replicas which can go faulty
       'timeoutDelta'  : 2500, # Used by Pacemaker for timeout in milliseconds
@@ -28,7 +28,7 @@ a system. The steps for Anaconda installation is provided in Setup below
       'testcase':{
         "type":"normal",
         "specialArguments": []# Special Arguments included for different configurations
-      }
+      }```
 
 ## 3. Timeouts
 - For get_round_timer in Pacemaker, We use the formula 4* *delta* where delta is passed as the timeout value
