@@ -9,7 +9,7 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 class Ledger:
 
-    def __init__(self,genesis_block, replicaID, memPool, specluate_ledger, clientResponseHandler):
+    def __init__(self,genesis_block, replicaID, memPool, specluate_ledger, clientResponseHandler,OutputLogger):
         print("LEDGER for replica {}".format(replicaID))
         self.replicaID = replicaID
         self.memPool = memPool
@@ -20,6 +20,10 @@ class Ledger:
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
         self.last_committed_block = genesis_block.id
+        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
+        self.diem_logger.info("Hello ")
+        self.OutputLogger=OutputLogger
+        self.OutputLogger("{} Hello ".format("Ledger "))
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):

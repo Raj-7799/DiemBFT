@@ -4,11 +4,10 @@ import random
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 
 class LeaderElection:
-    def __init__(self, f, paceMaker, ledger, validators, replicaID):
+    def __init__(self, f, paceMaker, ledger, validators, replicaID,OutputLogger):
         self.validators = validators
         self.window_size = f + 1
         self.exclude_size = f + 1
@@ -16,6 +15,11 @@ class LeaderElection:
         self.paceMaker = paceMaker
         self.ledger = ledger
         self.replicaID = replicaID
+        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
+        self.diem_logger.info("Hello ")
+        self.OutputLogger=OutputLogger
+        self.OutputLogger("Hello")
+
 
     def elect_reputation_leaders(self, qc):
         active_validators = OrderedDict()

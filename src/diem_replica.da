@@ -17,7 +17,7 @@ import Util
 from diembft_logger import get_logger
 import time
 
-diem_logger = get_logger(os.path.basename(__file__))
+
 
 class Replica(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
@@ -35,14 +35,32 @@ class Replica(process):
         self.timedOut = False
 
 
-        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message)
-        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
-        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
-        self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
+        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
+        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
+        self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID,self.OutputLeaderElection)
 
 
         self.pending_blocks=dict()
         self.candidate_block_to_commit = dict()
+        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
+        self.diem_logger.info("Hello")
+
+    
+ 
+    def OutputLoggerPacemaker(log):
+        output("[Pacemaker][ReplicaID-{}][{}]".format(self.replicaID,log))
+
+    def OutputLoggerSafety(log):
+        output("[Safety][ReplicaID-{}][{}]".format(self.replicaID,log))
+
+    def OutputLoggerBlockTree(log):
+        output("[BlockTree][ReplicaID-{}][{}]".format(self.replicaID,log))
+
+    def OutputLeaderElection(log):
+        output("[LeaderElection][ReplicaID-{}][{}]".format(self.replicaID,log))
+
+
 
 
     def broadcast_helper(method, message):
@@ -64,7 +82,7 @@ class Replica(process):
         return replicaIDs
 
     def pacemaker_broadcast_timeout(tmo_message):
-        diem_logger.debug("[replicaID {}] Pacemaker broadcasting timeout.".format(self.replicaID))
+        self.diem_logger.debug("[replicaID {}] Pacemaker broadcasting timeout.".format(self.replicaID))
         SIGNED_MSG = Util.sign_object_dup(tmo_message, self.privateKey)
         #send(("process_proposal_msg", [tmo_message, SIGNED_MSG]), to=replicaInfo.process)
         self.broadcast_helper("process_timeout_msg", [tmo_message, SIGNED_MSG])
@@ -85,13 +103,13 @@ class Replica(process):
 
 
     def process_certificate(qc):
-        diem_logger.info("[replicaID {}] Processing QC {} for vote_info {} at round {}".format(self.replicaID, qc, qc.vote_info.id, self.paceMaker.current_round))
+        self.diem_logger.info("[replicaID {}] Processing QC {} for vote_info {} at round {}".format(self.replicaID, qc, qc.vote_info.id, self.paceMaker.current_round))
         self.blockTree.process_qc(qc)
         self.leaderElection.update_leaders(qc)
         self.paceMaker.advance_round_qc(qc)
 
     def process_next_round_event(last_tc):
-        # diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
+        # self.diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
             transaction = memPool.get_transactions()
 
@@ -114,16 +132,16 @@ class Replica(process):
                 output("[replicaID {}] Transaction after waiting {}".format(self.replicaID, transaction))
 
             block = blockTree.generate_block(transaction, paceMaker.current_round)
-            diem_logger.info("[replicaID {}] Generated block with block_id {} for transaction {} at round {}".format(self.replicaID, block.id, transaction, paceMaker.current_round))
-            diem_logger.info("[replicaID {}] Mempool state {}".format(self.replicaID, self.memPool))
+            self.diem_logger.info("[replicaID {}] Generated block with block_id {} for transaction {} at round {}".format(self.replicaID, block.id, transaction, paceMaker.current_round))
+            self.diem_logger.info("[replicaID {}] Mempool state {}".format(self.replicaID, self.memPool))
             proposal_msg = plm.ProposalMsg(block, last_tc, blockTree.high_commit_qc, self.privateKey, self.publicKey)
-            diem_logger.info("[replicaID {}] Broadcasting proposal message for block with block_id {} at round {}".format(self.replicaID, block.id, paceMaker.current_round))
+            self.diem_logger.info("[replicaID {}] Broadcasting proposal message for block with block_id {} at round {}".format(self.replicaID, block.id, paceMaker.current_round))
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 
     def receive(msg=("request", cmd), from_=source):
-        diem_logger.info("[replicaID {}] Received client request. Inserting cmd {} into mempool of replica".format(self.replicaID, cmd))
+        self.diem_logger.info("Received client request. Inserting cmd {} into mempool of replica".format(cmd))
         if not Util.verify_message_dup(cmd.signature, self.clientInfos[source].public_key):
             output("[replicaID {}] Received forged client signature".format(self.replicaID))
             return
@@ -150,10 +168,10 @@ class Replica(process):
             output("Validation Successful")
         P=P[0]
         output("type of process_proposal_msg = " + str(type(P.block)))
-        diem_logger.info("[replicaID {}] Received proposal msg with Block ID : {} at round {}".format(self.replicaID, P.block.id, self.paceMaker.current_round))
+        self.diem_logger.info("[ Received proposal msg with Block ID : {} at round {}".format(P.block.id, self.paceMaker.current_round))
 
         if P is None:
-            diem_logger.info("[replicaID {}] Received a null proposal".format(self.replicaID))
+            self.diem_logger.info("Received a null proposal".format(self.replicaID))
             return
         
         self.memPool.markState(P.block.payload)
@@ -168,15 +186,15 @@ class Replica(process):
 
         if P.block.roundNo != current_round or sourceReplica.replicaID != current_leader or P.block.author != sourceReplica.replicaID:
 
-            diem_logger.info("[replicaID {}] Inconsistency {} {} {} {} {} {} {}".format(self.replicaID, P.block.id, P.block.roundNo, current_round, sourceReplica.replicaID, current_leader, P.block.author, sourceReplica.replicaID))
-            diem_logger.info("[replicaID {}] Inconsistency in round no or message source or block author for block {}".format(self.replicaID, P.block.id))
+            self.diem_logger.info("[replicaID {}] Inconsistency {} {} {} {} {} {} {}".format(self.replicaID, P.block.id, P.block.roundNo, current_round, sourceReplica.replicaID, current_leader, P.block.author, sourceReplica.replicaID))
+            self.diem_logger.info("[replicaID {}] Inconsistency in round no or message source or block author for block {}".format(self.replicaID, P.block.id))
             return
         
         blockTree.execute_and_insert(P.block,self.paceMaker.current_round)
         vote_message = self.safety.make_vote(P.block, P.last_round_tc)
         if vote_message:
             nextLeaderID = self.leaderElection.get_leader(current_round + 1)
-            diem_logger.info("[replicaID {}] Next leader for the round {} is at replica {}".format(self.replicaID, current_round + 1, nextLeaderID))
+            self.diem_logger.info("[replicaID {}] Next leader for the round {} is at replica {}".format(self.replicaID, current_round + 1, nextLeaderID))
             nextLeaderInfo = None
             
             for _,replicaInfo in self.replicaInfos.items():
@@ -184,11 +202,11 @@ class Replica(process):
                     nextLeaderInfo = replicaInfo
                     break
             
-            diem_logger.info("[replicaID {}] Sending vote message to next leader : {} for block ID {} at round {}".format(self.replicaID, nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
+            self.diem_logger.info("[replicaID {}] Sending vote message to next leader : {} for block ID {} at round {}".format(self.replicaID, nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
             SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
             send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
         else:
-            diem_logger.info("[replicaID {}] Unable to make vote for block {}".format(self.replicaID, P.block.id))
+            self.diem_logger.info("[replicaID {}] Unable to make vote for block {}".format(self.replicaID, P.block.id))
 
     def receive(msg=("process_vote_msg", M), from_=source):
         output('Inside process_vote_msg receive handler')
@@ -198,11 +216,11 @@ class Replica(process):
             output("Validation Successful")
         
         M=M[0]
-        diem_logger.info("[replicaID {}] Received vote message from {} for block {} at round {}".format(self.replicaID, M.sender, M.vote_info.id, self.paceMaker.current_round))
+        self.diem_logger.info("[replicaID {}] Received vote message from {} for block {} at round {}".format(self.replicaID, M.sender, M.vote_info.id, self.paceMaker.current_round))
         qc = self.blockTree.process_vote(M)
 
         if qc:
-            diem_logger.info("[replicaID {}] Formed QC from votes at round {}".format(self.replicaID, self.paceMaker.current_round))
+            self.diem_logger.info("[replicaID {}] Formed QC from votes at round {}".format(self.replicaID, self.paceMaker.current_round))
             self.process_certificate(qc)
             self.process_next_round_event(None)
 
@@ -215,7 +233,7 @@ class Replica(process):
             output("Validation Successful")
         
         M=M[0]
-        diem_logger.info("[replicaID {}] Received process_timeout_msg at replica".format(self.replicaID))
+        self.diem_logger.info("[replicaID {}] Received process_timeout_msg at replica".format(self.replicaID))
 
         if self.waiting:
             self.waiting = False

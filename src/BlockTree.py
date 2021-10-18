@@ -8,7 +8,7 @@ import client_request as cr
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
+
 
 
 ## Creating genesis block for startup 
@@ -50,20 +50,15 @@ class QC:
         self.pbc_key             = pbc_key
         #self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
-        # if self.verify_self_signature():
-        #     print("QuoromCertificate Validtion successfull")
-        # else:
-        #     print("QuoromCertificate Validtion failed")
     
     def __str__(self):
         return "VoteInfo - {} \n LedgerCommitInfo - {} \n author - {}".format(self.vote_info, self.ledger_commit_info, self.author)
     
     def get_signers(self):
-        diem_logger.info("[QC][replicaID {}] START get_signers ".format(self.author))
+        # self.diem_logger..info("[QC][replicaID {}] START get_signers ".format(self.author))
         signers = []
         for voter in self.signatures:
             signers.append(voter)
-        diem_logger.info("[QC][replicaID {}] END get_signers ".format(self.author))
 
         return signers
     
@@ -197,21 +192,25 @@ class PendingBlockTree:
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler,send_sync_message):      
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler,send_sync_message,OutputLogger):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
         self.author=author
+        self.OutputLogger=OutputLogger
+
 
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
         genesis_block.id=0
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block)
-        self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler)
+        self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler,self.OutputLogger)
 
         self.fCount=fCount
         self.send_sync_message=send_sync_message
+        self.diem_logger = get_logger(os.path.basename(__file__),self.author)
+        self.diem_logger.info("Hello ")
 
     @property
     def pending_block_tree(self):
@@ -286,7 +285,7 @@ class BlockTree:
             
             return qc
         
-        diem_logger.info("Could not form qc for vote msg at replica {}. Vote count {} ".format(self.author, len(self.pending_votes[vote_idx])))
+        self.diem_logger.info("Could not form qc for vote msg at replica {}. Vote count {} ".format(self.author, len(self.pending_votes[vote_idx])))
         return None
 
     def generate_block(self,txns,current_round):      

@@ -8,13 +8,12 @@ import BlockTree as Blocktree
 import os
 from diembft_logger import get_logger
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 
 
 class Safety():
 
-    def __init__(self, blocktree: bt.BlockTree, public_keys, sender):
+    def __init__(self, blocktree: bt.BlockTree, public_keys, sender,OutputLogger):
         self.blocktree = blocktree
         self.ledger = self.blocktree._ledger
         self.private_key = self.blocktree.pvt_key
@@ -25,7 +24,11 @@ class Safety():
         self.sender = sender
         self.pvt_key = self.private_key
         self.pbc_key = self.blocktree.pbc_key
-
+        self.diem_logger = get_logger(os.path.basename(__file__),self.sender)
+        self.diem_logger.debug("Hello ")
+        self.OutputLogger=OutputLogger
+        self.OutputLogger("Hello")
+        print("Hello safety")
     def _increase_highest_vote_round(self, roundNo):
         # print("[replicaID {}] Block round {} is less than qc_round {} or high vote round {}".format(self.sender, block_round, qc_round, self.highest_vote_round))
         self.highest_vote_round = max(roundNo, self.highest_vote_round)

@@ -5,10 +5,9 @@ from collections import defaultdict
 from diembft_logger import get_logger
 import os
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 class Pacemaker:
-    def __init__(self, safety, blocktree, delta, fCount, replica_broadcast, replicaID):
+    def __init__(self, safety, blocktree, delta, fCount, replica_broadcast, replicaID,OutputLogger):
         self.safety = safety
         self.blocktree = blocktree
         self.delta = delta
@@ -19,6 +18,10 @@ class Pacemaker:
         self.last_round_tc = None
         self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
         self.dict_of_timer = {} # dict of timer for a round
+        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
+        self.diem_logger.info("Hello ")
+        self.OutputLogger=OutputLogger
+        self.OutputLogger("Pacemaker from OutputLogger")
 
 
     def get_round_timer(self):
