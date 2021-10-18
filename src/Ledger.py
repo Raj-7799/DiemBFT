@@ -1,64 +1,63 @@
 import plyvel
-
-
+import pickle
 
 import os
-from diembft_logger import get_logger
-
-diem_logger = get_logger(os.path.basename(__file__))
 
 
-class Ledger():
+class Ledger:
 
-    def __init__(self,genesis_block, replicaID):
+    def __init__(self,genesis_block, replicaID, memPool, specluate_ledger, clientResponseHandler,OutputLogger):
         self.replicaID = replicaID
+        self.memPool = memPool
         self._db = plyvel.DB('/tmp/diemLedger_{}/'.format(self.replicaID), create_if_missing=True)
         self._db_speculate = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(self.replicaID), create_if_missing=True)
+        self.specluate_ledger = specluate_ledger
+        self.clientResponseHandler = clientResponseHandler
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
-        
+        self.last_committed_block = genesis_block.id
 
+        self.OutputLogger=OutputLogger
+        
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):
-        diem_logger.info("[Ledger][replicaID {}] START speculate ".format(self.replicaID))
         block_id=bytes(str(block_id),'utf-8')
-        value = bytes(str([prev_block_id,txns]),'utf-8')        
-        self._db_speculate.put(block_id,value)
-        diem_logger.info("[Ledger][replicaID {}] END speculate ".format(self.replicaID))
+        value = pickle.dumps([prev_block_id,txns])      
+        self._db_speculate.put(block_id,value,sync=True)  
 
+    #// find the pending state for the given block id or ⊥ if not present
+    def pending_state(self,bk_id):
 
-
-    #find the pending state for the given block id or ⊥ if not present
-    def pending_state(self,block_id):
-        diem_logger.info("[Ledger][replicaID {}] START pending_state ".format(self.replicaID)) 
-        block_id = bytes(str(block_id),'utf-8')     
-        entry = self._db_speculate.get(block_id)
-        if entry is not None:
-            diem_logger.info("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
-            return block_id
-        diem_logger.info("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
-        return None                
+        if bk_id in self.specluate_ledger.cache.keys() or bk_id == 0 or bk_id=="0":
+            return bk_id 
+        return None
 
 
     #commit the pending prefix of the given block id and prune other branches
-    def commit(self,block_id):
-        diem_logger.info("[Ledger][replicaID {}] START commit ".format(self.replicaID)) 
-        block_id = bytes(str(block_id),'utf-8')
-        entry = self._db_speculate.get(block_id)        
+    def commit(self,bk_id):
+        block_id = bytes(str(bk_id),'utf-8')
+        
+        entry =  self.specluate_ledger.cache[bk_id] if bk_id in self.specluate_ledger.cache.keys() else None
         if  entry is not None:
-            self._db.put(block_id,entry)
-            self._db_speculate.delete(block_id)      
-        diem_logger.info("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
-             
+            self._db.put(block_id,pickle.dumps([entry.prev_node_id,entry.block]))
+            block = self.committed_block(bk_id)
+            
+            self.memPool.remove_transaction(block.payload)
+            # returning tuple to client ,given tuples are immutatble it ensure object is untrampered
+            self.clientResponseHandler((bk_id, block.payload,self.replicaID))
+            self.last_committed_block = bk_id
 
 
     #returns a committed block given its id
-    def committed_block(self,block_id):
-        diem_logger.info("[Ledger][replicaID {}] START committed_block ".format(self.replicaID)) 
-        block_id=bytes(str(block_id),'utf-8')
-        diem_logger.info("[Ledger][replicaID {}] END committed_block ".format(self.replicaID)) 
-        return self._db_speculate.get(block_id)        
+    def committed_block(self, bk_id):
+        block_id=bytes(str(bk_id),'utf-8')
+        entry = pickle.loads(self._db.get(block_id))
+        # if entry[1]:
+        #     self.OutputLogger("[Ledger] Fetching commited block successfull {}.".format( bk_id)) 
+        # else:
+        #     self.OutputLogger("[Ledger] Failed fetching block {}.".format( bk_id)) 
+        return entry[1]
 
 
     def print_ledger(self):
@@ -66,4 +65,15 @@ class Ledger():
         it =  self._db.iterator()
         with self._db.iterator() as it:
             for k,v  in it:
-                print(k,v)
+                self.OutputLogger("key: {}  value {}".format(k,pickle.loads(v)[1]))
+
+    
+
+    def get_next_block(self,id):
+        it = self._db.iterator(include_key=False)
+        it.seek(bytes(str(id)),"utf-8")
+        block = next(it)
+        it.close()
+        if block is not None:
+            return pickle.loads(block)[1]
+        

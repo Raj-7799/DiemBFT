@@ -1,9 +1,6 @@
 
 
 import os
-from diembft_logger import get_logger
-
-diem_logger = get_logger(os.path.basename(__file__))
 
 class ClientInfo:
     def __init__(self, public_key: str, clientID: int):

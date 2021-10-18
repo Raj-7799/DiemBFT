@@ -1,37 +1,99 @@
-
-
+from collections import Counter
 import os
-from diembft_logger import get_logger
+from collections import defaultdict
+import client_request as cr
+import Util
+import request_timeout_handler as rth
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
-  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str):
-    self.pID          = clientID
-    self.nReq         = requests
-    self.timeout      = clientTimeout
-    self.replicaInfos = replicaInfos
-    self.private_key = private_key
+  def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int, runner_process):
+    self.pID                 = clientID
+    self.nReq                = requests
+    self.verified            = 1
+    self.timeout             = clientTimeout
+    self.replicaInfos        = replicaInfos
+    self.private_key         = private_key
+    self.public_key          = public_key
+    self.f                   = f
+    self.responses           = defaultdict(list)
+    self.pendingVerification = {}
+    self.transactionMap      = {}
+    self.runner_process      = runner_process
+    self.timeoutHandler = rth.RequestTimeoutHandler(broadcast, self.pID,self.OutputRequestTimeOutHandler)
+
+  
+  def OutputClient(log):
+    output("[Client][ClientID-{}][{}]".format(self.pID,log))
+
+    
+  def OutputRequestTimeOutHandler(log):
+      output("[RequestTimeOutHandler][ClientID-{}][{}]".format(self.pID,log))
+
+  def broadcast(transaction):
+    processes = [r.process for _, r in self.replicaInfos.items()]
+    send(("request", transaction), to=processes)
   
   def run():
-    output("Yo running client!!!")
-    output("Broadcasting messages to replicas")
-    diem_logger.debug("client START: run ")
-    
-    for i in ["abcd", "cdef", "xyzw", "ghfg"]:
-      for _, replicaInfo in self.replicaInfos.items():
-        send(("request", i), to=replicaInfo.process)
+    self.OutputClient("Broadcasting messages to replicas")
+    ## Adding two nodes to commit qc.vote_info.parent_id block 
+    client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)] + ["dummy1" + "-" + str(self.pID),"dummy2" + "-" + str(self.pID)]
+    for  i in  client_request:
+      client_request = cr.ClientRequest(i, self, self.private_key)
+      pendingVerification[client_request] = True
       
+      broadcast(client_request)
+      self.timeoutHandler.start_timer(client_request, self.timeout)
+
     await(self.nReq == 0)
-    diem_logger.debug("client END: run ")
-
-
-  def receive(msg=("Yo bro",), from_=source):
     
-    if source in self.replicaInfos:  
-      replicaInfo = self.replicaInfos[source]
-      output("Got message from replica ", replicaInfo.replicaID)
-      self.nReq -= 1
+    for block_id, info in self.transactionMap.items():
+      replica_id = info["replicas"][0]
+      block_id = info["block_id"]
+      self.OutputClient("Checking validation for {} and {}".format(replica_id, block_id))
+      send(("validate", block_id), to=get_replica_info(replica_id).process)
+
+    await(self.verified == 0)
+    self.OutputClient("Exit client")
+
+    send(("client_done",), to=self.runner_process)
+
+
+  def get_replica_info(replicaID):
+    for _, replicaInfo in self.replicaInfos.items():
+      if replicaInfo.replicaID == replicaID:
+          return replicaInfo
+  
+  def receive(msg=("validation_block", block), from_=source):
+    if block is None:
+      return
+    
+    if block.payload.signature == Util.sign_object_dup(block.payload.payload, self.private_key):
+      self.OutputClient("Verified signature for block with id {}".format(block.id))
+      self.verified -= 1
     else:
-      output("Received unknown message")
-      
+      self.OutputClient("Unable to verify signature")
+    
+  
+  def check_block_state(transaction):
+    transaction_counts = defaultdict(int)
+    for entry in self.responses[transaction]:
+      transaction_counts[entry[0]]+=1
+    
+    for bk_id, count in transaction_counts.items():
+      if count == self.f + 1:
+        replicaIds=[]
+        self.OutputClient("Received f + 1 = {} messages for transaction {} and block_id {}".format(self.f + 1, transaction, bk_id))
+        for x in self.responses[transaction]:
+          if x[0]==bk_id:
+            replicaIds.append(x[1])
+                    
+        self.transactionMap[transaction] = {"block_id":bk_id,"replicas":replicaIds}
+        self.timeoutHandler.stop_timer(transaction)
+        self.nReq -= 1
+        break
+
+  def receive(msg=("transaction_committed", obj), from_=source):
+    block_id, block, author = obj
+    self.responses[block].append([block_id,author])
+    check_block_state(block)

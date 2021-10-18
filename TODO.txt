@@ -1,1 +1,4 @@
-1. Decide what to do
+1. read section 2.1 of phase2.pdf [ logging ]
+2. Block-tree Module - process_qc including pending_block_tree construction and pruning, reply to client
+3. Safety TC verification 
+4. signature verification mempool: get_transactions: client request msg handling, signature verif, duplicate filtering, …
