@@ -11,6 +11,8 @@ import plyvel
 import pickle
 import shutil
 import glob
+import diem_replica_omission
+import diem_replica_delay
 print(sys.path)
 
 
@@ -33,12 +35,14 @@ class RunDiemBFT(process):
 
   def getReplicafromConfiguration(scenario):
     if scenario == "omission":
-      return new(diem_replica_byz.ReplicaByz), self.specialArguments
+      return new(diem_replica_omission.Replica_Omission), self.specialArguments
     elif scenario == "normal":
       return new(diem_replica.Replica), {}
-    
-    return replicas
-
+    elif scenario == "delay":
+      return new(diem_replica_delay.Replica_Delay), self.specialArguments 
+        
+    # elif scenario == "":
+    #   return new(diem_replica_omission.Replica_Omision) ,self.specialArguments
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
 
@@ -55,19 +59,21 @@ class RunDiemBFT(process):
     specialArgs = {}
     
     i = 0
+
+    # spawning normal replicas
+    while i < replicas_required-self.specialArguments["potentiallyFaultyReplicaCount"]:
+      replica, special = self.getReplicafromConfiguration("normal")
+      specialArgs[i] = special
+      replicas.append(replica)
+      i += 1
+
     # spawning faulty replicas
-    while i < self.faulty_replicas:
+    while i < self.specialArguments["potentiallyFaultyReplicaCount"]:
       replica, special = self.getReplicafromConfiguration(self.scenario)
       specialArgs[i] = special
       replicas.append(replica)
       i += 1
     
-    # spawning normal replicas
-    while i < replicas_required:
-      replica, special = self.getReplicafromConfiguration("normal")
-      specialArgs[i] = special
-      replicas.append(replica)
-      i += 1
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -128,7 +134,7 @@ def getConfigs():
       'clientTimeout' : 5,
       'testcase':{
         "type":"normal",
-        "specialArguments": []
+        "specialArguments": {}
       }
     },
     {
@@ -166,6 +172,22 @@ def getConfigs():
         "type":"omission",
         "specialArguments": {}
       },
+      {
+      'Name' : "Faulty replicas having delay failures", 
+      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 5,
+      'testcase':{
+        "type":"delay",
+        "specialArguments":  {
+            "randomSeed":50,
+            "potentiallyFaultyReplicaCount": 1
+        }
+      },
+
+
     }
   ]
 

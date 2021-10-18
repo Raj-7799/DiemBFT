@@ -19,8 +19,9 @@ import time
 
 diem_logger = get_logger(os.path.basename(__file__))
 
-class Replica(process):
+class Replica_Omission(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
+        output("Replica_Omission replicaId {} ".format(replicaID))
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
         self.fCount = faulty_replica_count
@@ -172,7 +173,7 @@ class Replica(process):
             return
         
         blockTree.execute_and_insert(P.block,self.paceMaker.current_round)
-        vote_message = self.safety.make_vote(P.block, P.last_round_tc)
+        vote_message =  None #self.safety.make_vote(P.block, P.last_round_tc)
         if vote_message:
             nextLeaderID = self.leaderElection.get_leader(current_round + 1)
             diem_logger.info("[replicaID {}] Next leader for the round {} is at replica {}".format(self.replicaID, current_round + 1, nextLeaderID))
