@@ -57,16 +57,17 @@ class RunDiemBFT(process):
     specialArgs = {}
     
     i = 0
-    # spawning faulty replicas
-    while i < self.faulty_replicas:
-      replica, special = self.getReplicafromConfiguration(self.scenario)
+
+    # spawning normal replicas
+    while i < replicas_required - self.faulty_replicas:
+      replica, special = self.getReplicafromConfiguration("normal")
       specialArgs[i] = special
       replicas.append(replica)
       i += 1
-    
-    # spawning normal replicas
-    while i < replicas_required:
-      replica, special = self.getReplicafromConfiguration("normal")
+
+    # spawning faulty replicas
+    while i < self.replicas_required:
+      replica, special = self.getReplicafromConfiguration(self.scenario)
       specialArgs[i] = special
       replicas.append(replica)
       i += 1
@@ -120,18 +121,18 @@ class RunDiemBFT(process):
 
 def getConfigs():
   configs = [
-    {
-      'Name' : "Normal Replicas", 
-      'faultyReplicas': 1,    # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,  # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 5,
-      'testcase':{
-        "type":"normal",
-        "specialArguments": []
-      }
-    },
+    # {
+    #   'Name' : "Normal Replicas", 
+    #   'faultyReplicas': 1,    # number of replicas which can go faulty
+    #   'timeoutDelta'  : 2500,  # milliseconds
+    #   'clients'       : 1,
+    #   'requests'      : 10,
+    #   'clientTimeout' : 5,
+    #   'testcase':{
+    #     "type":"normal",
+    #     "specialArguments": []
+    #   }
+    # },
     # {
     #   'Name' : "Normal Replicas with multiple clients", 
     #   'faultyReplicas': 1,    # number of replicas which can go faulty
@@ -180,18 +181,18 @@ def getConfigs():
     #     "specialArguments": {}
     #   },
     # },
-    # {
-    #   'Name' : "Forge signature", 
-    #   'faultyReplicas': 1,    # number of replicas which can go faulty
-    #   'timeoutDelta'  : 500,  # milliseconds
-    #   'clients'       : 1,
-    #   'requests'      : 5,
-    #   'clientTimeout' : 5,
-    #   'testcase':{
-    #     "type":"forge_signature",
-    #     "specialArguments": {}
-    #   },
-    # }
+    {
+      'Name' : "Forge signature", 
+      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'timeoutDelta'  : 500,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 2,
+      'testcase':{
+        "type":"forge_signature",
+        "specialArguments": {}
+      },
+    }
   ]
 
   return configs[0:1]

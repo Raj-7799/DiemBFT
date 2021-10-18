@@ -143,6 +143,7 @@ class Replica(process):
            return
         else:
             output("Validation Successful")
+        
         P=P[0]
         output("type of process_proposal_msg = " + str(type(P.block)))
         diem_logger.info("[replicaID {}] Received proposal msg with Block ID : {} at round {}".format(self.replicaID, P.block.id, self.paceMaker.current_round))
@@ -198,12 +199,12 @@ class Replica(process):
         qc = self.blockTree.process_vote(M)
 
         if qc:
-            diem_logger.info("[replicaID {}] Formed QC from votes at round {}".format(self.replicaID, self.paceMaker.current_round))
-            qc.signatures = ["abc"]
             output("Modifying qc {}".format(self.replicaID))
             output("QC signature state {}".format(qc.verify_self_signature_qc()))
             output("QC formed is {}".format(qc))
+            qc.signatures = ["abc"]
             self.process_certificate(qc)
+            diem_logger.info("[replicaID {}] Formed QC from votes at round {}".format(self.replicaID, self.paceMaker.current_round))
             self.process_next_round_event(None)
 
     def receive(msg=("process_timeout_msg", M), from_=source):
