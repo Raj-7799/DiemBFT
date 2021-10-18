@@ -11,9 +11,6 @@ import random
 
 
 import os
-from diembft_logger import get_logger
-
-diem_logger = get_logger(os.path.basename(__file__))
 
 def max_round_qc(current_qc,high_qc):
     if current_qc.verify_self_signature_qc():

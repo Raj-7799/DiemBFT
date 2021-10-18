@@ -6,8 +6,6 @@ import BlockTree as Blocktree
 
 
 import os
-from diembft_logger import get_logger
-
 
 
 
@@ -24,8 +22,7 @@ class Safety():
         self.sender = sender
         self.pvt_key = self.private_key # // Own private key
         self.pbc_key = self.blocktree.pbc_key
-        self.diem_logger = get_logger(os.path.basename(__file__),self.sender)
-        self.diem_logger.debug("Hello ")
+        
         self.OutputLogger=OutputLogger
         self.OutputLogger("__init__")
     def _increase_highest_vote_round(self, roundNo):

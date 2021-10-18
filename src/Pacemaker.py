@@ -2,7 +2,7 @@ import TimeoutMsg as timeoutmsg
 import TC as Tc
 import threading
 from collections import defaultdict
-from diembft_logger import get_logger
+
 import os
 
 
@@ -18,7 +18,6 @@ class Pacemaker:
         self.last_round_tc = None # / Initially ⊥
         self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
         self.dict_of_timer = {} # dict of timer for a round
-        self.diem_logger = get_logger(os.path.basename(__file__),self.replicaID)
         self.OutputLogger=OutputLogger
         self.OutputLogger("__init__")
 

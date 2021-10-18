@@ -14,9 +14,10 @@ import pickle
 import sys
 import os
 import Util
-from diembft_logger import get_logger
 import time
 from collections import defaultdict
+
+
 class Replica(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
@@ -31,7 +32,7 @@ class Replica(process):
         self.firstRequestProcess = False
         self.waiting = False
         self.timedOut = False
-
+        
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
@@ -40,7 +41,6 @@ class Replica(process):
 
 
         self.pending_blocks=defaultdict(list)
-        self.candidate_block_to_commit = dict()
 
         self.OutputReplica("__init__")
     
@@ -116,7 +116,6 @@ class Replica(process):
     #process new round event(last tc)
     def process_next_round_event(last_tc):
         self.OutputReplica("[process_next_round_event] Entry")
-        # self.diem_logger.debug("New Round event {}".format( self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         #Psuedocode
         #if u = LeaderElection.get leader(Pacemaker.current round) then
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
@@ -327,8 +326,9 @@ class Replica(process):
         self.OutputReplica("[BlockSyncMessage] Entry received block id {} ".format(M[0].id))
         if source==self.replicaID:
             self.pending_blocks[M[0].id]+=1
-            self.candidate_block_to_commit[M[0].id]=M.next_block
+        
             self.blockTree.pending_block_tree.add(M[0].qc.vote_info.id,M[0])
+            self.blockTree._ledger.speculate(M[0].qc.vote_info.id,M[0])
 
             if len(self.pending_blocks[M[0].id]) == 2*self.fCount + 1:
                 self.blockTree._ledger.commit(M[0].id)

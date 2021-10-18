@@ -14,7 +14,6 @@ import pickle
 import sys
 import os
 import Util
-from diembft_logger import get_logger
 import time
 import random
 from collections import defaultdict
@@ -41,7 +40,6 @@ class Replica_Delay(process):
 
         self.specialArgs = specialArgs
         self.pending_blocks=defaultdict(list)
-        self.candidate_block_to_commit = dict()
 
         self.OutputReplica("__init__")
         
@@ -139,7 +137,7 @@ class Replica_Delay(process):
                 self.OutputReplica("[process_next_round_event] Transaction after waiting {}".format( transaction))
 
             block = blockTree.generate_block(transaction, paceMaker.current_round)
-                self.OutputReplica("[process_next_round_event] Generated block with block_id {} for transaction {} at round {}".format( block.id, transaction, paceMaker.current_round))
+            self.OutputReplica("[process_next_round_event] Generated block with block_id {} for transaction {} at round {}".format( block.id, transaction, paceMaker.current_round))
             self.OutputReplica("[process_next_round_event] Mempool state {}".format( self.memPool))
             proposal_msg = plm.ProposalMsg(block, last_tc, blockTree.high_commit_qc, self.privateKey, self.publicKey)
             self.OutputReplica("[process_next_round_event] Broadcasting proposal message for block with block_id {} at round {}".format( block.id, paceMaker.current_round))
@@ -281,6 +279,7 @@ class Replica_Delay(process):
 
     
 
+
     def send_sync_message(sync_status_object):
         self.OutputReplica("[send_sync_message] Entry broadcast message")
         for _, replicaInfo in self.replicaInfos.items():
@@ -293,8 +292,9 @@ class Replica_Delay(process):
         self.OutputReplica("[BlockSyncMessage] Entry received block id {} ".format(M[0].id))
         if source==self.replicaID:
             self.pending_blocks[M[0].id]+=1
-            self.candidate_block_to_commit[M[0].id]=M.next_block
+        
             self.blockTree.pending_block_tree.add(M[0].qc.vote_info.id,M[0])
+            self.blockTree._ledger.speculate(M[0].qc.vote_info.id,M[0])
 
             if len(self.pending_blocks[M[0].id]) == 2*self.fCount + 1:
                 self.blockTree._ledger.commit(M[0].id)

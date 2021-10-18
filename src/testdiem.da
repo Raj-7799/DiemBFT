@@ -198,7 +198,7 @@ def getConfigs():
     }
   ]
 
-  return configs[0]
+  return configs[1]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))

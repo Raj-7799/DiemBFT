@@ -1,11 +1,8 @@
 
 
 import os
-from diembft_logger import get_logger
 import Util
 import pickle
-
-diem_logger = get_logger(os.path.basename(__file__))
 
 class TC:
 #Since TC is used by Pacemaker module only, Its contruction requires all datafields to be declared

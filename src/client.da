@@ -1,12 +1,10 @@
 from collections import Counter
 import os
-from diembft_logger import get_logger
 from collections import defaultdict
 import client_request as cr
 import Util
 import request_timeout_handler as rth
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 class Client(process):
   def setup(clientID: int, requests: int, clientTimeout: int, replicaInfos, private_key:str, public_key, f: int, runner_process):

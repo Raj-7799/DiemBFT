@@ -2,7 +2,6 @@ from collections import OrderedDict
 import random
 
 import os
-from diembft_logger import get_logger
 
 
 

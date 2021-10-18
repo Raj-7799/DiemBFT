@@ -6,8 +6,6 @@ import pickle
 import client_request as cr
 
 import os
-from diembft_logger import get_logger
-
 
 
 

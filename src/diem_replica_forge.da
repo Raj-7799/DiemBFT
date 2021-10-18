@@ -14,12 +14,10 @@ import pickle
 import sys
 import os
 import Util
-from diembft_logger import get_logger
 import time
 
 from collections import defaultdict
 
-diem_logger = get_logger(os.path.basename(__file__))
 
 class Replica_forged(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
@@ -45,7 +43,6 @@ class Replica_forged(process):
 
 
         self.pending_blocks=defaultdict(list)
-        self.candidate_block_to_commit = dict()
 
         self.OutputReplica("__init__")
     
@@ -119,7 +116,6 @@ class Replica_forged(process):
 
     def process_next_round_event(last_tc):
         self.OutputReplica("[process_next_round_event] Entry")
-        # self.diem_logger.debug("New Round event {}".format( self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
             transaction = memPool.get_transactions()
 
@@ -288,12 +284,14 @@ class Replica_forged(process):
 
 
     
+ 
     def receive(msg=("BlockSyncMessage",M), from_=source):
         self.OutputReplica("[BlockSyncMessage] Entry received block id {} ".format(M[0].id))
         if source==self.replicaID:
             self.pending_blocks[M[0].id]+=1
-            self.candidate_block_to_commit[M[0].id]=M.next_block
+        
             self.blockTree.pending_block_tree.add(M[0].qc.vote_info.id,M[0])
+            self.blockTree._ledger.speculate(M[0].qc.vote_info.id,M[0])
 
             if len(self.pending_blocks[M[0].id]) == 2*self.fCount + 1:
                 self.blockTree._ledger.commit(M[0].id)

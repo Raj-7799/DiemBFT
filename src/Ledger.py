@@ -2,7 +2,6 @@ import plyvel
 import pickle
 
 import os
-from diembft_logger import get_logger
 
 
 class Ledger:
