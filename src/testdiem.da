@@ -23,8 +23,8 @@ class RunDiemBFT(process):
       self.requests          = config['requests']
       self.clientTimeout     = config['clientTimeout']
       
-
   def run():
+    #OutputLogger("Creating {} DiemBFT Replicas".format(self.replicas_required))
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
     
     replicas = new(diem_replica.Replica, num=self.replicas_required)

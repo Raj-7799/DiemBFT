@@ -50,10 +50,11 @@ class QC:
         self.pbc_key             = pbc_key
         #self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
+        
         # if self.verify_self_signature():
-        #     print("QuoromCertificate Validtion successfull")
+        #     self.OutputLogger("QuoromCertificate Validtion successfull")
         # else:
-        #     print("QuoromCertificate Validtion failed")
+        #     self.OutputLogger("QuoromCertificate Validtion failed")
     
     def __str__(self):
         return "VoteInfo - {} \n LedgerCommitInfo - {} \n author - {}".format(self.vote_info, self.ledger_commit_info, self.author)
@@ -79,9 +80,9 @@ class VoteMsg:
         #self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.form_signature_object(), pvt_key)
         # if self.verify_self_signature(pbc_key):
-        #     print("VoteMsg Validtion successfull")
+        #     self.OutputLogger("VoteMsg Validtion successfull")
         # else:
-        #     print("VoteMsg Validtion failed")
+        #     self.OutputLogger("VoteMsg Validtion failed")
     
     # def verify_self_signature(self):
 
@@ -122,10 +123,10 @@ class Node:
 
 class PendingBlockTree:
 
-    def __init__(self,genesis_block):
+    def __init__(self,genesis_block, OutputLogger):
         super()
         self.root = Node(0,genesis_block)
-        
+        self.OutputLogger = OutputLogger
         self.cache = dict()
         self.cache[genesis_block.id]=self.root
         self.add(genesis_block.id,genesis_block)
@@ -137,17 +138,17 @@ class PendingBlockTree:
         return self.cache[block_id]
 
     def add(self,prev_node_id,block):
-        print("Block {} added to {} ".format(block.id,prev_node_id))
+        self.OutputLogger("Block {} added to {} ".format(block.id,prev_node_id))
         node =  self.get_node(prev_node_id)
         node.childNodes[block.id]=Node(prev_node_id,block)
         self.cache[block.id]=node.childNodes[block.id]
     
     def prune(self,id):
-        print("PRUNING {}".format(id))
+        self.OutputLogger("PRUNING {}".format(id))
         self.print_cache()
         curr_node =  self.get_node(id)
         self.root =  curr_node
-        print("new root ",self.root.block.payload)
+        self.OutputLogger("new root {}".format(self.root.block.payload))
         self.cache_cleanup(id)
         self.print_cache()
         # parent_node = self.get_node(curr_node.prev_node_id)
@@ -173,9 +174,9 @@ class PendingBlockTree:
         
         if temp is None:
             return
-        print("helper ",temp.block.payload)
+        self.OutputLogger("helper {}".format(temp.block.payload))
         for i in temp.childNodes.keys():            
-            print("parent node : {} childNode: id {} ,node {} ".format(temp.childNodes[i].prev_node_id,i,temp.childNodes[i].block.payload))
+            self.OutputLogger("parent node : {} childNode: id {} ,node {} ".format(temp.childNodes[i].prev_node_id,i,temp.childNodes[i].block.payload))
             self.helper(temp.childNodes[i])
 
     def print_nodes(self):
@@ -183,23 +184,24 @@ class PendingBlockTree:
         self.helper(temp)
         
     def print_cache(self):
-        print("PRINTING CACHE ")
+        self.OutputLogger("PRINTING CACHE ")
         for i in self.cache.keys():
-            print("key {} ,value {} block payload {} ".format(i,self.cache[i],self.cache[i].block.payload))
+            self.OutputLogger("key {} ,value {} block payload {} ".format(i,self.cache[i],self.cache[i].block.payload))
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler):      
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler, OutputLogger):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
         self.author=author
+        self.OutputLogger = OutputLogger
 
         genesis_qc,genesis_block=create_genesis_object(self.pvt_key, self.pbc_key)
         genesis_block.id=0
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
-        self._pending_block_tree=PendingBlockTree(genesis_block)
+        self._pending_block_tree=PendingBlockTree(genesis_block, self.OutputLogger)
         self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler)
 
         self.fCount=fCount
@@ -227,17 +229,17 @@ class BlockTree:
 
         if qc.ledger_commit_info.commit_state_id != None:
             #Ledger.commit(qc['vote_info']['parent_id'])
-            print("Leger commit info replicaID {} {}".format(qc.ledger_commit_info.commit_state_id, self.author))
+            self.OutputLogger("Leger commit info replicaID {} {}".format(qc.ledger_commit_info.commit_state_id, self.author))
             self._ledger.commit(qc.vote_info.parent_id)
-            print("qc.vote_info.parent_id {} replica {} ".format(qc.vote_info.parent_id,self.author))
+            self.OutputLogger("qc.vote_info.parent_id {} replica {} ".format(qc.vote_info.parent_id,self.author))
             self.pending_block_tree.prune(qc.vote_info.parent_id)
-            # print("[BlockTree][replicaID {}] Before HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
+            # self.OutputLogger("[replicaID {}] Before HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
             self._high_commit_qc=max_round_qc(qc,self.high_commit_qc) # max_rond high commit qc ← max round {qc, high commit qc} // max round need elaboration
-            # print("[BlockTree][replicaID {}] HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
+            # self.OutputLogger("[replicaID {}] HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
         #high qc ← max round {qc, high qc}
         self._high_qc=max_round_qc(qc,self.high_qc)
-        # print("[BlockTree][replicaID {}] HighQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_qc))
-        # print("[BlockTree][replicaID {}] END process_qc ".format(self.author))
+        # self.OutputLogger("[replicaID {}] HighQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_qc))
+        # self.OutputLogger("[replicaID {}] END process_qc ".format(self.author))
 
 
   
@@ -255,7 +257,7 @@ class BlockTree:
         self.pending_votes[vote_idx].add(vote)
 
         if len(self.pending_votes[vote_idx]) == 2 * self.fCount + 1:
-            # print("Forming qc at {}".format(self.author))
+            # self.OutputLogger("Forming qc at {}".format(self.author))
             voters = [x.sender for x in self.pending_votes[vote_idx]]
 
             qc = QC(
@@ -285,5 +287,5 @@ class BlockTree:
         
         ## Creating genesis block for startup 
 # compute_block=x.generate_block(1,2)
-# print(compute_block)
+# self.OutputLogger(compute_block)
 
