@@ -125,19 +125,19 @@ def getConfigs():
       "byzantineNodes": [],
       "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
     },
-    # {
-    #   'faultyReplicas': 2,    # number of replicas which can go faulty
-    #   'timeoutDelta'  : 2500,  # milliseconds
-    #   'clients'       : 1,
-    #   'requests'      : 10,
-    #   'clientTimeout' : 5000,
-    #   'networkByzantine'     : False,
-    #   'networkByzantineSeed' : 10,
-    #   'processByzantine' : False,
-    #   'processByzantineSeed' : 20,
-    #   "byzantineNodes": [],
-    #   "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
-    # },
+    {
+      'faultyReplicas': 2,    # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 0.5,
+      'networkByzantine'     : False,
+      'networkByzantineSeed' : 10,
+      'processByzantine' : False,
+      'processByzantineSeed' : 20,
+      "byzantineNodes": [],
+      "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
+    },
     # {
     #   'faultyReplicas': 1,    # number of replicas which can go faulty
     #   'timeoutDelta'  : 2500,  # milliseconds
