@@ -2,6 +2,7 @@ from GenerateKey import GenerateKey
 from Keys import Keys
 from client import Client
 import diem_replica
+import diem_replica_byz
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
 import sys
@@ -26,18 +27,22 @@ class RunDiemBFT(process):
       self.clientNo           = config['clients']
       self.requests          = config['requests']
       self.clientTimeout     = config['clientTimeout']
-      self.networkByzantine  =  config['networkByzantine']
-      self.networkByzantineSeed =  config['networkByzantineSeed']
-      self.processByzantine = config['processByzantine']
-      self.processByzantineSeed =  config['processByzantineSeed']
-      self.byzantineNodes = config['byzantineNodes']
-      self.degreeOfByzantine = config['degreeOfByzantine']
+      self.scenario =  config['testcase']
 
+
+  def getReplicafromConfiguration(scenario):
+
+    if scenario["type"]=="delay":
+      replicas =  new(diem_replica_byz.ReplicaByz,num=self.replicas_required)
+    elif scenario["type"]=="normal":
+      replicas =  new(diem_replica.Replica,num=self.replicas_required)
+    
+    return replicas
 
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
-    
-    replicas = new(diem_replica.Replica, num=self.replicas_required)
+    replicas=self.getReplicafromConfiguration(self.scenario)
+
     clients = new(Client, num=self.clientNo)
     output("Generating keys ")
     GenerateKey(self.replicas_required + 1).write_config()
@@ -48,6 +53,7 @@ class RunDiemBFT(process):
 
     clientInfo = {}
     current_runner_process = self
+    
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -58,29 +64,17 @@ class RunDiemBFT(process):
       clientInfo[i] = ClientInfo(KeySets[-1].public_key, i)
 
     for i, replica in enumerate(replicas):
-      
-      is_current_process_byzantine = False
-      is_current_network_byzantine = False
-      
-      if i in self.byzantineNodes:
-          is_current_process_byzantine=self.processByzantine
-          is_current_network_byzantine=self.networkByzantine  
-            
-      setup(replica, (
-          i,
-          replicaInfos, 
-          self.faulty_replicas, 
-          self.replicas_required,
-          self.delta,
-          replicaToPvtKeys[i],
-          clientInfo,
-          is_current_network_byzantine,
-          self.networkByzantineSeed,
-          is_current_process_byzantine,
-          self.processByzantineSeed,
-          degreeOfByzantine
 
-      ))
+      setup(replica, (
+            i,
+            replicaInfos, 
+            self.faulty_replicas, 
+            self.replicas_required,
+            self.delta,
+            replicaToPvtKeys[i],
+            clientInfo
+        ))
+      
 
     start(replicas)
 
@@ -117,53 +111,11 @@ def getConfigs():
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
       'requests'      : 10,
-      'clientTimeout' : 0.5, # seconds
-      'networkByzantine'     : False,
-      'networkByzantineSeed' : 10,
-      'processByzantine' : False,
-      'processByzantineSeed' : 20,
-      "byzantineNodes": [],
-      "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
+      'clientTimeout' : 5000,
+      'testcase':{
+        "type":"delay"
+      }
     },
-    {
-      'faultyReplicas': 2,    # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,  # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 0.5,
-      'networkByzantine'     : False,
-      'networkByzantineSeed' : 10,
-      'processByzantine' : False,
-      'processByzantineSeed' : 20,
-      "byzantineNodes": [],
-      "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
-    },
-    # {
-    #   'faultyReplicas': 1,    # number of replicas which can go faulty
-    #   'timeoutDelta'  : 2500,  # milliseconds
-    #   'clients'       : 1,
-    #   'requests'      : 10,
-    #   'clientTimeout' : 5000,
-    #   'networkByzantine'     : True,
-    #   'networkByzantineSeed' : 10,
-    #   'processByzantine' : False,
-    #   'processByzantineSeed' : 20,
-    #   "byzantineNodes": [2],
-    #   "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
-    # },
-    # {
-    #   'faultyReplicas': 2,    # number of replicas which can go faulty
-    #   'timeoutDelta'  : 2500,  # milliseconds
-    #   'clients'       : 1,
-    #   'requests'      : 10,
-    #   'clientTimeout' : 5000,
-    #   'networkByzantine'     : False,
-    #   'networkByzantineSeed' : 10,
-    #   'processByzantine' : True,
-    #   'processByzantineSeed' : 20,
-    #   "byzantineNodes": [2,3],
-    #   "degreeOfByzantine": 5 # use it to make a node fully byzantine of to some extends to simuluate hardware failures
-    # }
   ]
 
   return configs[0:1]

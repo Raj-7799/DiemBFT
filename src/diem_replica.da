@@ -20,7 +20,7 @@ import time
 diem_logger = get_logger(os.path.basename(__file__))
 
 class Replica(process):
-    def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]",networkByzantine,networkByzantineSeed,processByzantine,processByzantineSeed,degreeOfByzantine):
+    def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]"):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
         self.fCount = faulty_replica_count
@@ -35,26 +35,14 @@ class Replica(process):
         self.timedOut = False
 
 
-        self.networkByzantine = networkByzantine
-        self.networkByzantineSeed = networkByzantineSeed
-        self.processByzantine  = processByzantine
-        self.processByzantineSeed=processByzantineSeed
-        self.degreeOfByzantine=degreeOfByzantine
 
         
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
         
-        if not self.processByzantine:
-            self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
-        else:
-            self.safety = sfbyz.SafetyByz(blockTree, get_replica_public_keys(), self.replicaID,self.processByzantineSeed,self.degreeOfByzantine)
-
-        if not self.networkByzantine:
-            self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
-        else:
-            self.paceMaker = pmbyz.PacemakerByz(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID, self.networkByzantineSeed,self.degreeOfByzantine)
-
-
+        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
+       
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
+   
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
 
  
