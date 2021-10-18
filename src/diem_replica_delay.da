@@ -123,35 +123,35 @@ class Replica_Delay(process):
             if not transaction:
                 self.waiting = True
                 self.timedOut = False
-                self.OutputReplica("Waiting for transactions in mempool")
-                self.OutputReplica("Mempoool state {}".format( self.memPool.print()))
+                self.OutputReplica("[process_next_round_event]Waiting for transactions in mempool")
+                self.OutputReplica("[process_next_round_event] Mempoool state {}".format( self.memPool.print()))
                 --request
                 await(self.waiting == False)
             
             if self.timedOut:
-                self.OutputReplica("Timed out while waiting for transaction")
+                self.OutputReplica("[process_next_round_event] Timed out while waiting for transaction")
                 return
 
             if transaction is None:
                 self.waiting = False
                 self.timedOut = False
                 transaction = memPool.get_transactions()
-                self.OutputReplica("Transaction after waiting {}".format( transaction))
+                self.OutputReplica("[process_next_round_event] Transaction after waiting {}".format( transaction))
 
             block = blockTree.generate_block(transaction, paceMaker.current_round)
-            self.OutputReplica("Generated block with block_id {} for transaction {} at round {}".format( block.id, transaction, paceMaker.current_round))
-            self.OutputReplica("Mempool state {}".format( self.memPool))
+                self.OutputReplica("[process_next_round_event] Generated block with block_id {} for transaction {} at round {}".format( block.id, transaction, paceMaker.current_round))
+            self.OutputReplica("[process_next_round_event] Mempool state {}".format( self.memPool))
             proposal_msg = plm.ProposalMsg(block, last_tc, blockTree.high_commit_qc, self.privateKey, self.publicKey)
-            self.OutputReplica("Broadcasting proposal message for block with block_id {} at round {}".format( block.id, paceMaker.current_round))
+            self.OutputReplica("[process_next_round_event] Broadcasting proposal message for block with block_id {} at round {}".format( block.id, paceMaker.current_round))
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 ##Adding random delay for byzantine leader 
                 if self.paceMaker.current_round > 0:
                     random.seed(self.specialArgs["randomSeed"])
                     t =random.randint(1,4)*self.tDelta
-                    output("Random delay start for byzantine node sleep for {} for round {}".format(t,self.paceMaker.current_round))
+                    self.OutputReplica("[process_next_round_event] Random delay start for byzantine node sleep for {} for round {}".format(t,self.paceMaker.current_round))
                     time.sleep(t//1000)
-                    output("Random delay end for byzantine node up from sleep for {} for round {}".format(t,self.paceMaker.current_round))
+                    self.OutputReplica("[process_next_round_event] Random delay end for byzantine node up from sleep for {} for round {}".format(t,self.paceMaker.current_round))
                     return
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 

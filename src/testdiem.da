@@ -192,8 +192,7 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "delay",
 			"specialArguments": {
-				"randomSeed"                   : 50,
-				"potentiallyFaultyReplicaCount": 1,
+				"randomSeed"                   : 50
 			}
 		}
     }
