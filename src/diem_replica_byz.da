@@ -33,8 +33,6 @@ class ReplicaByz(process,Replica):
             output("Faulty Leader sleeping  {}".format(self.replicaID))
             # self.time.sleep(10000)
             output("Faulty Leader woke up  {}".format(self.replicaID))
-
- 
         
             if not transaction:
                 self.waiting = True
