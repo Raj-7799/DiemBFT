@@ -110,10 +110,6 @@ class Block:
     
     def __str__(self):
         return " Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
-    
-    # TODO : this needs to be hash verification
-    def verify_block(self):
-        return self.qc.verify_self_signature_qc()
 
 class Node:
     def __init__(self,prev_node_id,block):
@@ -260,10 +256,6 @@ class BlockTree:
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.id,block.id,block)
         self.pending_block_tree.add(block.qc.vote_info.id,block)  # forking is possible so we need to know which node to extend
-
-    def sync_replica(self,current_round, block_round):
-        # TODO : this code needs to be writted
-        pass
 
     def process_vote(self, vote):
 

@@ -49,9 +49,6 @@ class Ledger:
         print("TRYING TO COMMIT {} {} ".format(bk_id,entry))
         if  entry is not None:
             print("[Ledger][replicaID {}] Commited block {}.".format(self.replicaID, bk_id)) 
-            #self._db.put(block_id,entry)
-            # TODO : fix this
-            # self._db_speculate.delete(block_id)
             self._db.put(block_id,pickle.dumps([entry.prev_node_id,entry.block]))
             block = self.committed_block(bk_id)
             

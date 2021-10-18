@@ -68,8 +68,6 @@ class Safety():
     '''Safety: Private'''
     #validate function currently always returns true
     def _validate_signatures(self, qc, last_tc):
-        #TODO
-        #print("Safety validation" + str(type(qc)))
         if ((last_tc is None) or last_tc.verify_self_signature()) and (qc.verify_self_signature_qc()):
             print("Safety validation successsful")
             return True
