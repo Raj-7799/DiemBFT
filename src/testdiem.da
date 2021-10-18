@@ -2,10 +2,18 @@ from GenerateKey import GenerateKey
 from Keys import Keys
 from client import Client
 import diem_replica
+import diem_replica_byz
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
 import sys
-
+from tabulate import tabulate
+import plyvel
+import pickle
+import shutil
+import glob
+import diem_replica_forge
+import diem_replica_omission
+import diem_replica_delay
 print(sys.path)
 
 
@@ -16,28 +24,57 @@ diem_logger = get_logger(os.path.basename(__file__))
 
 class RunDiemBFT(process): 
   def setup(config:dict): 
-      self.faulty_replicas   = config['faultyReplicas']
+      self.faulty_replicas   = config["faultyReplicas"]
       self.replicas_required = 3 * faulty_replicas + 1
-      self.delta             = config['timeoutDelta']
-      self.clientNo           = config['clients']
-      self.requests          = config['requests']
-      self.clientTimeout     = config['clientTimeout']
-      
+      self.delta             = config["timeoutDelta"]
+      self.clientNo           = config["clients"]
+      self.requests          = config["requests"]
+      self.clientTimeout     = config["clientTimeout"]
+      self.scenario =  config["testcase"]['type']
+      self.specialArguments = config["testcase"]['specialArguments']
 
+
+  def getReplicafromConfiguration(scenario):
+    if scenario == "omission":
+      return new(diem_replica_omission.Replica_Omission), self.specialArguments
+    elif scenario == "normal":
+      return new(diem_replica.Replica), {}
+    elif scenario == "forge_signature":
+      return new(diem_replica_forge.Replica), self.specialArguments
+    elif scenario == "delay":
+      return new(diem_replica_delay.Replica_Delay), self.specialArguments 
+        
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
-    
-    replicas = new(diem_replica.Replica, num=self.replicas_required)
+
     clients = new(Client, num=self.clientNo)
     output("Generating keys ")
     GenerateKey(self.replicas_required + 1).write_config()
     KeySets = [ Keys(i) for i in range(self.replicas_required + 1)]
-
+    
+    replicas = []
     replicaInfos = {}
     replicaToPvtKeys = {}
-
     clientInfo = {}
     current_runner_process = self
+    specialArgs = {}
+    
+    i = 0
+    # spawning faulty replicas
+    while i < self.faulty_replicas:
+      replica, special = self.getReplicafromConfiguration(self.scenario)
+      specialArgs[i] = special
+      replicas.append(replica)
+      i += 1
+    
+    # spawning normal replicas
+    while i < replicas_required:
+      replica, special = self.getReplicafromConfiguration("normal")
+      specialArgs[i] = special
+      replicas.append(replica)
+      i += 1
+
+
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -49,14 +86,15 @@ class RunDiemBFT(process):
 
     for i, replica in enumerate(replicas):
       setup(replica, (
-          i,
-          replicaInfos, 
-          self.faulty_replicas, 
-          self.replicas_required,
-          self.delta,
-          replicaToPvtKeys[i],
-          clientInfo
-      ))
+            i,
+            replicaInfos, 
+            self.faulty_replicas, 
+            self.replicas_required,
+            self.delta,
+            replicaToPvtKeys[i],
+            clientInfo,
+            specialArgs[i]
+        ))
 
     start(replicas)
 
@@ -84,26 +122,120 @@ class RunDiemBFT(process):
     self.clientNo -= 1
 
 
-def main():
-  config(clock='Lamport')
-  config(channel='fifo')
-  
 
+def getConfigs():
   configs = [
     {
-      'faultyReplicas': 1,    # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,  # milliseconds
+      'Name'          : "Normal Replicas",
+      'faultyReplicas': 1,                 # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,              # milliseconds
       'clients'       : 1,
       'requests'      : 10,
-      'clientTimeout' : 5000,
-      'networkByzantine'     : False,
-      'networkByzantineSeed' : 10,
-      'processByzantine' : False,
-      'processByzantineSeed' : 20
+      'clientTimeout' : 5,
+      'testcase'      : {
+        "type"            : "normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name'          : "Normal Replicas with multiple clients",
+      'faultyReplicas': 1,                                       # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                    # milliseconds
+      'clients'       : 2,
+      'requests'      : 10,
+      'clientTimeout' : 5,
+      'testcase'      : {
+        "type"            : "normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name'          : "Client small timeout with request resubmission and handling de-deuplication",
+      'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                                                          # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 0.5,
+      'testcase'      : {
+        "type"            : "normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name'          : "Faulty replica having omission failures",
+      'faultyReplicas': 1,                                         # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                      # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 5,
+      'testcase'      : {
+        "type"            : "omission",
+        "specialArguments": {}
+      },
+    },
+    {
+      'Name'          : "Forge signature",
+      'faultyReplicas': 1,                 # number of replicas which can go faulty
+      'timeoutDelta'  : 500,               # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 2,
+      'testcase'      : {
+        "type"            : "forge_signature",
+        "specialArguments": {}
+      },
+    },
+    {
+		"Name"          : "Faulty replicas having delay failures",
+		"faultyReplicas": 1,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "delay",
+			"specialArguments": {
+				"randomSeed"                   : 50,
+				"potentiallyFaultyReplicaCount": 1
+			}
+		}
     }
   ]
 
+  return configs[5]
+
+def printLedger(replicaIDs):
+  # output("Printing Ledger  {} ".format(replicaIDs))
+  for i in replicaIDs:
+    _db = plyvel.DB('/tmp/diemLedger_{}/'.format(i), create_if_missing=True)
+    _db_s = plyvel.DB('/tmp/diemLedger_speculate_{}/'.format(i), create_if_missing=True)
+    print("\n\n Commits for replica ", i)
+    ledger = []
+    with _db.iterator() as it:
+        for k,v in it:
+            block = pickle.loads(v)[1]
+            ledger.append([block.qc.vote_info.id, block.payload, block.id])
+    
+    ledger.sort(key=lambda x: x[1].payload)
+    print(tabulate(ledger, headers=["Parent Block ID", "Block transaction", "Block ID"]))
+    _db.close()
+
+
+def clearLedger():
+  ## cleanup 
+  print("Cleaning up the ledger files ")
+  files=glob.glob('/tmp/diemLedger_*')
+  for file in files:
+      x = shutil.rmtree(file)
+
+def main():
+  config(clock='Lamport')
+  config(channel='fifo')
+  ## TODO show return the entire list 
+  configs = [getConfigs()]
+  print("configuration ",configs)
   for configuration in configs:
+    output("Processing configuration: {}".format(configuration))
     runner = new(RunDiemBFT)
     setup(runner, (configuration,))
     start(runner)

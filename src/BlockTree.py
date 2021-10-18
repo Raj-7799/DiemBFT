@@ -17,7 +17,7 @@ def create_genesis_object(pvt_key, pbc_key):
     ledger_commit_info = LedgerCommitInfo(commit_state_id=0,vote_info=genesis_voteInfo)  
     
     genesis_qc = QC(vote_info=genesis_voteInfo,ledger_commit_info=ledger_commit_info, votes=[], author=0, pvt_key=pvt_key, pbc_key=pbc_key)        
-    genesis_block =  Block(0, -1, cr.ClientRequest("0", None, pvt_key, pbc_key), genesis_qc, pvt_key, pbc_key)
+    genesis_block =  Block(0, -1, cr.ClientRequest("0", None, pvt_key), genesis_qc, pvt_key, pbc_key)
     genesis_block.id = 0
 
     return genesis_qc , genesis_block
@@ -110,7 +110,8 @@ class Block:
     
     def __str__(self):
         return " Block ID - {} \n Payload- {} \n Author - {} \n Round- {} \n QC- {}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
-
+    
+    # TODO : this needs to be hash verification
     def verify_block(self):
         return self.qc.verify_self_signature_qc()
 
@@ -134,11 +135,15 @@ class PendingBlockTree:
         #logger.debug("PendingBlockTree END: init")
         
     def get_node(self,block_id):
-        return self.cache[block_id]
+        if block_id in self.cache.keys():
+            return self.cache[block_id]
+        return None
 
     def add(self,prev_node_id,block):
         print("Block {} added to {} ".format(block.id,prev_node_id))
         node =  self.get_node(prev_node_id)
+        if node is None:
+            node=self.root #Correction for forking , will be used in syncing
         node.childNodes[block.id]=Node(prev_node_id,block)
         self.cache[block.id]=node.childNodes[block.id]
     
@@ -146,6 +151,8 @@ class PendingBlockTree:
         print("PRUNING {}".format(id))
         self.print_cache()
         curr_node =  self.get_node(id)
+        if curr_node is None:
+            return
         self.root =  curr_node
         print("new root ",self.root.block.payload)
         self.cache_cleanup(id)
@@ -183,13 +190,14 @@ class PendingBlockTree:
         self.helper(temp)
         
     def print_cache(self):
+        return
         print("PRINTING CACHE ")
         for i in self.cache.keys():
             print("key {} ,value {} block payload {} ".format(i,self.cache[i],self.cache[i].block.payload))
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler):      
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler,send_sync_message):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
@@ -203,7 +211,7 @@ class BlockTree:
         self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler)
 
         self.fCount=fCount
-
+        self.send_sync_message=send_sync_message
 
     @property
     def pending_block_tree(self):
@@ -241,13 +249,22 @@ class BlockTree:
 
 
   
-    def execute_and_insert(self,block):
+    def execute_and_insert(self,block,current_round):
+
+        print("execute_and_insert block.roundNo {} current_round {}".format(block.roundNo,current_round))
+
+        if block.roundNo >  current_round + 1:
+            #Sync node 
+            self.send_sync_message((self._ledger.last_committed_block,self.replicaID))
         ##In paper : Ledger.speculate(b.qc.block id, b.id, b.payload)
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.id,block.id,block)
         self.pending_block_tree.add(block.qc.vote_info.id,block)  # forking is possible so we need to know which node to extend
 
-    
+    def sync_replica(self,current_round, block_round):
+        # TODO : this code needs to be writted
+        pass
+
     def process_vote(self, vote):
 
         self.process_qc(vote.high_commit_qc)
@@ -283,7 +300,14 @@ class BlockTree:
                                 )   
         return new_block
         
-        ## Creating genesis block for startup 
+
+    def start_sync(current_block,block_round):
+        last_committed_block =  self.ledger.last_committed_block
+        send_sync_message((last_committed_block,self.author))
+        
+
+
+## Creating genesis block for startup 
 # compute_block=x.generate_block(1,2)
 # print(compute_block)
 

@@ -30,6 +30,8 @@ class MemPool:
         if command not in self.locator and command not in self.state:
             self.queue.append(command)
             self.locator[command] = client
+        else:
+            print("Command already present in mempool")
 
     def delete_command(self, command):
         print("Delete {} from Mempool".format(command))
