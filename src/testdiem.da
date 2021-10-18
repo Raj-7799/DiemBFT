@@ -117,7 +117,7 @@ def getConfigs():
       'timeoutDelta'  : 2500,  # milliseconds
       'clients'       : 1,
       'requests'      : 10,
-      'clientTimeout' : 5000,
+      'clientTimeout' : 0.5, # seconds
       'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
       'processByzantine' : False,

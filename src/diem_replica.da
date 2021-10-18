@@ -227,6 +227,7 @@ class Replica(process):
            return
         else:
             output("Validation Successful")
+        
         M=M[0]
         diem_logger.info("[replicaID {}] Received process_timeout_msg at replica".format(self.replicaID))
 
@@ -246,7 +247,6 @@ class Replica(process):
             self.process_next_round_event(tc)
     
     def receive(msg=("client_end"), from_=source):
-         
         output("Received message to close the replica")
     
     def receive(msg=("validate", block_id), from_=source):
