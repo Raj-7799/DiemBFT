@@ -37,13 +37,15 @@ class Replica_Delay(process):
         self.timedOut = False
 
 
-        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
+        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler, send_sync_message)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
 
         self.specialArgs = specialArgs
         print("specialArgs {} ".format(self.specialArgs))
+        self.pending_blocks=dict()
+        self.candidate_block_to_commit = dict()
  
 
 
@@ -126,11 +128,14 @@ class Replica_Delay(process):
                 
                 
                 ##Adding random delay for byzantine leader 
-                random.seed(self.specialArgs["randomSeed"])
-                t =random.randint(1,4)*self.tDelta
-                output("Random delay start for byzantine node sleep for {} for round {}".format(t,self.paceMaker.current_round))
-                time.sleep(t//1000)
-                output("Random delay end for byzantine node up from sleep for {} for round {}".format(t,self.paceMaker.current_round))
+                output("Byzantine leader {} {}".format(self.paceMaker.current_round, self.paceMaker.current_round > 1))
+                if self.paceMaker.current_round > 0:
+                    random.seed(self.specialArgs["randomSeed"])
+                    t =random.randint(1,4)*self.tDelta
+                    output("Random delay start for byzantine node sleep for {} for round {}".format(t,self.paceMaker.current_round))
+                    time.sleep(t//1000)
+                    output("Random delay end for byzantine node up from sleep for {} for round {}".format(t,self.paceMaker.current_round))
+                    return
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 
     def receive(msg=("request", cmd), from_=source):
@@ -184,7 +189,7 @@ class Replica_Delay(process):
             return
         
         blockTree.execute_and_insert(P.block,self.paceMaker.current_round)
-        vote_message =  f.safety.make_vote(P.block, P.last_round_tc)
+        vote_message =  self.safety.make_vote(P.block, P.last_round_tc)
         if vote_message:
             nextLeaderID = self.leaderElection.get_leader(current_round + 1)
             diem_logger.info("[replicaID {}] Next leader for the round {} is at replica {}".format(self.replicaID, current_round + 1, nextLeaderID))
@@ -250,3 +255,28 @@ class Replica_Delay(process):
         output("[replicaID {}] Received validate at replica".format(self.replicaID))
         block = self.blockTree._ledger.committed_block(block_id)
         send(("validation_block", block), to=source)
+    
+    def send_sync_message(sync_status_object):
+        for _, replicaInfo in self.replicaInfos.items():
+            send(("SyncMsgRequest",sync_status_object),to=replicaInfo.process)
+
+    
+    def receive(msg=("BlockSyncMessage",M), from_=source):
+        if source==self.replicaID:
+            self.pending_blocks[M[0].id]+=1
+            self.candidate_block_to_commit[M[0].id]=M.next_block
+            self.blockTree.pending_block_tree.add(M[0].qc.vote_info.id,M[0])
+
+            if pending_blocks[M[0].id] == 2*self.fCount + 1:
+                self.blockTree._ledger.commit(M[0].id)
+                self.paceMaker.current_round=M[0].roundNo
+                if M[1] != M[0].id:
+                    for _, replicaInfo in self.replicaInfos.items():
+                        send(("SyncMsgRequest",(self.blockTree._ledger.get_last_commited,self.replicaID)), to=replicaInfo.process)
+
+
+    def receive(msg=("SyncMsgRequest",M), from_=source):
+        if source != M[1]:
+            next_block =  self.blockTree._ledger.get_next_block(M[0])
+            last_committed_block=self.blockTree._ledger.last_committed_block
+            send(("BlockSyncMessage",(next_block,last_committed_block)),to=source)

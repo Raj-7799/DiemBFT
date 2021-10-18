@@ -35,11 +35,14 @@ class Replica(process):
         self.timedOut = False
 
 
-        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
+        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler, send_sync_message)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
 
+        self.pending_blocks=dict()
+        self.candidate_block_to_commit = dict()
+        
     def broadcast_helper(method, message):
         for _, replicaInfo in self.replicaInfos.items():
             send((method, message), to=replicaInfo.process)
@@ -241,3 +244,28 @@ class Replica(process):
         output("[replicaID {}] Received validate at replica".format(self.replicaID))
         block = self.blockTree._ledger.committed_block(block_id)
         send(("validation_block", block), to=source)
+    
+    def send_sync_message(sync_status_object):
+        for _, replicaInfo in self.replicaInfos.items():
+            send(("SyncMsgRequest",sync_status_object),to=replicaInfo.process)
+
+    
+    def receive(msg=("BlockSyncMessage",M), from_=source):
+        if source==self.replicaID:
+            self.pending_blocks[M[0].id]+=1
+            self.candidate_block_to_commit[M[0].id]=M.next_block
+            self.blockTree.pending_block_tree.add(M[0].qc.vote_info.id,M[0])
+
+            if pending_blocks[M[0].id] == 2*self.fCount + 1:
+                self.blockTree._ledger.commit(M[0].id)
+                self.paceMaker.current_round=M[0].roundNo
+                if M[1] != M[0].id:
+                    for _, replicaInfo in self.replicaInfos.items():
+                        send(("SyncMsgRequest",(self.blockTree._ledger.get_last_commited,self.replicaID)), to=replicaInfo.process)
+
+
+    def receive(msg=("SyncMsgRequest",M), from_=source):
+        if source != M[1]:
+            next_block =  self.blockTree._ledger.get_next_block(M[0])
+            last_committed_block=self.blockTree._ledger.last_committed_block
+            send(("BlockSyncMessage",(next_block,last_committed_block)),to=source)

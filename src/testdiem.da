@@ -2,7 +2,6 @@ from GenerateKey import GenerateKey
 from Keys import Keys
 from client import Client
 import diem_replica
-import diem_replica_byz
 from replica_info import ReplicaInfo
 from client_info import ClientInfo
 import sys
@@ -73,8 +72,6 @@ class RunDiemBFT(process):
       specialArgs[i] = special
       replicas.append(replica)
       i += 1
-
-
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -196,7 +193,7 @@ def getConfigs():
 			"type"            : "delay",
 			"specialArguments": {
 				"randomSeed"                   : 50,
-				"potentiallyFaultyReplicaCount": 1
+				"potentiallyFaultyReplicaCount": 1,
 			}
 		}
     }
