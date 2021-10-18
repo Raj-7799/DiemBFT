@@ -9,35 +9,32 @@ class MemPool:
     def __init__(self):
         self.queue = deque([])
         self.locator = {}
-        self.state = set()
+        self.commited_blocks = set()
     
     def get_transactions(self):
         # currently only sends one transaction
         if self.queue:
             command = self.queue.popleft()
-            if command in self.locator and command not in self.state:
-                self.state.add(command)
-                return command
-            else:
-                return self.get_transactions()
+            print("Returning command ", command, self.print(), self.commited_blocks)
+            return command
         else:
             return None
 
     def markState(self, command):
-        self.state.add(command)
+        if command in self.queue:
+            self.queue.remove(command)
     
     def insert_command(self, command, client):
-        if command not in self.locator and command not in self.state:
+        if command not in self.commited_blocks and command not in self.queue:
             self.queue.append(command)
             self.locator[command] = client
+            print("Inserted commmand into mempool", command)
         else:
-            print("Command already present in mempool")
+            print("Command already present in mempool", command)
+            print("Command in ", self.print(), self.commited_blocks)
 
     def delete_command(self, command):
-        print("Delete {} from Mempool".format(command))
-        if command in self.locator:
-            print("Delete {} from Mempool Successfull".format(command))
-            del self.locator[command]
+        self.commited_blocks.add(command)
 
     def remove_transaction(self, command):
         self.delete_command(command)

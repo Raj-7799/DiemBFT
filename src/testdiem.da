@@ -120,18 +120,18 @@ class RunDiemBFT(process):
 
 def getConfigs():
   configs = [
-    {
-      'Name' : "Normal Replicas", 
-      'faultyReplicas': 1,    # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,  # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 5,
-      'testcase':{
-        "type":"normal",
-        "specialArguments": []
-      }
-    },
+    # {
+    #   'Name' : "Normal Replicas", 
+    #   'faultyReplicas': 1,    # number of replicas which can go faulty
+    #   'timeoutDelta'  : 2500,  # milliseconds
+    #   'clients'       : 1,
+    #   'requests'      : 10,
+    #   'clientTimeout' : 5,
+    #   'testcase':{
+    #     "type":"normal",
+    #     "specialArguments": []
+    #   }
+    # },
     # {
     #   'Name' : "Normal Replicas with multiple clients", 
     #   'faultyReplicas': 1,    # number of replicas which can go faulty
@@ -180,18 +180,18 @@ def getConfigs():
     #     "specialArguments": {}
     #   },
     # },
-    # {
-    #   'Name' : "Forge signature", 
-    #   'faultyReplicas': 1,    # number of replicas which can go faulty
-    #   'timeoutDelta'  : 500,  # milliseconds
-    #   'clients'       : 1,
-    #   'requests'      : 5,
-    #   'clientTimeout' : 5,
-    #   'testcase':{
-    #     "type":"forge_signature",
-    #     "specialArguments": {}
-    #   },
-    # }
+    {
+      'Name' : "Forge signature", 
+      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'timeoutDelta'  : 1000,  # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 5,
+      'testcase':{
+        "type":"forge_signature",
+        "specialArguments": {}
+      },
+    }
   ]
 
   return configs[0:1]

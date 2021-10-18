@@ -27,6 +27,7 @@ class Client(process):
   
   def broadcast(transaction):
     processes = [r.process for _, r in self.replicaInfos.items()]
+    output("Sending request : ", transaction.payload)
     send(("request", transaction), to=processes)
   
   def run():
@@ -34,11 +35,11 @@ class Client(process):
     ## Adding two nodes to commit qc.vote_info.parent_id block 
     client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)] + ["dummy1" + "-" + str(self.pID),"dummy2" + "-" + str(self.pID)]
     for  i in  client_request:
-      client_request = cr.ClientRequest(i, self, self.private_key)
-      pendingVerification[client_request] = True
+      request = cr.ClientRequest(i, self, self.private_key)
+      pendingVerification[request] = True
       
-      broadcast(client_request)
-      self.timeoutHandler.start_timer(client_request, self.timeout)
+      self.timeoutHandler.start_timer(request, self.timeout)
+      broadcast(request)
 
     await(self.nReq == 0)
     
