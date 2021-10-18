@@ -94,6 +94,7 @@ class Replica_Delay(process):
 
     def process_next_round_event(last_tc):
         # diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
+        output("[replicaID {}] process_next_round_event ".format(self.replicaID))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
             transaction = memPool.get_transactions()
 
@@ -122,6 +123,7 @@ class Replica_Delay(process):
             diem_logger.info("[replicaID {}] Broadcasting proposal message for block with block_id {} at round {}".format(self.replicaID, block.id, paceMaker.current_round))
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
+                
                 
                 ##Adding random delay for byzantine leader 
                 random.seed(self.specialArgs["randomSeed"])

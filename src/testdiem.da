@@ -60,21 +60,21 @@ class RunDiemBFT(process):
     specialArgs = {}
     
     i = 0
-
-    # spawning normal replicas
-    while i < replicas_required - self.faulty_replicas:
-      replica, special = self.getReplicafromConfiguration("normal")
-      specialArgs[i] = special
-      replicas.append(replica)
-      i += 1
-
     # spawning faulty replicas
-    while i < self.replicas_required:
+    while i < self.faulty_replicas:
       replica, special = self.getReplicafromConfiguration(self.scenario)
       specialArgs[i] = special
       replicas.append(replica)
       i += 1
     
+    # spawning normal replicas
+    while i < replicas_required:
+      replica, special = self.getReplicafromConfiguration("normal")
+      specialArgs[i] = special
+      replicas.append(replica)
+      i += 1
+
+
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -202,7 +202,7 @@ def getConfigs():
     }
   ]
 
-  return configs[4]
+  return configs[5]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
