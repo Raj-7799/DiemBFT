@@ -191,6 +191,7 @@ class Replica(process):
            output("Validation Failed")
         else:
             output("Validation Successful")
+        
         M=M[0]
         diem_logger.info("[replicaID {}] Received vote message from {} for block {} at round {}".format(self.replicaID, M.sender, M.vote_info.id, self.paceMaker.current_round))
         qc = self.blockTree.process_vote(M)
