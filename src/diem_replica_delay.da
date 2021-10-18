@@ -28,7 +28,7 @@ class Replica_Delay(process):
         self.privateKey = privateKey
         self.publicKey = get_replica_public_key(self.replicaID)
         self.clientInfos = clientInfos
-        self.memPool = mempool.MemPool()
+        self.memPool = mempool.MemPool(self.OutputMempool)
         self.firstRequestProcess = False
         self.waiting = False
         self.timedOut = False
@@ -64,7 +64,9 @@ class Replica_Delay(process):
     def OutputReplica(log):
         output("[Replica_Delay][ReplicaID-{}][{}]".format(self.replicaID,log))
 
-    
+    def OutputMempool(log):
+        output("[Mempool][ReplicaID-{}][{}]".format(self.replicaID,log))
+
     def broadcast_helper(method, message):
         for _, replicaInfo in self.replicaInfos.items():
             send((method, message), to=replicaInfo.process)

@@ -25,8 +25,8 @@ class Client(process):
     self.timeoutHandler = rth.RequestTimeoutHandler(broadcast, self.pID)
 
   
-    def OutputClient(log):
-        output("[Client][ClientID-{}][{}]".format(self.pID,log))
+  def OutputClient(log):
+      output("[Client][ClientID-{}][{}]".format(self.pID,log))
 
     
 
@@ -55,7 +55,7 @@ class Client(process):
       send(("validate", block_id), to=get_replica_info(replica_id).process)
 
     await(self.verified == 0)
-    self.OutputClient(self.transactionMap,"Exit client")
+    self.OutputClient("Exit client")
 
     send(("client_done",), to=self.runner_process)
 
