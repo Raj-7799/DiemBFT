@@ -28,7 +28,7 @@ a system. The steps for Anaconda installation is provided in Setup below
       'testcase':{
         "type":"normal",
         "specialArguments": []# Special Arguments included for different configurations
-      }```
+      }
 
 ## 3. Timeouts
 - For get_round_timer in Pacemaker, We use the formula 4* *delta* where delta is passed as the timeout value
