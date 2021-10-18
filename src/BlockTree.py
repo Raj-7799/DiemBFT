@@ -142,7 +142,7 @@ class PendingBlockTree:
         print("Block {} added to {} ".format(block.id,prev_node_id))
         node =  self.get_node(prev_node_id)
         if node is None:
-            return 
+            node=self.root #Correction for forking , will be used in syncing
         node.childNodes[block.id]=Node(prev_node_id,block)
         self.cache[block.id]=node.childNodes[block.id]
     
@@ -196,7 +196,7 @@ class PendingBlockTree:
 
 
 class BlockTree:
-    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler):      
+    def __init__(self,fCount,author, pvt_key, pbc_key, memPool, responseHandler,send_sync_message):      
         self._pending_votes=defaultdict(set) # collected votes per block indexed by their LedgerInfo hash
         self.pvt_key = pvt_key
         self.pbc_key = pbc_key
@@ -210,6 +210,7 @@ class BlockTree:
         self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler)
 
         self.fCount=fCount
+        self.send_sync_message=send_sync_message
 
     @property
     def pending_block_tree(self):
@@ -253,7 +254,7 @@ class BlockTree:
 
         if block.roundNo >  current_round + 1:
             #Sync node 
-            self.sync_replica(current_round,block.roundNo)
+            self.send_sync_message((self._ledger.last_committed_block,self.replicaID))
         ##In paper : Ledger.speculate(b.qc.block id, b.id, b.payload)
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.id,block.id,block)
@@ -297,7 +298,14 @@ class BlockTree:
                                 )   
         return new_block
         
-        ## Creating genesis block for startup 
+
+    def start_sync(current_block,block_round):
+        last_committed_block =  self.ledger.last_committed_block
+        send_sync_message((last_committed_block,self.author))
+        
+
+
+## Creating genesis block for startup 
 # compute_block=x.generate_block(1,2)
 # print(compute_block)
 

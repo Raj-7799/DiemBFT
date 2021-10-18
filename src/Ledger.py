@@ -19,44 +19,14 @@ class Ledger:
         self.clientResponseHandler = clientResponseHandler
         self.speculate(genesis_block.id,genesis_block.id,genesis_block)
         self.commit(genesis_block.id)
-        
+        self.last_committed_block = genesis_block.id
 
     # apply txns speculatively
     def speculate(self,prev_block_id, block_id, txns):
         print("[Ledger][replicaID {}] Speculating for prev block {} and current block {} ".format(self.replicaID, prev_block_id, block_id))
         block_id=bytes(str(block_id),'utf-8')
         value = pickle.dumps([prev_block_id,txns])      
-        self._db_speculate.put(block_id,value,sync=True)
-
-
-    #find the pending state for the given block id or ⊥ if not present
-    # def pending_state(self,bk_id):
-    #     print("[Ledger][replicaID {}] START pending_state for block_id {}".format(self.replicaID, bk_id)) 
-    #     block_id = bytes(str(bk_id),'utf-8')     
-    #     entry = self._db_speculate.get(block_id)
-    #     # Check this once
-    #     if entry is not None:
-    #         print("[Ledger][replicaID {}] END pending_state ".format(self.replicaID)) 
-    #         return bk_id
-        
-    #     # TODO : fix this implementation
-    #     if bk_id == 0 or bk_id == "0":
-    # #         return bk_id
-    # def pending_state(self,bk_id):
-    #     print("[Ledger][replicaID {}] Attempting to find pending state for block id {}".format(self.replicaID, bk_id)) 
-    #     block_id = bytes(str(bk_id),'utf-8')     
-    #     entry = self._db_speculate.get(block_id)
-    #     # Check this once
-    #     if entry is not None:
-    #         print("[Ledger][replicaID {}] Found pending state for block id {}".format(self.replicaID, bk_id)) 
-    #         return bk_id
-        
-    #     # TODO : fix this implementation
-    #     if bk_id == 0 or bk_id == "0":
-    #         print("[Ledger][replicaID {}] Received genesis block id {}".format(self.replicaID, bk_id)) 
-    #         return bk_id
-            
-    # #     return None        
+        self._db_speculate.put(block_id,value,sync=True)  
 
     def pending_state(self,bk_id):
 
@@ -89,6 +59,8 @@ class Ledger:
             # returning tuple to client ,given tuples are immutatble it ensure object is untrampered
             self.clientResponseHandler((bk_id, block.payload,self.replicaID))
             # self._db_speculate.delete(block_id)      
+            self.last_committed_block = bk_id
+
         print("[Ledger][replicaID {}] END commit ".format(self.replicaID)) 
 
     #returns a committed block given its id
@@ -112,3 +84,15 @@ class Ledger:
         with self._db.iterator() as it:
             for k,v  in it:
                 print("key: {}  value {}".format(k,pickle.loads(v)[1]))
+
+    
+
+    def get_next_block(self,id):
+        it = self._db.iterator(include_key=False)
+        it.seek(bytes(str(id)),"utf-8")
+        block = next(it)
+        it.close()
+        if block is not None:
+
+            return pickle.loads(block)[1]
+        
