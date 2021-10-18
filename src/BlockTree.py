@@ -37,6 +37,7 @@ class VoteInfo:
     def __str__(self):
         return "ID - {}  RoundNo - {}  ParentID - {}  ParentRound - {}  ExecStateID - {}".format(self.id, self.roundNo, self.parent_id, self.parent_round, self.exec_state_id)
 
+
 #// speculated new committed state to vote directly on
 class LedgerCommitInfo:
     def __init__(self, commit_state_id: str, vote_info: VoteInfo):
@@ -166,6 +167,7 @@ class BlockTree:
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block) #tree of blocks pending commitment, starting node will be gensis until pruned to some other block 
+        
         
         self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler,OutputLogger)
 
