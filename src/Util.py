@@ -34,13 +34,10 @@ def sign_object(obj, pvt_key, pbc_key):
 
 def sign_message(pickled_msg, pvt_key, pbc_key):    
     
-    print("Start Signing")
     signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
     verify_key = pbc_key
-    print("Signed Successful")
     verify_key_hex = verify_key.encode(encoder=HexEncoder)
-    
-    print("Encoding Successful")     
+         
     return [signed_hex,verify_key_hex]
 
 def check_authenticity(obj, signed_msg):
@@ -62,15 +59,11 @@ def sign_object_dup(obj, pvt_key):
     return sign_message_dup(seralized_msg, pvt_key)
 
 def sign_message_dup(pickled_msg, pvt_key):
-    print("Start Signing")
     signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
-    print("Signed Successful")
     return signed_hex
 
 def encode_key_dup(key):
-    print("Start Encoding")
     key_hex = key.encode(encoder=HexEncoder)
-    print("End Encoding")
     return key_hex
 
 def check_authenticity_dup(obj, signed_msg, pbc_key):

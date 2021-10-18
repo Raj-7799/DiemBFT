@@ -117,27 +117,4 @@ class Keys:
     @property
     def public_keys(self):
         return self._public_keys
-
-
-
-
-# k=Keys(1)
-# k0=Keys(0) 
-# enc_msg=k.encrypt("tmp",0)
-# dcyp_mes=k0.decrypt(enc_msg,1)
-# print(dcyp_mes)
-
-# result =k.sign_message("test")
-# print(k0.verify_message(result))
-
-# enc_msg_no_trace= k.encrypt_no_trace("tmp1",0)
-# print(k0.decrypt_no_trace(enc_msg_no_trace))
-
-# k=Keys(1)
-# print(k.public_key)
-# result=k.sign_message("tmp")
-# print(result)
-
-
-# k0=Keys(0) 
-# print(k0.verify_message(result))
+        

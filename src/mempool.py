@@ -32,9 +32,7 @@ class MemPool:
             self.locator[command] = client
 
     def delete_command(self, command):
-        print("Delete {} from Mempool".format(command))
         if command in self.locator:
-            print("Delete {} from Mempool Successfull".format(command))
             del self.locator[command]
 
     def remove_transaction(self, command):
@@ -45,10 +43,3 @@ class MemPool:
     
     def __str__(self):
         return "{} {}".format(self.queue, self.locator)
-    
-    def print(self):
-        output = ""
-        for q in self.queue:
-            output += str(q)
-        
-        return output

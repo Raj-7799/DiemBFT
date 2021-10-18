@@ -18,11 +18,6 @@ class TC:
         self.pbc_key = pbc_key
         self.signature = Util.sign_object_dup(self.get_block_identity_object(), pvt_key)
 
-        if self.verify_self_signature():
-            print("TC Validtion successfull")
-        else:
-            print("TC Validtion failed")
-
     def get_block_identity_object(self):
         return [self.roundNo, self.tmo_high_qc_rounds, self.tmo_signatures]
     

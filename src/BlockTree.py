@@ -202,7 +202,7 @@ class BlockTree:
         self._high_qc = genesis_qc # highest known QC
         self._high_commit_qc=genesis_qc # highest QC that serves as a commit certificate        
         self._pending_block_tree=PendingBlockTree(genesis_block, self.OutputLogger)
-        self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler)
+        self._ledger = ld.Ledger(genesis_block, self.author, memPool,self.pending_block_tree, responseHandler, self.OutputLogger)
 
         self.fCount=fCount
 

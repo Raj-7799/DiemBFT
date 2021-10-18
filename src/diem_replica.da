@@ -104,7 +104,6 @@ class Replica(process):
                 self.waiting = True
                 self.timedOut = False
                 output("[replicaID {}] Waiting for transactions in mempool".format(self.replicaID))
-                output("[replicaID {}] Mempoool state {}".format(self.replicaID, self.memPool.print()))
                 --request
                 await(self.waiting == False)
             

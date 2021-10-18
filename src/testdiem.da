@@ -91,10 +91,10 @@ def main():
 
   configs = [
     {
-      'faultyReplicas': 1,    # number of replicas which can go faulty
+      'faultyReplicas': 2,    # number of replicas which can go faulty
       'timeoutDelta'  : 2500,  # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
+      'clients'       : 2,
+      'requests'      : 20,
       'clientTimeout' : 5000,
       'networkByzantine'     : False,
       'networkByzantineSeed' : 10,
