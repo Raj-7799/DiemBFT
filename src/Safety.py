@@ -73,7 +73,6 @@ class Safety():
     
     '''Safety: Private'''
     def _validate_signatures(self, qc, last_tc):
-        #TODO
         if ((last_tc is None) or last_tc.verify_self_signature()) and (qc.verify_self_signature_qc()):
             self.OutputLogger("Safety validation successsful")
             return True

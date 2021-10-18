@@ -227,7 +227,6 @@ def clearLedger():
 def main():
   config(clock='Lamport')
   config(channel='fifo')
-  ## TODO show return the entire list 
   configs = [getConfigs()]
   print("configuration ",configs)
   for configuration in configs:
