@@ -39,7 +39,7 @@ class RunDiemBFT(process):
     elif scenario == "normal":
       return new(diem_replica.Replica), {}
     elif scenario == "forge_signature":
-      return new(diem_replica_forge.Replica), self.specialArguments
+      return new(diem_replica_forge.Replica_forged), self.specialArguments
     elif scenario == "delay":
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
         
@@ -192,14 +192,13 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "delay",
 			"specialArguments": {
-				"randomSeed"                   : 50,
-				"potentiallyFaultyReplicaCount": 1,
+				"randomSeed"                   : 50
 			}
 		}
     }
   ]
 
-  return configs[0]
+  return configs[1]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
