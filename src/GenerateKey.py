@@ -88,7 +88,5 @@ class GenerateKey():
         for file in files:
             x = os.remove(file)
     
-   
-# x = GenerateKey(2)
-# x.write_config()
+
 

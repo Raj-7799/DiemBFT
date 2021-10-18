@@ -32,8 +32,6 @@ class Keys:
 
         with open(CONF_FILE_PATH+self.config_file,"r") as file:
             entry = file.read().splitlines() 
-            #self._private_key=PrivateKey(bytes.fromhex(entry[0].split("=")[1]))       
-            #self._public_key=PublicKey(bytes.fromhex(entry[1].split("=")[1]))
             
           
             private_key_from_file=bytes(entry[0].split("=")[1],'utf-8')
@@ -46,7 +44,6 @@ class Keys:
         with open(CONF_FILE_PATH+self._public_key_file,"r") as file:
             entries=file.read().splitlines() 
             for entry in entries:
-                #self._public_keys.append(PublicKey(bytes.fromhex(entry.split("=")[1])))
                 public_key_from_file=bytes(entry.split("=")[1],'utf-8')
                 public_key=VerifyKey(public_key_from_file,encoder=HexEncoder)
                 self._public_keys.append(public_key)
@@ -55,14 +52,12 @@ class Keys:
     def encrypt(self,msg,to_idx):         
         priv_key = self.private_key
         pub_key = self.public_keys[to_idx]
-        #Box needs private key and Public key object
         sender_box = Box(priv_key,pub_key)
         return sender_box.encrypt(str.encode(msg))     
     
     def decrypt(self,msg,from_idx):
         priv_key = self.private_key
         pub_key = self.public_keys[from_idx]
-        #Box needs private key and Public key object
         receiver_box = Box(priv_key,pub_key)
         return receiver_box.decrypt(msg).decode('utf-8')
 

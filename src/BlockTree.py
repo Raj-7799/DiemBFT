@@ -48,13 +48,7 @@ class QC:
         self.signatures         = votes
         self.author             = author
         self.pbc_key             = pbc_key
-        #self.signature          = Util.sign_object(self.signatures, pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
-        
-        # if self.verify_self_signature():
-        #     self.OutputLogger("QuoromCertificate Validtion successfull")
-        # else:
-        #     self.OutputLogger("QuoromCertificate Validtion failed")
     
     def __str__(self):
         return "VoteInfo - {} \n LedgerCommitInfo - {} \n author - {}".format(self.vote_info, self.ledger_commit_info, self.author)
@@ -77,16 +71,7 @@ class VoteMsg:
         self.ledger_commit_info = ledger_commit_info
         self.high_commit_qc = high_commit_qc
         self.sender = sender
-        #self.signature = Util.sign_object(self.form_signature_object(), pvt_key, pbc_key)
         self.signature = Util.sign_object_dup(self.form_signature_object(), pvt_key)
-        # if self.verify_self_signature(pbc_key):
-        #     self.OutputLogger("VoteMsg Validtion successfull")
-        # else:
-        #     self.OutputLogger("VoteMsg Validtion failed")
-    
-    # def verify_self_signature(self):
-
-    #     return Util.check_authenticity_dup(self.form_signature_object(), self.signature)
 
     def verify_self_signature(self, pbc_key):
         return Util.check_authenticity_dup(self.form_signature_object(), self.signature, pbc_key)
@@ -131,8 +116,6 @@ class PendingBlockTree:
         self.cache[genesis_block.id]=self.root
         self.add(genesis_block.id,genesis_block)
 
-
-        #logger.debug("PendingBlockTree END: init")
         
     def get_node(self,block_id):
         return self.cache[block_id]
@@ -151,9 +134,6 @@ class PendingBlockTree:
         self.OutputLogger("new root {}".format(self.root.block.payload))
         self.cache_cleanup(id)
         self.print_cache()
-        # parent_node = self.get_node(curr_node.prev_node_id)
-        # parent_node.childNodes[id]=None
-        # del parent_node.childNodes[id]
 
     def cache_cleanup(self,id):
         self.cache=dict()
@@ -228,24 +208,17 @@ class BlockTree:
     def process_qc(self,qc):
 
         if qc.ledger_commit_info.commit_state_id != None:
-            #Ledger.commit(qc['vote_info']['parent_id'])
             self.OutputLogger("Leger commit info replicaID {} {}".format(qc.ledger_commit_info.commit_state_id, self.author))
             self._ledger.commit(qc.vote_info.parent_id)
             self.OutputLogger("qc.vote_info.parent_id {} replica {} ".format(qc.vote_info.parent_id,self.author))
             self.pending_block_tree.prune(qc.vote_info.parent_id)
-            # self.OutputLogger("[replicaID {}] Before HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
             self._high_commit_qc=max_round_qc(qc,self.high_commit_qc) # max_rond high commit qc ← max round {qc, high commit qc} // max round need elaboration
-            # self.OutputLogger("[replicaID {}] HighCommitQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_commit_qc))
-        #high qc ← max round {qc, high qc}
+            
         self._high_qc=max_round_qc(qc,self.high_qc)
-        # self.OutputLogger("[replicaID {}] HighQC with commit id new QC {} current high commit {}".format(self.author, qc, self._high_qc))
-        # self.OutputLogger("[replicaID {}] END process_qc ".format(self.author))
-
+        
 
   
     def execute_and_insert(self,block):
-        ##In paper : Ledger.speculate(b.qc.block id, b.id, b.payload)
-        ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.id,block.id,block)
         self.pending_block_tree.add(block.qc.vote_info.id,block)  # forking is possible so we need to know which node to extend
 
@@ -257,7 +230,7 @@ class BlockTree:
         self.pending_votes[vote_idx].add(vote)
 
         if len(self.pending_votes[vote_idx]) == 2 * self.fCount + 1:
-            # self.OutputLogger("Forming qc at {}".format(self.author))
+            
             voters = [x.sender for x in self.pending_votes[vote_idx]]
 
             qc = QC(
@@ -285,7 +258,5 @@ class BlockTree:
                                 )   
         return new_block
         
-        ## Creating genesis block for startup 
-# compute_block=x.generate_block(1,2)
-# self.OutputLogger(compute_block)
+
 
