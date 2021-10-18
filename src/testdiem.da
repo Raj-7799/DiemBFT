@@ -11,6 +11,7 @@ import plyvel
 import pickle
 import shutil
 import glob
+import diem_replica_forge
 import diem_replica_omission
 import diem_replica_delay
 print(sys.path)
@@ -38,11 +39,11 @@ class RunDiemBFT(process):
       return new(diem_replica_omission.Replica_Omission), self.specialArguments
     elif scenario == "normal":
       return new(diem_replica.Replica), {}
+    elif scenario == "forge_signature":
+      return new(diem_replica_forge.Replica), self.specialArguments
     elif scenario == "delay":
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
         
-    # elif scenario == "":
-    #   return new(diem_replica_omission.Replica_Omision) ,self.specialArguments
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
 
@@ -59,20 +60,16 @@ class RunDiemBFT(process):
     specialArgs = {}
     
     i = 0
-    potentiallyFaultyReplicaCount=0
-  
-    if "potentiallyFaultyReplicaCount" in self.specialArguments.keys():
-      potentiallyFaultyReplicaCount =self.specialArguments["potentiallyFaultyReplicaCount"]
 
     # spawning normal replicas
-    while i < replicas_required- potentiallyFaultyReplicaCount:
+    while i < replicas_required - self.faulty_replicas:
       replica, special = self.getReplicafromConfiguration("normal")
       specialArgs[i] = special
       replicas.append(replica)
       i += 1
 
     # spawning faulty replicas
-    while i < potentiallyFaultyReplicaCount:
+    while i < self.replicas_required:
       replica, special = self.getReplicafromConfiguration(self.scenario)
       specialArgs[i] = special
       replicas.append(replica)
@@ -127,73 +124,85 @@ class RunDiemBFT(process):
 
 
 def getConfigs():
-  
-  configs = [{
-		"Name": "Normal Replicas",
+  configs = [
+    {
+      'Name'          : "Normal Replicas",
+      'faultyReplicas': 1,                 # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,              # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 5,
+      'testcase'      : {
+        "type"            : "normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name'          : "Normal Replicas with multiple clients",
+      'faultyReplicas': 1,                                       # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                    # milliseconds
+      'clients'       : 2,
+      'requests'      : 10,
+      'clientTimeout' : 5,
+      'testcase'      : {
+        "type"            : "normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name'          : "Client small timeout with request resubmission and handling de-deuplication",
+      'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                                                          # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 0.5,
+      'testcase'      : {
+        "type"            : "normal",
+        "specialArguments": {}
+      }
+    },
+    {
+      'Name'          : "Faulty replica having omission failures",
+      'faultyReplicas': 1,                                         # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                      # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 5,
+      'testcase'      : {
+        "type"            : "omission",
+        "specialArguments": {}
+      },
+    },
+    {
+      'Name'          : "Forge signature",
+      'faultyReplicas': 1,                 # number of replicas which can go faulty
+      'timeoutDelta'  : 500,               # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 2,
+      'testcase'      : {
+        "type"            : "forge_signature",
+        "specialArguments": {}
+      },
+    },
+    {
+		"Name"          : "Faulty replicas having delay failures",
 		"faultyReplicas": 1,
-		"timeoutDelta": 2500,
-		"clients": 1,
-		"requests": 10,
-		"clientTimeout": 5,
-		"testcase": {
-			"type": "normal",
-			"specialArguments": {}
-		}
-	},
-	{
-		"Name": "Normal Replicas with multiple clients",
-		"faultyReplicas": 1,
-		"timeoutDelta": 2500,
-		"clients": 2,
-		"requests": 10,
-		"clientTimeout": 5,
-		"testcase": {
-			"type": "normal",
-			"specialArguments": {}
-		}
-	},
-	{
-		"Name": "Client small timeout with request resubmission and handling de-deuplication",
-		"faultyReplicas": 1,
-		"timeoutDelta": 2500,
-		"clients": 1,
-		"requests": 10,
-		"clientTimeout": 0.5,
-		"testcase": {
-			"type": "normal",
-			"specialArguments": {}
-		}
-	},
-	{
-		"Name": "Faulty replica having omission failures",
-		"faultyReplicas": 1,
-		"timeoutDelta": 2500,
-		"clients": 1,
-		"requests": 5,
-		"clientTimeout": 5,
-		"testcase": {
-			"type": "omission",
-			"specialArguments": {}
-		}
-	},
-	{
-		"Name": "Faulty replicas having delay failures",
-		"faultyReplicas": 1,
-		"timeoutDelta": 2500,
-		"clients": 1,
-		"requests": 5,
-		"clientTimeout": 5,
-		"testcase": {
-			"type": "delay",
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "delay",
 			"specialArguments": {
-				"randomSeed": 50,
+				"randomSeed"                   : 50,
 				"potentiallyFaultyReplicaCount": 1
 			}
 		}
-	}
-]
+    }
+  ]
 
-  return configs[0]
+  return configs[4]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))

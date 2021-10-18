@@ -37,7 +37,8 @@ class Safety():
         return (roundNo + 1) == block_round
 
     def _safe_to_extend(self, block_round, qc_round, tc):
-        #max_tmo_high_qc = max()
+        if tc is None:
+            return True
         return self._consecutive(block_round, tc.roundNo) and (qc_round >= max(tc.tmo_high_qc_rounds))
 
     def _safe_to_vote(self, block_round, qc_round, tc):
@@ -49,7 +50,10 @@ class Safety():
     def _safe_to_timeout(self, roundNo, qc_round, tc):
         if (qc_round < self.highest_qc_round) or (roundNo <= max((self.highest_vote_round - 1), qc_round)):
             return False
-        return self._consecutive(roundNo, qc_round) or self._consecutive(roundNo, tc.roundNo)
+        
+        consecutive_qc = self._consecutive(roundNo, qc_round)
+        consecutive_tc = self._consecutive(roundNo, tc.roundNo) if tc is not None else True
+        return consecutive_qc or consecutive_tc
 
     def _commit_state_id_candidate(self, block_round, qc):
         if self._consecutive(block_round, qc.vote_info.roundNo):
@@ -87,7 +91,13 @@ class Safety():
         return None
 
     def make_timeout(self, roundNo, high_qc, last_tc):
+        print("Inside make timeout")
+
         qc_round = high_qc.vote_info.roundNo
+        print("Validate signatures", self._validate_signatures(high_qc, last_tc))
+        print("Safe to timeout", self._safe_to_timeout(roundNo, qc_round, last_tc))
+        print("High QC is ", high_qc)
+
         if self._validate_signatures(high_qc, last_tc) and self._safe_to_timeout(roundNo, qc_round, last_tc):
             self._increase_highest_vote_round(roundNo)
             timeoutinfo = Timeoutinfo.TimeoutInfo(roundNo, high_qc, self.sender, self.pvt_key, self.pbc_key)

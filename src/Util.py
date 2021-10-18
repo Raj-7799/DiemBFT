@@ -16,12 +16,15 @@ from diembft_logger import get_logger
 diem_logger = get_logger(os.path.basename(__file__))
 
 def max_round_qc(current_qc,high_qc):
-    qc_round =  current_qc.vote_info.roundNo
-    high_qc_round =  high_qc.vote_info.roundNo
-    if qc_round >  high_qc_round:
-        return current_qc
-    else:
-        return high_qc
+    if current_qc.verify_self_signature_qc():
+        qc_round =  current_qc.vote_info.roundNo
+        high_qc_round =  high_qc.vote_info.roundNo
+        if qc_round >  high_qc_round:
+            return current_qc
+        else:
+            return high_qc
+    print("Current qc signature verification failed in max_round_qc")
+    return high_qc
 
 def hash(object):
     hasher = nacl.hash.sha256

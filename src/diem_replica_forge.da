@@ -35,15 +35,10 @@ class Replica(process):
         self.timedOut = False
 
 
-        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message)
+        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID)
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID)
-
-
-        self.pending_blocks=dict()
-        self.candidate_block_to_commit = dict()
-
 
     def broadcast_helper(method, message):
         for _, replicaInfo in self.replicaInfos.items():
@@ -148,6 +143,7 @@ class Replica(process):
            return
         else:
             output("Validation Successful")
+        
         P=P[0]
         output("type of process_proposal_msg = " + str(type(P.block)))
         diem_logger.info("[replicaID {}] Received proposal msg with Block ID : {} at round {}".format(self.replicaID, P.block.id, self.paceMaker.current_round))
@@ -189,6 +185,7 @@ class Replica(process):
             send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
         else:
             diem_logger.info("[replicaID {}] Unable to make vote for block {}".format(self.replicaID, P.block.id))
+            print("Block where qc failed is {}".format(P.block.payload))
 
     def receive(msg=("process_vote_msg", M), from_=source):
         output('Inside process_vote_msg receive handler')
@@ -202,8 +199,12 @@ class Replica(process):
         qc = self.blockTree.process_vote(M)
 
         if qc:
-            diem_logger.info("[replicaID {}] Formed QC from votes at round {}".format(self.replicaID, self.paceMaker.current_round))
+            output("Modifying qc {}".format(self.replicaID))
+            output("QC signature state {}".format(qc.verify_self_signature_qc()))
+            output("QC formed is {}".format(qc))
+            qc.signatures = ["abc"]
             self.process_certificate(qc)
+            diem_logger.info("[replicaID {}] Formed QC from votes at round {}".format(self.replicaID, self.paceMaker.current_round))
             self.process_next_round_event(None)
 
     def receive(msg=("process_timeout_msg", M), from_=source):
@@ -240,35 +241,3 @@ class Replica(process):
         output("[replicaID {}] Received validate at replica".format(self.replicaID))
         block = self.blockTree._ledger.committed_block(block_id)
         send(("validation_block", block), to=source)
-
-    
-
-    def send_sync_message(sync_status_object):
-        for _, replicaInfo in self.replicaInfos.items():
-            send(("SyncMsgRequest",sync_status_object),to=replicaInfo.process)
-
-    
-    def receive(msg=("BlockSyncMessage",M), from_=source):
-
-        if source==self.replicaID:
-            self.pending_blocks[M[0].id]+=1
-            self.candidate_block_to_commit[M[0].id]=M.next_block
-            self.blockTree.pending_block_tree.add(M[0].qc.vote_info.id,M[0])
-
-            if pending_blocks[M[0].id] == 2*self.fCount + 1:
-                self.blockTree._ledger.commit(M[0].id)
-                self.paceMaker.current_round=M[0].roundNo
-                if M[1] != M[0].id:
-                    for _, replicaInfo in self.replicaInfos.items():
-                        send(("SyncMsgRequest",(self.blockTree._ledger.get_last_commited,self.replicaID)), to=replicaInfo.process)
-
-
-    def receive(msg=("SyncMsgRequest",M), from_=source):
-
-        if source != M[1]:
-            next_block =  self.blockTree._ledger.get_next_block(M[0])
-            last_committed_block=self.blockTree._ledger.last_committed_block
-            send(("BlockSyncMessage",(next_block,last_committed_block)),to=source)
-
-
-
