@@ -16,24 +16,29 @@ import os
 import Util
 from diembft_logger import get_logger
 import time
-
 from diem_replica import Replica
+
 
 diem_logger = get_logger(os.path.basename(__file__))
 
 class ReplicaByz(process,Replica):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs):#,networkByzantine,networkByzantineSeed,processByzantine,processByzantineSeed,degreeOfByzantine):
         output("Spwaning process for replica {}".format(replicaID))
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID)
+        self.spec = spec
         
 
     def process_next_round_event(last_tc):
         # diem_logger.debug("[replicaID {}] New Round event {}".format(self.replicaID, self.replicaID == leaderElection.get_leader(paceMaker.current_round)))
         if self.replicaID == leaderElection.get_leader(paceMaker.current_round):
             transaction = memPool.get_transactions()
-            output("Faulty Leader sleeping  {}".format(self.replicaID))
-            # self.time.sleep(10000)
-            output("Faulty Leader woke up  {}".format(self.replicaID))
-        
+
+            if self.spec["faulty_round"] == self.paceMaker.current_round:
+                output("Faulty Leader sleeping  {}".format(self.replicaID)) 
+                self.time.sleep(1000)
+                output("Faulty Leader woke up  {}".format(self.replicaID))
+
+ 
             if not transaction:
                 self.waiting = True
                 self.timedOut = False
@@ -60,4 +65,7 @@ class ReplicaByz(process,Replica):
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
- 
+
+    def run():
+        await(some(received(("client_end"))))
+
