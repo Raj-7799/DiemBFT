@@ -36,14 +36,12 @@ class Replica_Delay(process):
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID,self.OutputLeaderElection)
-
+        
         self.specialArgs = specialArgs
-        self.pending_blocks=defaultdict(list)
-
+        self.pending_blocks=defaultdict(list)      
         self.OutputReplica("__init__")
         
 
-    
  
     def OutputLoggerPacemaker(log):
         output("[Pacemaker][ReplicaID-{}][{}]".format(self.replicaID,log))
@@ -143,13 +141,16 @@ class Replica_Delay(process):
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 ##Adding random delay for byzantine leader 
-                if self.paceMaker.current_round > 0:
+                # ============> Changes Fault injection Start
+                if self.paceMaker.current_round == self.specialArgs['faulty_round']:
+                    self.specialArgs['faulty_round']=-1
+                    #return
                     random.seed(self.specialArgs["randomSeed"])
-                    t =random.randint(1,4)*self.tDelta
-                    self.OutputReplica("[process_next_round_event] Random delay start for byzantine node sleep for {} for round {}".format(t,self.paceMaker.current_round))
-                    time.sleep(t//1000)
-                    self.OutputReplica("[process_next_round_event] Random delay end for byzantine node up from sleep for {} for round {}".format(t,self.paceMaker.current_round))
-                    return
+                    t =(random.randint(4,8)*self.tDelta)//1000
+                    self.OutputReplica("[process_next_round_event] Random delay start for byzantine node sleep for {} for round {} start time {}".format(t,self.paceMaker.current_round,time.time()))
+                    time.sleep(t)
+                    self.OutputReplica("[process_next_round_event] Random delay end for byzantine node up from sleep for {} for round {} end time {} ".format(t,self.paceMaker.current_round,time.time()))
+                # ============> Changes Fault injection END
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 
         self.OutputReplica("[process_next_round_event] Exit")
@@ -167,7 +168,7 @@ class Replica_Delay(process):
         self.OutputReplica("[request] Waiting state {}".format( self.waiting))
         self.waiting = False
 
-        self.memPool.insert_command(cmd, source)
+        self.memPool.insert_command(cmd)
         if not self.firstRequestProcess:
             if self.replicaID == 0:
                 self.paceMaker.advance_round_qc(self.blockTree._high_qc)

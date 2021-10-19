@@ -179,7 +179,10 @@ def getConfigs():
       'clientTimeout' : 2,
       'testcase'      : {
         "type"            : "forge_signature",
-        "specialArguments": {}
+        "specialArguments": {
+          "forge": True,
+          "faulty_signature" : "diembft"
+        }
       },
     },
     {
@@ -192,13 +195,14 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "delay",
 			"specialArguments": {
-				"randomSeed"                   : 50
+				"randomSeed"                   : 50,
+        "faulty_round": 1
 			}
 		}
     }
   ]
 
-  return configs[1]
+  return configs[5]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))

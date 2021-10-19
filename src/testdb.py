@@ -5,8 +5,12 @@ import os
 import glob
 import shutil
 from tabulate import tabulate
-
+import sys
 replicaID=[0, 1, 2, 3]
+count =  sys.argv[1] if len(sys.argv) > 1 else 4
+print(len(sys.argv))
+clean  = sys.argv[2] if len(sys.argv) > 2 else "yes"
+replicaID = [ x for x in range(0,int(count))]
 
 for i in replicaID:
     _db = plyvel.DB('/tmp/diemLedger_{}/'.format(i), create_if_missing=True)
@@ -28,7 +32,8 @@ for i in replicaID:
 _db.close()
 _db.closed
 ## cleanup 
-print("Cleaning up the ledger files ")
-files=glob.glob('/tmp/diemLedger_*')
-for file in files:
-    x = shutil.rmtree(file)
+if clean in ["y","Y","Yes","YES","yes"]:
+    print("Cleaning up the ledger files ")
+    files=glob.glob('/tmp/diemLedger_*')
+    for file in files:
+        x = shutil.rmtree(file)

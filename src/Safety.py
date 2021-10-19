@@ -81,7 +81,7 @@ class Safety():
             return False
 
     def make_vote(self, b, last_tc):
-        self.OutputLogger("[make_vote] Entry")
+        self.OutputLogger("[make_vote] Entry  block {}".format(b))
         qc_round = b.qc.vote_info.roundNo
         if self._validate_signatures(b.qc, last_tc) and self._safe_to_vote(b.roundNo, qc_round, last_tc):
             self._update_highest_qc_round(qc_round) # // Protect qc round

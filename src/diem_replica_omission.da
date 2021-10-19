@@ -160,7 +160,7 @@ class Replica_Omission(process):
         self.OutputReplica("[request] Waiting state {}".format( self.waiting))
         self.waiting = False
 
-        self.memPool.insert_command(cmd, source)
+        self.memPool.insert_command(cmd)
         if not self.firstRequestProcess:
             if self.replicaID == 0:
                 self.paceMaker.advance_round_qc(self.blockTree._high_qc)
@@ -200,7 +200,11 @@ class Replica_Omission(process):
             return
         
         blockTree.execute_and_insert(P.block,self.paceMaker.current_round)
+        
+        # ============> Changes Fault injection Start
         vote_message = None
+        # ============> Changes Fault injection End
+
         if vote_message:
             nextLeaderID = self.leaderElection.get_leader(current_round + 1)
             self.OutputReplica("[process_proposal_msg] Next leader for the round {} is at replica {}".format( current_round + 1, nextLeaderID))

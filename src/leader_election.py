@@ -31,7 +31,7 @@ class LeaderElection:
             #current block ←Ledger.committed block(current qc.vote info.parent id)
             current_block = self.ledger.committed_block(current_qc.vote_info.parent_id)
             # Change if block is the genesis block stop iteration
-            if current_block.id == 0:
+            if  current_block is None or current_block.id == 0:
                 break
             #block author ←current block.author
             block_author = current_block.author

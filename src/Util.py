@@ -70,6 +70,7 @@ def encode_key_dup(key):
 
 def check_authenticity_dup(obj, signed_msg, pbc_key):
     objIdentity = verify_message_dup(signed_msg, pbc_key)
+    # print("[check_authenticity_dup] {} ".format(pickle.dumps(obj) == objIdentity))
     return pickle.dumps(obj) == objIdentity
 
 def verify_message_dup(signed_msg, pbc_key):

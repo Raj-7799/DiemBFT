@@ -42,6 +42,8 @@ class LedgerCommitInfo:
         self.commit_state_id = commit_state_id #// ⊥ if no commit happens when this vote is aggregated to Q
         self.vote_info_hash = Util.hash(vote_info) #// Hash of VoteMsg.vote info
     
+    def __str__(self):
+        return "commit_state_id {} vote_info_hash {} ".format(self.commit_state_id,self.vote_info_hash[0:4])
 #// QC is a VoteMsg with multiple signatures
 class QC:
     def __init__(self,vote_info :VoteInfo, ledger_commit_info :LedgerCommitInfo, votes, author:int, pvt_key, pbc_key):
@@ -53,7 +55,7 @@ class QC:
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
     
     def __str__(self):
-        return "VoteInfo - {}  author - {}".format(self.vote_info, self.author)
+        return "signature - {} VoteInfo - {}  author - {} ledger_commit_info {}".format(self.signature[0:3],self.vote_info, self.author,self.ledger_commit_info)
     
     def get_signers(self):
         signers = []
@@ -192,6 +194,8 @@ class BlockTree:
     
 
     def process_qc(self,qc):
+        self.OutputLogger("[process_qc] Entry with qc as {} high_qc as {} and high_commit_qc {}".format(qc,self._high_qc,self._high_commit_qc))
+
         #Psuedo code
         # if qc.ledger commit info.commit state id 6= ⊥ then
         if qc.ledger_commit_info.commit_state_id != None:
@@ -203,6 +207,7 @@ class BlockTree:
     
         #high qc ← max round {qc, high qc}
         self._high_qc=max_round_qc(qc,self.high_qc)
+        self.OutputLogger("[process_qc] Exit with high_qc as {} and high_commit_qc {}".format(self._high_qc,self._high_commit_qc))
         
 
 
