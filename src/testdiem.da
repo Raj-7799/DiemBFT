@@ -19,8 +19,6 @@ import diem_replica_proposalDropTimeoutDelay
 import diem_replica_voteDrop
 import diem_replica_setAttrFailure
 
-print(sys.path)
-
 
 import os
 from diembft_logger import get_logger
@@ -230,7 +228,7 @@ def getConfigs():
     },
     {
 		"Name"          : "6. Proposal Messages Dropped at validators 1 and 2",
-		"faultyReplicas": 1,#2 Please change in File diem_replica_proposalDrop.da line 153
+		"faultyReplicas": 1,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
 		"requests"      : 5,
@@ -238,7 +236,7 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "ProposalDrop",
 			"specialArguments": {
-        "faultyRound"                   : 2
+        "faultyRound" : 2
       }
 		}
     },
@@ -304,7 +302,7 @@ def getConfigs():
     }
   ]
 
-  return configs[5]
+  return configs[6]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
