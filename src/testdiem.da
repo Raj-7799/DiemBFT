@@ -13,7 +13,6 @@ import glob
 import diem_replica_forge
 import diem_replica_omission
 import diem_replica_delay
-print(sys.path)
 
 
 import os
@@ -174,7 +173,7 @@ def getConfigs():
       'Name'          : "4. Forge signature",
       'faultyReplicas': 1,                 # number of replicas which can go faulty
       'timeoutDelta'  : 500,               # milliseconds
-      'clients'       : 2,
+      'clients'       : 1,
       'requests'      : 5,
       'clientTimeout' : 2,
       'testcase'      : {
@@ -202,7 +201,7 @@ def getConfigs():
     }
   ]
 
-  return configs[3]
+  return configs[5]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
