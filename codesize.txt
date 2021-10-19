@@ -1,43 +1,44 @@
-      35 text files.
-classified 35 files      35 unique files.                              
-       5 files ignored.
+      37 text files.
+      37 unique files.                              
+       3 files ignored.
 
-github.com/AlDanial/cloc v 1.82  T=0.70 s (45.8 files/s, 4812.6 lines/s)
-------------------------------------------------------------------------------------------
-File                                        blank        comment           code
-------------------------------------------------------------------------------------------
-./diem_replica.da                              75              0            278
-./diem_replica_delay.da                        76              0            244
-./diem_replica_forge.da                        79              0            237
-./diem_replica_omission.da                     81              0            235
-./BlockTree.py                                 71             29            183
-./testdiem.da                                  28             75            133
-./Pacemaker.py                                 22             30             97
-./test_vote.py                                 47             23             93
-./Keys.py                                      37             23             79
-./client.da                                    22              0             77
-./Safety.py                                    24             11             75
-./Util.py                                      15              1             67
-./pending_block_tree_test.py                   39             38             65
-./GenerateKey.py                               28              3             64
-./leader_election.py                           14             26             62
-./Ledger.py                                    22              9             48
-./mempool.py                                   14              1             47
-./client.py                                     5              1             43
-./diem.py                                       5              1             32
-./testdb.py                                     7              1             26
-./request_timeout_handler.py                    7              0             25
-./diembft_logger.py                             6              2             19
-./TC.py                                         7              2             19
-./client_request.py                             5              0             14
-./TimeoutInfo.py                                7              1             13
-./ProposalMsg.py                                7              0             13
-./TimeoutMsg.py                                 3              1              9
-./replica_info.da                               3              0              6
-./client_info.py                                3              0              5
-./Message.py                                    0              0              4
-./message_broker.py                             0              0              3
-./__init__.py                                   0              6              1
-------------------------------------------------------------------------------------------
-SUM:                                          759            284           2316
-------------------------------------------------------------------------------------------
+github.com/AlDanial/cloc v 1.82  T=0.63 s (54.3 files/s, 8854.0 lines/s)
+-------------------------------------------------------------------------------------------------
+File                                                          blank        comment           code
+-------------------------------------------------------------------------------------------------
+./src/diem_replica_multiple.da                                   78              0            303
+./src/diem_replica_proposalDropTimeoutDelay.da                   74              0            294
+./src/diem_replica_delay.da                                      77              0            292
+./src/diem_replica_proposalDelay.da                              79              0            292
+./src/diem_replica_proposalDrop.da                               80              0            288
+./src/diem_replica.da                                            78              0            285
+./src/diem_replica_omission.da                                   75              0            284
+./src/diem_replica_setAttrFailure.da                             75              0            284
+./src/diem_replica_voteDrop.da                                   74              0            284
+./src/diem_replica_forge.da                                      80              0            243
+./src/BlockTree.py                                               72             29            187
+./src/testdiem.da                                                28            209            158
+./src/Pacemaker.py                                               24             30            112
+./src/Keys.py                                                    37             23             79
+./src/client.da                                                  22              0             77
+./src/Safety.py                                                  24             11             75
+./src/Util.py                                                    15              2             67
+./src/leader_election.py                                         14             27             66
+./src/GenerateKey.py                                             28              3             64
+./src/Ledger.py                                                  24              7             52
+./src/mempool.py                                                 17              1             50
+./src/client.py                                                   5              1             43
+./src/testdb.py                                                   6              1             32
+./src/TC.py                                                      12              2             28
+./src/request_timeout_handler.py                                  7              0             25
+./src/diembft_logger.py                                           6              2             19
+./src/client_request.py                                           5              0             14
+./src/ProposalMsg.py                                              7              0             13
+./src/TimeoutInfo.py                                              7              1             13
+./src/TimeoutMsg.py                                               3              1              9
+./src/replica_info.da                                             3              0              6
+./src/client_info.py                                              3              0              5
+./src/Message.py                                                  0              0              4
+./src/__init__.py                                                 0              6              1
+-------------------------------------------------------------------------------------------------
+SUM:                                                           1139            356           4048
