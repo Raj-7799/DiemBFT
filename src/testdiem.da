@@ -15,6 +15,7 @@ import diem_replica_omission
 import diem_replica_delay
 import diem_replica_proposalDrop
 import diem_replica_proposalDelay
+import diem_replica_proposalDropTimeoutDelay
 print(sys.path)
 
 
@@ -44,10 +45,12 @@ class RunDiemBFT(process):
       return new(diem_replica_forge.Replica_forged), self.specialArguments
     elif scenario == "delay":
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
-    elif scenario== "ProposalDrop":
+    elif scenario == "ProposalDrop":
       return new(diem_replica_proposalDrop.Replica_Drop), self.specialArguments 
-    elif scenario== "ProposalDelay":
+    elif scenario == "ProposalDelay":
       return new(diem_replica_proposalDelay.Replica_Delay), self.specialArguments 
+    elif scenario == "ProposalDropTimeoutDelay":
+      return new(diem_replica_proposalDropTimeoutDelay.Replica_Drop_Delay), self.specialArguments 
         
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
@@ -66,7 +69,7 @@ class RunDiemBFT(process):
     
     i = 0
     # spawning faulty replicas
-    if (self.scenario != "ProposalDrop" and self.scenario != "ProposalDelay"):
+    if (self.scenario != "ProposalDrop" and self.scenario != "ProposalDelay" and self.scenario != "ProposalDropTimeoutDelay"):
       while i < self.faulty_replicas:
         replica, special = self.getReplicafromConfiguration(self.scenario)
         specialArgs[i] = special
@@ -86,6 +89,12 @@ class RunDiemBFT(process):
         replicas.append(replica)
         i += 1
     elif self.scenario == "ProposalDelay":
+      while i < replicas_required:
+        replica, special = self.getReplicafromConfiguration(self.scenario)
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
+    elif self.scenario == "ProposalDropTimeoutDelay":
       while i < replicas_required:
         replica, special = self.getReplicafromConfiguration(self.scenario)
         specialArgs[i] = special
@@ -141,7 +150,7 @@ class RunDiemBFT(process):
 
 def getConfigs():
   configs = [
-    {
+    {#0
       'Name'          : "Normal Replicas",
       'faultyReplicas': 1,                 # number of replicas which can go faulty
       'timeoutDelta'  : 2500,              # milliseconds
@@ -153,7 +162,7 @@ def getConfigs():
         "specialArguments": {}
       }
     },
-    {
+    {#1
       'Name'          : "Normal Replicas with multiple clients",
       'faultyReplicas': 1,                                       # number of replicas which can go faulty
       'timeoutDelta'  : 2500,                                    # milliseconds
@@ -165,7 +174,7 @@ def getConfigs():
         "specialArguments": {}
       }
     },
-    {
+    {#2
       'Name'          : "Client small timeout with request resubmission and handling de-deuplication",
       'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
       'timeoutDelta'  : 2500,                                                                          # milliseconds
@@ -177,7 +186,7 @@ def getConfigs():
         "specialArguments": {}
       }
     },
-    {
+    {#3
       'Name'          : "Faulty replica having omission failures",
       'faultyReplicas': 1,                                         # number of replicas which can go faulty
       'timeoutDelta'  : 2500,                                      # milliseconds
@@ -189,7 +198,7 @@ def getConfigs():
         "specialArguments": {}
       }
     },
-    {
+    {#4
       'Name'          : "Forge signature",
       'faultyReplicas': 1,                 # number of replicas which can go faulty
       'timeoutDelta'  : 500,               # milliseconds
@@ -201,7 +210,7 @@ def getConfigs():
         "specialArguments": {}
       }
     },
-    {
+    {#5
 		"Name"          : "Faulty replicas having delay failures",
 		"faultyReplicas": 1,
 		"timeoutDelta"  : 2500,
@@ -215,7 +224,7 @@ def getConfigs():
 			}
 		  }
     },
-    {
+    {#6
 		"Name"          : "Proposal Messages Dropped at validators 1 and 2",
 		"faultyReplicas": 1,#2 Please change in File diem_replica_proposalDrop.da line 153
 		"timeoutDelta"  : 2500,
@@ -224,10 +233,12 @@ def getConfigs():
 		"clientTimeout" : 5,
 		"testcase"      : {
 			"type"            : "ProposalDrop",
-			"specialArguments": {}
+			"specialArguments": {
+        "faultyRound"                   : 2
+      }
 		}
     },
-    {
+    {#7
 		"Name"          : "Proposal Messages Delayed at validators 1 and 2 and 5",
 		"faultyReplicas": 2,
 		"timeoutDelta"  : 2500,
@@ -237,7 +248,23 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "ProposalDelay",
 			"specialArguments": {
-				"randomSeed"                   : 50
+				"randomSeed"                   : 50,
+        "faultyRound"                   : 2
+			}
+		}
+    },
+    {#8
+		"Name"          : "Proposal Drop and Timeout Delay in round 3",
+		"faultyReplicas": 2,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "ProposalDropTimeoutDelay",
+			"specialArguments": {
+				"randomSeed"                   : 50,
+        "faultyRound"                   : 2
 			}
 		}
     }

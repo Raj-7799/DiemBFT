@@ -150,8 +150,8 @@ class Replica_Delay(process):
             #Psuedocode
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
-                self.OutputReplica("YOLO Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                if proposal_msg.block.roundNo == 3 and (replicaInfo.replicaID == 0 or replicaInfo.replicaID == 1 or replicaInfo.replicaID == 4):#Delaying proposal messages
+                self.OutputReplica("Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
+                if proposal_msg.block.roundNo == self.specialArgs["faultyRound"] and (replicaInfo.replicaID == 0 or replicaInfo.replicaID == 1 or replicaInfo.replicaID == 4):#Delaying proposal messages
                     self.OutputReplica("Delaying proposal messages for Round {} fro replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
                     random.seed(self.specialArgs["randomSeed"])
                     t =random.randint(1,4)*self.tDelta

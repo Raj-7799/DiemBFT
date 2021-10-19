@@ -13,10 +13,11 @@ import sys
 import os
 import Util
 import time
+import random
 from collections import defaultdict
 
 
-class Replica_Drop(process):
+class Replica_Drop_Delay(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
@@ -37,7 +38,7 @@ class Replica_Drop(process):
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID,self.OutputLeaderElection)
 
-
+        self.specialArgs = specialArgs
         self.pending_blocks=defaultdict(list)
 
         self.OutputReplica("__init__")
@@ -82,6 +83,12 @@ class Replica_Drop(process):
         return replicaIDs
 
     def pacemaker_broadcast_timeout(tmo_message):
+        if(tmo_message.tmo_info.roundNo == self.specialArgs["randomSeed"]):
+            random.seed(self.specialArgs["randomSeed"])
+            t =random.randint(1,4)*self.tDelta
+            self.OutputReplica("[process_next_round_event] Random delay start. sleep for round {}".format(tmo_message.tmo_info.roundNo))
+            time.sleep(t//1000)
+            self.OutputReplica("[process_next_round_event] Random delay end. up from sleep for round {}".format(tmo_message.tmo_info.roundNo))
         self.OutputReplica("[pacemaker_broadcast_timeout] Entry")
         SIGNED_MSG = Util.sign_object_dup(tmo_message, self.privateKey)
         self.broadcast_helper("process_timeout_msg", [tmo_message, SIGNED_MSG])
@@ -150,12 +157,13 @@ class Replica_Drop(process):
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
                 self.OutputReplica("Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                if not (proposal_msg.block.roundNo == self.specialArgs["faultyRound"] and (replicaInfo.replicaID == 0 or replicaInfo.replicaID ==1)):#Droppign proposal messages for replica 0 and 1
+                if proposal_msg.block.roundNo != self.specialArgs["faultyRound"]: #Dropping packets for Round 3 
                     SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                     send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
                 else:
                     self.OutputReplica("Dropping proposal messages for Round {} fro replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
                 
+                    
         self.OutputReplica("[process_next_round_event] Exit")
 
 
