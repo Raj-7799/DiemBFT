@@ -13,10 +13,10 @@ import sys
 import os
 import Util
 import time
-import random
 from collections import defaultdict
 
-class Replica_Delay(process):
+
+class Replica_setAttrFailure(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
@@ -37,7 +37,7 @@ class Replica_Delay(process):
         self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID,self.OutputLeaderElection)
 
-
+        self.specialArgs = specialArgs
         self.pending_blocks=defaultdict(list)
 
         self.OutputReplica("__init__")
@@ -58,7 +58,7 @@ class Replica_Delay(process):
 
     
     def OutputReplica(log):
-        output("[Replica][ReplicaDelayID-{}][{}]".format(self.replicaID,log))
+        output("[Replica][ReplicaID-{}][{}]".format(self.replicaID,log))
 
     def OutputMempool(log):
         output("[Mempool][ReplicaID-{}][{}]".format(self.replicaID,log))
@@ -105,13 +105,10 @@ class Replica_Delay(process):
 
     def process_certificate(qc):
         self.OutputReplica("[process_certificate] Entry Processing QC {} for vote_info {} at round {}".format( qc, qc.vote_info.id, self.paceMaker.current_round))
-        if qc.verify_self_signature_qc():
-            self.blockTree.process_qc(qc)
-            self.leaderElection.update_leaders(qc)
-            self.paceMaker.advance_round_qc(qc)
-            self.OutputReplica("[process_certificate] Exit Processing QC {} for vote_info {} at round {}".format( qc, qc.vote_info.id, self.paceMaker.current_round))
-        else:
-            self.OutputReplica("[process_certificate] Exit QC invalid")
+        self.blockTree.process_qc(qc)
+        self.leaderElection.update_leaders(qc)
+        self.paceMaker.advance_round_qc(qc)
+        self.OutputReplica("[process_certificate] Exit Processing QC {} for vote_info {} at round {}".format( qc, qc.vote_info.id, self.paceMaker.current_round))
 
     #Psuedocode
     #process new round event(last tc)
@@ -153,17 +150,8 @@ class Replica_Delay(process):
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
-                ##Adding random delay for byzantine leader 
-                # ============> Changes Fault injection Start
-                if self.paceMaker.current_round == self.specialArgs['faulty_round']:
-                    self.specialArgs['faulty_round']= -1
-                    random.seed(self.specialArgs["randomSeed"])
-                    t =(random.randint(4, 8) * self.tDelta)//1000
-                    self.OutputReplica("[process_next_round_event] Random delay start for byzantine node sleep for {} for round {} start time {}".format(t,self.paceMaker.current_round,time.time()))
-                    time.sleep(t)
-                    self.OutputReplica("[process_next_round_event] Random delay end for byzantine node up from sleep for {} for round {} end time {} ".format(t,self.paceMaker.current_round,time.time()))
-                # ============> Changes Fault injection END
-
+                send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
+            
         self.OutputReplica("[process_next_round_event] Exit")
 
 
@@ -179,7 +167,7 @@ class Replica_Delay(process):
         self.OutputReplica("[request] Waiting state {}".format( self.waiting))
         self.waiting = False
 
-        self.memPool.insert_command(cmd)
+        self.memPool.insert_command(cmd, source)
         if not self.firstRequestProcess:
             if self.replicaID == 0:
                 self.paceMaker.advance_round_qc(self.blockTree._high_qc)
@@ -190,8 +178,7 @@ class Replica_Delay(process):
         self.OutputReplica("[request] Exit") 
 
     def receive(msg=("process_proposal_msg", P), from_=source):
-        self.OutputReplica('[process_proposal_msg] Entry') 
-
+        self.OutputReplica('[process_proposal_msg] Entry ')
         if not Util.verify_message_dup(P[1], self.replicaInfos[source].public_key):
            self.OutputReplica("[process_proposal_msg]  Validation Failed")
            return
@@ -203,9 +190,6 @@ class Replica_Delay(process):
         if P is None:
             self.OutputReplica("[process_proposal_msg] Received a null proposal")
             return
-
-        self.OutputReplica('[process_proposal_msg] Processing with qc as  {} '.format(P.block.qc))
-
         
         self.memPool.markState(P.block.payload)
         #Psuedocode 
@@ -252,8 +236,14 @@ class Replica_Delay(process):
                     break
             
             self.OutputReplica("[process_proposal_msg] Exit Sending vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
+            
             SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
             send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
+            # =========================> Changes Fault Injection START
+            if vote_message.vote_info.roundNo == self.specialArgs["faultyCurrentRound"]: 
+                self.OutputReplica("[process_proposal_msg] Forging Pacemaker's current_round for replica {} to {}".format(replicaInfo.replicaID, self.specialArgs["faultyCurrentRound"]))
+                self.paceMaker.current_round = self.specialArgs["faultyCurrentRound"]
+            # =========================>Changes Fault Injection END
         else:
             self.OutputReplica("[process_proposal_msg] Exit Unable to make vote for block {}".format( P.block.id))
 
@@ -283,12 +273,12 @@ class Replica_Delay(process):
             self.OutputReplica("[process_vote_msg] Exit")
 
     def receive(msg=("process_timeout_msg", M), from_=source):
-        self.OutputReplica('[process_timeout_msg] Entry Inside process_timeout_msg receive handler')
+        self.OutputReplica('[process_vote_msg] Entry Inside process_timeout_msg receive handler')
         if not Util.verify_message_dup(M[1], self.replicaInfos[source].public_key):
-           self.OutputReplica("[process_timeout_msg] Exit Validation Failed")
+           self.OutputReplica("[process_vote_msg] Exit Validation Failed")
            return
         else:
-            self.OutputReplica("[process_timeout_msg] Validation Successful")        
+            self.OutputReplica("[process_vote_msg] Validation Successful")        
         M=M[0]
 
         if self.waiting:
@@ -307,7 +297,7 @@ class Replica_Delay(process):
         #tc ←Pacemaker.process remote timeout(M)
         tc = self.paceMaker.process_remote_timeout(M)
         if tc:
-            self.OutputReplica("[process_timeout_msg] Processing TC  ")
+            self.OutputReplica("[process_vote_msg] Processing TC  ")
             # In paper Pacemaker.advance_round(tc)
             # it should be Pacemaker.adbance_round_tc(tc)
             
@@ -315,7 +305,7 @@ class Replica_Delay(process):
             #Psuedocode
             #process new round event(tc)
             self.process_next_round_event(tc)
-        self.OutputReplica("[process_timeout_msg] Exit")           
+        self.OutputReplica("[process_vote_msg] Exit")           
     
     def receive(msg=("client_end"), from_=source):
         self.OutputReplica("[client_end] Received message to close the replica")
