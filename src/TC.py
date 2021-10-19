@@ -19,6 +19,7 @@ class TC:
             print("TC Validtion successfull")
         else:
             print("TC Validtion failed")
+        
 
     def get_block_identity_object(self):
         return [self.roundNo, self.tmo_high_qc_rounds, self.tmo_signatures]
@@ -26,3 +27,16 @@ class TC:
     def verify_self_signature(self):
         #hash = Util.hash(pickle.dumps(self.get_block_identity_object()))
         return Util.check_authenticity_dup(self.get_block_identity_object(), self.signature, self.pbc_key)
+    
+    def __str__(self):
+        output = []
+        output.append("RoundNo : [ ")
+        output.append(str(self.roundNo) + " ] ")
+        output.append("Tmo High QC Rounds : [ ")
+
+        for i in self.tmo_high_qc_rounds:
+            output.append(str(i) + ", ")
+        
+        output.append("]")
+
+        return "".join(output)
