@@ -14,9 +14,9 @@ import os
 import Util
 import time
 from collections import defaultdict
+import random
 
-
-class Replica_Drop(process):
+class Replica_Multiple_Failure(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
@@ -30,6 +30,7 @@ class Replica_Drop(process):
         self.firstRequestProcess = False
         self.waiting = False
         self.timedOut = False
+        self.specialArgs = specialArgs
         
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
@@ -58,7 +59,7 @@ class Replica_Drop(process):
 
     
     def OutputReplica(log):
-        output("[Replica][Replica_Drop-{}][{}]".format(self.replicaID,log))
+        output("[Replica][ReplicaID-{}][{}]".format(self.replicaID,log))
 
     def OutputMempool(log):
         output("[Mempool][ReplicaID-{}][{}]".format(self.replicaID,log))
@@ -152,14 +153,18 @@ class Replica_Drop(process):
             #Psuedocode
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
-                self.OutputReplica("Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                # =========================> Changes Fault Injection START
-                if not (proposal_msg.block.roundNo == self.specialArgs["faultyRound"] and (replicaInfo.replicaID == 0 or replicaInfo.replicaID ==1)):#Droppign proposal messages for replica 0 and 1
-                    SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
-                    send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
-                else:
-                    self.OutputReplica("Dropping proposal messages for Round {} fro replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                # =========================>Changes Fault Injection END
+                if self.specialArgs["subtype"] == "proposaldrop":
+                    if proposal_msg.block.roundNo in self.specialArgs["rounds"] and replicaInfo.replicaID  in self.specialArgs["validator"]:
+                        self.OutputReplica("[process_next_round_event] Case: in the third and fourth rounds, proposal messages to validator 4 are dropped. Round {} validator dropped {}".format(proposal_msg.block.roundNo , replicaInfo.replicaID ))
+                        continue
+                SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
+
+                if self.specialArgs['subtype'] =="probablisticdrop" and proposal_msg.block.roundNo in self.specialArgs["rounds"] :
+                    self.OutputReplica("[process_next_round_event]  Drop process_proposal_msg message")
+                    random.seed(self.specialArgs["randomSeed"])
+                    if random.uniform() <= self.specialArgs["probability"]:
+                        return
+                send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 
         self.OutputReplica("[process_next_round_event] Exit")
 
@@ -187,8 +192,6 @@ class Replica_Drop(process):
         self.OutputReplica("[request] Exit") 
 
     def receive(msg=("process_proposal_msg", P), from_=source):
-        
-        
         self.OutputReplica('[process_proposal_msg] Entry') 
 
         if not Util.verify_message_dup(P[1], self.replicaInfos[source].public_key):
@@ -249,7 +252,17 @@ class Replica_Drop(process):
                 if replicaInfo.replicaID == nextLeaderID:
                     nextLeaderInfo = replicaInfo
                     break
+            if self.specialArgs['subtype'] =="votedelay" and P.block.roundNo in self.specialArgs["rounds"] and nextLeaderInfo.replicaID in self.specialArgs["validator"]:
+                self.OutputReplica("[process_proposal_msg][Vote delay twice] Delay of vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
+                random.seed(self.specialArgs["randomSeed"])
+                t =(random.randint(self.specialArgs['start'],self.specialArgs['end'])*self.tDelta)//1000
+                time.sleep(t)
             
+            if self.specialArgs['subtype'] =="probablisticdrop" and P.block.roundNo in self.specialArgs["rounds"]:
+                self.OutputReplica("[process_proposal_msg]  [Drop proces_vote_msg]  ")
+                random.seed(self.specialArgs["randomSeed"])
+                if random.uniform() <= self.specialArgs["probability"]:
+                    return
             self.OutputReplica("[process_proposal_msg] Exit Sending vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
             SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
             send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)

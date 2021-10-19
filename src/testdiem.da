@@ -18,7 +18,7 @@ import diem_replica_proposalDelay
 import diem_replica_proposalDropTimeoutDelay
 import diem_replica_voteDrop
 import diem_replica_setAttrFailure
-
+import diem_replica_multiple
 
 import os
 from diembft_logger import get_logger
@@ -59,6 +59,8 @@ class RunDiemBFT(process):
       return new(diem_replica_voteDrop.Replica_VoteDrop), self.specialArguments
     elif scenario == "SetAttrFailure":
       return new(diem_replica_setAttrFailure.Replica_setAttrFailure), self.specialArguments
+    elif scenario in ["proposaldroptwice" ,"votedelay","probablisticdrop"]:
+      return new(diem_replica_multiple.Replica_Multiple_Failure), self.specialArguments
         
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
@@ -77,7 +79,7 @@ class RunDiemBFT(process):
     
     i = 0
     # spawning faulty replicas
-    if (self.scenario == "ProposalDrop" or self.scenario == "ProposalDelay" or self.scenario == "ProposalDropTimeoutDelay" or self.scenario == "VoteDrop" or self.scenario == "SetAttrFailure"):
+    if (self.scenario == "ProposalDrop" or self.scenario == "ProposalDelay" or self.scenario == "ProposalDropTimeoutDelay" or self.scenario == "VoteDrop" or self.scenario == "SetAttrFailure" or self.scenario in ["probablisticdrop","votedelay","proposaldroptwice"]):
       while i < replicas_required:
         replica, special = self.getReplicafromConfiguration(self.scenario)
         specialArgs[i] = special
@@ -297,12 +299,67 @@ def getConfigs():
 			"specialArguments": {
 				"randomSeed"                   : 50,
         "faultyCurrentRound"           : 4
-			}
-		}
-    }
+		  	  }
+         }
+      },
+      {
+      "Name"          : "11. Proposal drop twice",
+      "faultyReplicas": 1,
+      "timeoutDelta"  : 2500,
+      "clients"       : 5,
+      "requests"      : 5,
+      "clientTimeout" : 5,
+      "testcase"      : {
+        "type"            : "proposaldroptwice",
+        "specialArguments": {
+            "rounds": [3,4],
+            "validator":[4],
+            "subtype": "proposaldrop"
+             }
+          }
+        },
+        {
+          "Name"          : "12. Vote delay twice",
+          "faultyReplicas": 1,
+          "timeoutDelta"  : 2500,
+          "clients"       : 5,
+          "requests"      : 5,
+          "clientTimeout" : 5,
+          "testcase"      : {
+            "type"            : "votedelay",
+            "specialArguments": {
+                "rounds": [2,3],
+                "validator":[1,3],
+                "subtype": "votedelay",
+                "randomSeed"                   : 50,
+                "start": 4,
+                "end":7 
+              }
+          }
+        },
+        {
+          "Name"          : "13. Probabilistic Drop with f=2:",
+          "faultyReplicas": 2,
+          "timeoutDelta"  : 2500,
+          "clients"       : 5,
+          "requests"      : 20,
+          "clientTimeout" : 5,
+          "testcase"      : {
+            "type"            : "probablisticdrop",
+            "specialArguments": {
+                "rounds": [2,3,5,6,8,9],
+                
+                "subtype": "probablisticdrop",
+                "randomSeed"                   : 1234567,
+                "start": 4,
+                "end":7,
+                "probability": 0.15
+              }
+          }
+        }
   ]
 
-  return configs[6]
+  return configs[10]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
