@@ -205,16 +205,11 @@ def getConfigs():
       "clientTimeout" : 2,
       "testcase"      : {
         "type"            : "forge_signature",
-<<<<<<< HEAD
         "specialArguments": {
           "forge": True,
           "faulty_signature" : "diembft"
         }
       },
-=======
-        "specialArguments": {}
-      }
->>>>>>> 5db9380c32979a2a8a0372da3a905d3f835540ce
     },
     {#5
 		"Name"          : "Faulty replicas having delay failures",
@@ -306,12 +301,8 @@ def getConfigs():
 		}
     }
   ]
-<<<<<<< HEAD
 
   return configs[5]
-=======
-  return configs[8]
->>>>>>> 5db9380c32979a2a8a0372da3a905d3f835540ce
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
