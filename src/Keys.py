@@ -4,6 +4,12 @@ from nacl.exceptions import BadSignatureError
 from nacl.encoding import HexEncoder
 import os
 
+
+
+import os
+
+
+
 absolute_path=os.path.dirname(os.path.abspath(__file__))
 CONF_FILE_PATH=absolute_path+"/../conf/"
 
@@ -22,6 +28,10 @@ class Keys:
 
         with open(CONF_FILE_PATH+self.config_file,"r") as file:
             entry = file.read().splitlines() 
+            #self._private_key=PrivateKey(bytes.fromhex(entry[0].split("=")[1]))       
+            #self._public_key=PublicKey(bytes.fromhex(entry[1].split("=")[1]))
+            
+          
             private_key_from_file=bytes(entry[0].split("=")[1],'utf-8')
             public_key_from_file=bytes(entry[1].split("=")[1],'utf-8')
             private_key=HexEncoder.decode(private_key_from_file)
@@ -32,6 +42,7 @@ class Keys:
         with open(CONF_FILE_PATH+self._public_key_file,"r") as file:
             entries=file.read().splitlines() 
             for entry in entries:
+                #self._public_keys.append(PublicKey(bytes.fromhex(entry.split("=")[1])))
                 public_key_from_file=bytes(entry.split("=")[1],'utf-8')
                 public_key=VerifyKey(public_key_from_file,encoder=HexEncoder)
                 self._public_keys.append(public_key)
@@ -62,6 +73,7 @@ class Keys:
         unseal_box=SealedBox(self.private_key)
         return unseal_box.decrypt(enc_msg).decode("utf-8")
 
+
     ## Use the below method for siging the message 
     ## Reference : https://pynacl.readthedocs.io/en/latest/signing/#id1
     def sign_message(self,msg):    
@@ -71,6 +83,8 @@ class Keys:
         verify_key = self._public_key
         verify_key_hex = verify_key.encode(encoder=HexEncoder)        
         return [signed_hex,verify_key_hex]
+
+
 
     def verify_message(self,signed_msg):
         signed_hex, verify_key_hex=signed_msg
@@ -99,3 +113,27 @@ class Keys:
     @property
     def public_keys(self):
         return self._public_keys
+
+
+
+
+# k=Keys(1)
+# k0=Keys(0) 
+# enc_msg=k.encrypt("tmp",0)
+# dcyp_mes=k0.decrypt(enc_msg,1)
+# print(dcyp_mes)
+
+# result =k.sign_message("test")
+# print(k0.verify_message(result))
+
+# enc_msg_no_trace= k.encrypt_no_trace("tmp1",0)
+# print(k0.decrypt_no_trace(enc_msg_no_trace))
+
+# k=Keys(1)
+# print(k.public_key)
+# result=k.sign_message("tmp")
+# print(result)
+
+
+# k0=Keys(0) 
+# print(k0.verify_message(result))

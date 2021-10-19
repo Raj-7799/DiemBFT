@@ -33,7 +33,7 @@ class VoteInfo:
         self.exec_state_id = exec_state_id
     
     def __str__(self):
-        return "VoteInfo :  [ ID - {}  RoundNo - {}  ParentID - {}  ParentRound - {}  ExecStateID - {} ]".format(self.id, self.roundNo, self.parent_id, self.parent_round, self.exec_state_id)
+        return "ID - {}  RoundNo - {}  ParentID - {}  ParentRound - {}  ExecStateID - {}".format(self.id, self.roundNo, self.parent_id, self.parent_round, self.exec_state_id)
 
 
 #// speculated new committed state to vote directly on
@@ -43,8 +43,7 @@ class LedgerCommitInfo:
         self.vote_info_hash = Util.hash(vote_info) #// Hash of VoteMsg.vote info
     
     def __str__(self):
-        return "LedgerCommitInfo :  [ commit_state_id {} vote_info_hash {} ]".format(self.commit_state_id,self.vote_info_hash[0:4])
-
+        return "commit_state_id {} vote_info_hash {} ".format(self.commit_state_id,self.vote_info_hash[0:4])
 #// QC is a VoteMsg with multiple signatures
 class QC:
     def __init__(self,vote_info :VoteInfo, ledger_commit_info :LedgerCommitInfo, votes, author:int, pvt_key, pbc_key):
@@ -52,11 +51,11 @@ class QC:
         self.ledger_commit_info = ledger_commit_info  
         self.signatures         = votes #// A quorum of signatures
         self.author             = author #// QC is a VoteMsg with multiple signatures
-        self.pbc_key            = pbc_key
+        self.pbc_key             = pbc_key
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
     
     def __str__(self):
-        return "QC : [ signature - {} VoteInfo - {}  author - {} ledger_commit_info {} ]".format(self.signature[0:3],self.vote_info, self.author,self.ledger_commit_info)
+        return "signature - {} VoteInfo - {}  author - {} ledger_commit_info {}".format(self.signature[0:3],self.vote_info, self.author,self.ledger_commit_info)
     
     def get_signers(self):
         signers = []
@@ -67,7 +66,6 @@ class QC:
     
     def verify_self_signature_qc(self):
         return Util.check_authenticity_dup(self.signatures, self.signature, self.pbc_key)
-
 
 class VoteMsg:
     def __init__(self, vote_info: VoteInfo, ledger_commit_info: LedgerCommitInfo, high_commit_qc: QC, sender: int, pvt_key, pbc_key):
@@ -102,7 +100,7 @@ class Block:
         return [self.author, self.roundNo, self.payload, self.qc.vote_info.id, self.qc.signatures]
     
     def __str__(self):
-        return "Block : [Block ID - {}  Payload- {}  Author - {}  Round- {}  QC- {} ]".format(self.id, self.payload, self.author, self.roundNo, self.qc)
+        return " Block ID - {}  Payload- {}  Author - {}  Round- {}  QC- {}".format(self.id, self.payload, self.author, self.roundNo, self.qc)
 
 
 class Node:
@@ -145,7 +143,9 @@ class PendingBlockTree:
         self.cache=dict()
         self.prune_helper(self.root)
          
+
     def prune_helper(self,node):
+        
         if node is None:
             return 
         self.cache[node.block.id]=node
@@ -194,6 +194,8 @@ class BlockTree:
     
 
     def process_qc(self,qc):
+        self.OutputLogger("[process_qc] Entry with qc as {} high_qc as {} and high_commit_qc {}".format(qc,self._high_qc,self._high_commit_qc))
+
         #Psuedo code
         # if qc.ledger commit info.commit state id 6= ⊥ then
         if qc.ledger_commit_info.commit_state_id != None:
@@ -205,8 +207,14 @@ class BlockTree:
     
         #high qc ← max round {qc, high qc}
         self._high_qc=max_round_qc(qc,self.high_qc)
+        self.OutputLogger("[process_qc] Exit with high_qc as {} and high_commit_qc {}".format(self._high_qc,self._high_commit_qc))
         
+
+
+
+  
     def execute_and_insert(self,block,current_round):
+        self.OutputLogger("[execute_and_insert] Entry for block.roundNo {} current_round {}".format(block.roundNo,current_round))
         if block.roundNo >  current_round + 1:
             self.OutputLogger("[execute_and_insert] Syncing required for block.roundNo {} current_round {}".format(block.roundNo,current_round))
 
@@ -216,7 +224,10 @@ class BlockTree:
         ## changes:  parameter 1:b.qc.block id <-- is wrong ,parent node is needed extend then new node 
         self._ledger.speculate(block.qc.vote_info.id,block.id,block)
         self.pending_block_tree.add(block.qc.vote_info.id,block)  # forking is possible so we need to know which node to extend
-        self.OutputLogger("[execute_and_insert] Inserted block.roundNo {} current_round {} into sepculate and pending block tree".format(block.roundNo,current_round))
+        self.OutputLogger("[execute_and_insert] Exit for block.roundNo {} current_round {}".format(block.roundNo,current_round))
+
+
+
 
     def process_vote(self, vote):
         self.OutputLogger("[process_vote] Entry for vote.roundNo {}".format(vote.vote_info.roundNo))
@@ -232,7 +243,6 @@ class BlockTree:
         #Psuedo code 
         #if |pending votes[vote idx]|= 2f + 1 then
         if len(self.pending_votes[vote_idx]) == 2 * self.fCount + 1:
-            self.OutputLogger("[process_vote] Received 2 * f + 1 votes for round {}".format(vote.vote_info.roundNo))
             voters = [x.sender for x in self.pending_votes[vote_idx]]
             #Psuedo code
                 # qc ←QC 〈
@@ -248,11 +258,13 @@ class BlockTree:
                 pbc_key=self.pbc_key
             )
 
-            self.OutputLogger("[process_vote] Formed QC for vote.roundNo {}  with new qc {}".format(vote.vote_info.roundNo, qc))
+            self.OutputLogger("[process_vote] Exit for vote.roundNo {}   with new qc {}".format(vote.vote_info.roundNo,qc.vote_info.id))
             return qc
+        self.OutputLogger("[process_vote] Exit for vote.roundNo {}  with None and vote count {}".format(vote.vote_info.roundNo,len(self.pending_votes[vote_idx])))
         return None
 
-    def generate_block(self,txns,current_round):     
+    def generate_block(self,txns,current_round):  
+        self.OutputLogger("[generate_block] Entry for round {}".format(current_round))    
         new_block = Block(
                                     author=self.author,
                                     roundNo=current_round,
@@ -261,9 +273,10 @@ class BlockTree:
                                     pvt_key=self.pvt_key,
                                     pbc_key=self.pbc_key
                                 )   
-        self.OutputLogger("[generate_block] Generated block for round {} with block id {}".format(current_round,new_block.id))    
+        self.OutputLogger("[generate_block] Exit for round {} block id ".format(current_round,new_block.id))    
         return new_block
         
+
     def start_sync(current_block,block_round):
         self.OutputLogger("[start_sync] Entry for current_block {} and block_round".format(current_round,block_round))    
         last_committed_block =  self.ledger.last_committed_block

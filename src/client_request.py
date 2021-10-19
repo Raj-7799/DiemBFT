@@ -1,6 +1,5 @@
 import Util
 
-# Class to hold client request that serves as transaction
 class ClientRequest:
     def __init__(self, payload, source, pvt_key):
         self.payload = payload
