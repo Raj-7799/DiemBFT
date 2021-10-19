@@ -161,7 +161,9 @@ class Replica(process):
 
     def receive(msg=("request", cmd), from_=source):
         self.OutputReplica("[request] Enty Received client request. Inserting cmd {} into mempool of replica".format(cmd))
-        if not Util.verify_message_dup(cmd.signature, self.clientInfos[source].public_key):
+        
+        # not verifying signature for empty transaction
+        if (cmd.payload != "empty") and not Util.verify_message_dup(cmd.signature, self.clientInfos[source].public_key):
             self.OutputReplica("Received forged client signature")
             self.OutputReplica("[request] Exit") 
             return

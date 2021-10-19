@@ -62,3 +62,7 @@ class EmptyRequest():
     def  __init__(self):
         self.payload = "empty"
         self.source = None
+        self.signature = "NoSignature"
+    
+    def __str__(self):
+        return self.payload

@@ -18,6 +18,7 @@ class Pacemaker:
         self.last_round_tc = None # / Initially ⊥
         self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
         self.dict_of_timer = {} # dict of timer for a round
+        self.dict_of_timeout_timers = {} # dict of timer for a timeout messages
         self.OutputLogger=OutputLogger
         self.OutputLogger("__init__")
 
@@ -52,6 +53,20 @@ class Pacemaker:
         self.current_round = new_round
         self._start_timer(self.current_round)
         self.OutputLogger("[start_timer] Exit for round {}".format(self.current_round))
+    
+    def start_timeout_timer(self, timeout_msg):
+        self.OutputLogger("[start_timer] Starting timer for timeout message at round {}".format(timeout_msg.tmo_info.roundNo))
+        self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo] = threading.Timer(self.get_round_timer(), self.on_timeout_timer, [timeout_msg])
+        self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo].start()
+    
+    def stop_timeout_timer(self, tmo_info):
+        if tmo_info.roundNo in self.dict_of_timeout_timers:
+            self.OutputLogger("[stop_timeout_timer] Stopping timer for timeout message")
+            self.dict_of_timeout_timers[tmo_info.roundNo].cancel()
+    
+    def on_timeout_timer(self, timeout_msg):
+        self.OutputLogger("[on_timeout_timer] Timeout Timer expired, broadcasting again")
+        self.replica_broadcast(timeout_msg)
 
     def local_timeout_round(self):
         self.OutputLogger("[local_timeout_round] Entry for round {}".format(self.current_round))
@@ -63,6 +78,7 @@ class Pacemaker:
         #Psuedo code
         #broadcast TimeoutMsg〈timeout info,last round tc,Block-Tree.high commit qc〉
         self.replica_broadcast(timeout_msg)
+        self.start_timeout_timer(timeout_msg)
 
         self.OutputLogger("[local_timeout_round] timeout_info {} last_round_tc {} blocktree.high_qc {}".format(timeout_info,self.last_round_tc,self.blocktree.high_qc))
         self.OutputLogger("[local_timeout_round] Exit for round {} broadcasting timeout message timestamp {}".format(self.current_round,timeout_msg,time.time()))
@@ -81,6 +97,8 @@ class Pacemaker:
         self.OutputLogger(" START process_remote_timeout of tmo.tmo_info.roundNo {}".format( tmo.tmo_info.roundNo))
         # tmo info ←tmo.tmo info
         tmo_info = tmo.tmo_info
+        self.stop_timeout_timer(tmo.tmo_info)
+        
         if tmo_info.roundNo < self.current_round:
             return None
         #Psuedo code
