@@ -154,8 +154,8 @@ def getConfigs():
     {
       'Name': "0. Normal Replicas",
       'faultyReplicas': 1,
-      #number of replicas which can go faulty 'timeoutDelta': 2500,
-      #milliseconds 'clients': 1,
+      'timeoutDelta': 2500,
+      'clients': 1,
       'requests': 10,
       'clientTimeout': 5,
       'testcase': {
@@ -166,8 +166,8 @@ def getConfigs():
     {
       'Name': "1. Normal Replicas with multiple clients",
       'faultyReplicas': 1,
-      #number of replicas which can go faulty 'timeoutDelta': 2500,
-      #milliseconds 'clients': 2,
+      'timeoutDelta': 2500,
+      'clients': 2,
       'requests': 10,
       'clientTimeout': 5,
       'testcase': {
@@ -178,8 +178,8 @@ def getConfigs():
     {
       'Name': "2. Client small timeout with request resubmission and handling de-deuplication",
       'faultyReplicas': 1,
-      #number of replicas which can go faulty 'timeoutDelta': 2500,
-      #milliseconds 'clients': 1,
+      'timeoutDelta': 2500,
+      'clients': 1,
       'requests': 10,
       'clientTimeout': 0.5,
       'testcase': {
@@ -190,8 +190,8 @@ def getConfigs():
     {
       'Name': "3. Faulty replica having omission failures",
       'faultyReplicas': 1,
-      #number of replicas which can go faulty 'timeoutDelta': 2500,
-      #milliseconds 'clients': 1,
+      'timeoutDelta': 2500,
+      'clients': 1,
       'requests': 5,
       'clientTimeout': 5,
       'testcase': {
@@ -202,8 +202,8 @@ def getConfigs():
     {
       'Name': "4. Forge signature",
       'faultyReplicas': 1,
-      #number of replicas which can go faulty 'timeoutDelta': 500,
-      #milliseconds 'clients': 1,
+      'timeoutDelta': 500,
+      'clients': 1,
       'requests': 5,
       'clientTimeout': 2,
       'testcase': {
