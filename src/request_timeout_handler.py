@@ -11,7 +11,6 @@ class RequestTimeoutHandler:
     def _on_timeout(self, command):
         if command in self.dict_of_timer:
             del self.dict_of_timer[command]
-        
         self.OutputRequestTimeOutHandler("Resending request {} to back on timeout".format(command))
         self.callback(command)
 
@@ -27,6 +26,7 @@ class RequestTimeoutHandler:
         if command in self.dict_of_timer:
             return
         
+        self.OutputRequestTimeOutHandler("Starting timer of client {} for command {}".format(self.process, command))
         self.dict_of_timer[command] = threading.Timer(delta, self._on_timeout, [command])
         self.dict_of_timer[command].start()
         self.OutputRequestTimeOutHandler("Started timer of client {} for command {}".format(self.process, command))

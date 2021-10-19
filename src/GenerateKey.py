@@ -1,11 +1,19 @@
 import nacl.utils
+from nacl.public import PrivateKey
 import glob
 import os
-
-from nacl.public import PrivateKey
 from nacl.encoding import HexEncoder
 from nacl.signing import SigningKey
+
 from nacl import encoding
+ 
+
+
+import os
+from diembft_logger import get_logger
+
+diem_logger = get_logger(os.path.basename(__file__))
+
 
 absolute_path=os.path.dirname(os.path.abspath(__file__))
 CONF_FILE_PATH=absolute_path+"/../conf/"
@@ -43,6 +51,8 @@ class GenerateKey():
         del self._public_keys
         del self._key_pairs
         
+
+
     def generate(self,idx):
         key = PrivateKey.generate()
         public_key = (key.public_key)._public_key.hex()
@@ -64,6 +74,7 @@ class GenerateKey():
 
         for dic_key in self._key_pairs.keys():
             with open(CONF_FILE_PATH+"diem_key_"+str(dic_key)+".sec.conf","w") as file:
+                # print("private key ",self._key_pairs[dic_key][1].decode())
                 entry = ["private_key="+   (self._key_pairs[dic_key][1]).decode(),"\npublic_key="+  (self._key_pairs[dic_key][0]).decode()]
                 file.writelines(entry) 
 
@@ -77,3 +88,8 @@ class GenerateKey():
         files=glob.glob(CONF_FILE_PATH+'*')
         for file in files:
             x = os.remove(file)
+    
+   
+# x = GenerateKey(2)
+# x.write_config()
+
