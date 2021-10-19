@@ -30,6 +30,7 @@ class Replica(process):
         self.firstRequestProcess = False
         self.waiting = False
         self.timedOut = False
+        self.specialArgs = specialArgs
         
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
