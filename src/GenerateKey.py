@@ -1,16 +1,11 @@
 import nacl.utils
-from nacl.public import PrivateKey
 import glob
 import os
+
+from nacl.public import PrivateKey
 from nacl.encoding import HexEncoder
 from nacl.signing import SigningKey
-
 from nacl import encoding
- 
-
-
-import os
-
 
 absolute_path=os.path.dirname(os.path.abspath(__file__))
 CONF_FILE_PATH=absolute_path+"/../conf/"
@@ -48,8 +43,6 @@ class GenerateKey():
         del self._public_keys
         del self._key_pairs
         
-
-
     def generate(self,idx):
         key = PrivateKey.generate()
         public_key = (key.public_key)._public_key.hex()
@@ -85,8 +78,3 @@ class GenerateKey():
         files=glob.glob(CONF_FILE_PATH+'*')
         for file in files:
             x = os.remove(file)
-    
-   
-# x = GenerateKey(2)
-# x.write_config()
-
