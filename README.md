@@ -51,8 +51,8 @@ a system. The steps for Anaconda installation is provided in Manual.
 
 ## 6. Code Size
 - Cloc report in codesize.txt
-- Total code lines is 2316
-- Non essential code (tests, helper methods etc) is 353
+- Total code lines is 4048
+- Non essential code (tests, helper methods etc) is 753
 ## 7. Language Feature usage
 - **List Comprehensions =** Total 4 : 1 in client.da and 1 in diem_replica.da
 - **Dictionary Comprehensions =** 0
