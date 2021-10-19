@@ -13,7 +13,6 @@ import glob
 import diem_replica_forge
 import diem_replica_omission
 import diem_replica_delay
-print(sys.path)
 
 
 import os
@@ -198,7 +197,7 @@ def getConfigs():
     }
   ]
 
-  return configs[1]
+  return configs[0]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))

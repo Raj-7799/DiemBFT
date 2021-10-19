@@ -2,61 +2,53 @@ from collections import deque
 import os
 from diembft_logger import get_logger
 
+diem_logger = get_logger(os.path.basename(__file__))
 
 
 class MemPool:
-    def __init__(self,OutputMempool):
+    def __init__(self):
         self.queue = deque([])
-        self.locator = {}
-        self.state = set()
-        self.OutputMempool=OutputMempool
+        self.commited_blocks = set()
     
     def get_transactions(self):
         # currently only sends one transaction
-        self.OutputMempool("[get_transactions] Entry ")
         if self.queue:
             command = self.queue.popleft()
-            if command in self.locator and command not in self.state:
-                self.state.add(command)
-                self.OutputMempool("[get_transactions] Exit with command {} from queue  ".format(command))
-                return command
-            else:
-                return self.get_transactions()
+            print("Returning command ", command, self.print(), self.commited_blocks)
+            return command
         else:
-            self.OutputMempool("[get_transactions] Exit queue empty ")
-
             return None
 
     def markState(self, command):
-        self.state.add(command)
+        if command in self.queue:
+            self.queue.remove(command)
     
-    def insert_command(self, command, client):
-        self.OutputMempool("[insert_command] command {}".format(command))
-
-        if command not in self.locator and command not in self.state:
+    def insert_command(self, command):
+        if command not in self.commited_blocks and command not in self.queue:
             self.queue.append(command)
-            self.locator[command] = client
+            print("Inserted commmand into mempool", command)
         else:
-            self.OutputMempool("[insert_command] Command already present in mempool")
+            print("Command either commited or already present in mempool", command)
 
     def delete_command(self, command):
-        self.OutputMempool("[delete_command] Delete {} from Mempool".format(command))
-        if command in self.locator:
-            self.OutputMempool("[delete_command] Delete {} from Mempool Successfull".format(command))
-            del self.locator[command]
+        self.commited_blocks.add(command)
 
     def remove_transaction(self, command):
         self.delete_command(command)
-
-    def validate_command(self, command):
-        return command in self.locator
     
     def __str__(self):
-        return "{} {}".format(self.queue, self.locator)
-    
-    def print(self):
-        output = ""
+        output = []
+        output.append("MemPool : Queue [ ")
+
         for q in self.queue:
-            output += str(q)
+            output.append("{}, ".format(str(q)))
         
-        return output
+        output.append(" ]")
+
+        output.append(" Commited Blocks [ ")
+
+        for q in list(self.commited_blocks):
+            output.append("{}, ".format(str(q)))
+        
+        output.append(" ]")
+        return "".join(output)
