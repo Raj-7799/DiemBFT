@@ -51,13 +51,17 @@ class Ledger:
 
     #returns a committed block given its id
     def committed_block(self, bk_id):
+        
         block_id=bytes(str(bk_id),'utf-8')
-        entry = pickle.loads(self._db.get(block_id))
-        # if entry[1]:
-        #     self.OutputLogger("[Ledger] Fetching commited block successfull {}.".format( bk_id)) 
-        # else:
-        #     self.OutputLogger("[Ledger] Failed fetching block {}.".format( bk_id)) 
-        return entry[1]
+        ledger_entry = self._db.get(block_id)
+        if ledger_entry:
+            entry = pickle.loads(ledger_entry)
+            return entry[1]
+            #print("[committed_block] Fetching commited block successfull {} {}".format(bk_id,self.replicaID)) 
+        else:
+            #print("[committed_block] Failed fetching block {} {}".format( bk_id,self.replicaID)) 
+            return None
+        
 
 
     def print_ledger(self):
@@ -65,7 +69,7 @@ class Ledger:
         it =  self._db.iterator()
         with self._db.iterator() as it:
             for k,v  in it:
-                self.OutputLogger("key: {}  value {}".format(k,pickle.loads(v)[1]))
+                print("key: {}  value {}".format(k,pickle.loads(v)[1]))
 
     
 

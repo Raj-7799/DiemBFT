@@ -37,7 +37,7 @@ class Client(process):
   def run():
     self.OutputClient("Broadcasting messages to replicas")
     ## Adding two nodes to commit qc.vote_info.parent_id block 
-    client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)] + ["dummy1" + "-" + str(self.pID),"dummy2" + "-" + str(self.pID)]
+    client_request = [ str(x) + '-' + str(self.pID) for x in range(1,self.nReq + 1)]
     for  i in  client_request:
       client_request = cr.ClientRequest(i, self, self.private_key)
       pendingVerification[client_request] = True

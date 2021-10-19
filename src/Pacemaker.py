@@ -2,7 +2,7 @@ import TimeoutMsg as timeoutmsg
 import TC as Tc
 import threading
 from collections import defaultdict
-
+import time
 import os
 
 
@@ -18,6 +18,7 @@ class Pacemaker:
         self.last_round_tc = None # / Initially ⊥
         self.pending_timeouts = defaultdict(set)  #dict of sets of pending timeouts for a round
         self.dict_of_timer = {} # dict of timer for a round
+        self.dict_of_timeout_timers = {} # dict of timer for a timeout messages
         self.OutputLogger=OutputLogger
         self.OutputLogger("__init__")
 
@@ -27,22 +28,19 @@ class Pacemaker:
         # // For example, use 4 ×∆ or α + βcommit gap(r) if ∆ is unknown.
         return 4 * int(self.delta) // 1000 
         
-
+ 
     def _on_timeout(self):
         self.local_timeout_round()
 
     def _start_timer(self, roundNo):
-        self.OutputLogger("[_start_timer] Starting timer for round {}".format( roundNo))
+        self.OutputLogger("[_start_timer] Starting timer for round {} max_time : self.get_round_timer() {} timestamp {}".format( roundNo,self.get_round_timer(),time.time()))
         self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout)
         self.dict_of_timer[roundNo].start()
 
     def _stop_timer(self, roundNo):
         self.OutputLogger("[_stop_timer] Entry for round {}".format(roundNo))
-
-        self.OutputLogger("[_stop_timer] Start timer for round {}".format( roundNo))
-
         if roundNo in self.dict_of_timer:
-            self.OutputLogger(" Stopping timer for roundNo {}".format( roundNo))
+            self.OutputLogger(" Stopping timer for roundNo {} timestamp {} ".format( roundNo,time.time()))
             self.dict_of_timer[roundNo].cancel()
         self.OutputLogger("[_stop_timer] Exit for round {}".format(roundNo))
 
@@ -55,26 +53,43 @@ class Pacemaker:
         self.current_round = new_round
         self._start_timer(self.current_round)
         self.OutputLogger("[start_timer] Exit for round {}".format(self.current_round))
+    
+    def start_timeout_timer(self, timeout_msg):
+        self.OutputLogger("[start_timer] Starting timer for timeout message at round {}".format(timeout_msg.tmo_info.roundNo))
+        self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo] = threading.Timer(self.get_round_timer(), self.on_timeout_timer, [timeout_msg])
+        self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo].start()
+    
+    def stop_timeout_timer(self, tmo_info):
+        if tmo_info.roundNo in self.dict_of_timeout_timers:
+            self.OutputLogger("[stop_timeout_timer] Stopping timer for timeout message")
+            self.dict_of_timeout_timers[tmo_info.roundNo].cancel()
+    
+    def on_timeout_timer(self, timeout_msg):
+        self.OutputLogger("[on_timeout_timer] Timeout Timer expired, broadcasting again")
+        self.replica_broadcast(timeout_msg)
 
     def local_timeout_round(self):
         self.OutputLogger("[local_timeout_round] Entry for round {}".format(self.current_round))
         #Psuedo code
         # timeout info ←Safety.make timeout(current round,Block-Tree.high qc,last round tc
         timeout_info = self.safety.make_timeout(self.current_round, self.blocktree.high_qc, self.last_round_tc)
-        self.OutputLogger(" Local Timeout round called at round {} ".format( self.current_round))
+        self.OutputLogger("[local_timeout_round] Local Timeout round called at round {} ".format( self.current_round))
         timeout_msg = timeoutmsg.TimeoutMsg(timeout_info, self.last_round_tc, self.blocktree.high_qc)
         #Psuedo code
         #broadcast TimeoutMsg〈timeout info,last round tc,Block-Tree.high commit qc〉
         self.replica_broadcast(timeout_msg)
-        self.OutputLogger("[local_timeout_round] Exit for round {}".format(self.current_round))
+        self.start_timeout_timer(timeout_msg)
+
+        self.OutputLogger("[local_timeout_round] timeout_info {} last_round_tc {} blocktree.high_qc {}".format(timeout_info,self.last_round_tc,self.blocktree.high_qc))
+        self.OutputLogger("[local_timeout_round] Exit for round {} broadcasting timeout message timestamp {}".format(self.current_round,timeout_msg,time.time()))
 
 
     def _check_if_sender_pending(self, sender, tmo_info):
         for pending_tmo_info in self.pending_timeouts[tmo_info.roundNo]:
             if sender == pending_tmo_info.sender:
-                self.OutputLogger(" Sender is pending {} of tmo_info.roundNo {}".format( sender, tmo_info.roundNo))
+                self.OutputLogger("[_check_if_sender_pending] Sender is pending {} of tmo_info.roundNo {}".format( sender, tmo_info.roundNo))
                 return True
-        self.OutputLogger(" Sender {} is not pending for tmo_info.roundNo {}".format( sender, tmo_info.roundNo))
+        self.OutputLogger("[_check_if_sender_pending] Sender {} is not pending for tmo_info.roundNo {}".format( sender, tmo_info.roundNo))
         return False
 
     def process_remote_timeout(self, tmo):
@@ -82,6 +97,8 @@ class Pacemaker:
         self.OutputLogger(" START process_remote_timeout of tmo.tmo_info.roundNo {}".format( tmo.tmo_info.roundNo))
         # tmo info ←tmo.tmo info
         tmo_info = tmo.tmo_info
+        self.stop_timeout_timer(tmo.tmo_info)
+        
         if tmo_info.roundNo < self.current_round:
             return None
         #Psuedo code
@@ -112,32 +129,32 @@ class Pacemaker:
             tc = Tc.TC(tmo_info.roundNo, tmo_high_qc_rounds, tmo_signatures, self.blocktree.pvt_key, self.blocktree.pbc_key)
             self.OutputLogger("[process_remote_timeout] Exit for round {} returning TC tmo.tmo_info.roundNo {} with tc {}".format(self.current_round,tmo.tmo_info.roundNo, tc.roundNo))
             return tc
-        self.OutputLogger(" END process_remote_timeout of tmo.tmo_info.roundNo {}".format( tmo.tmo_info.roundNo))
+        self.OutputLogger("[advance_round_tc] END tmo.tmo_info.roundNo {}".format( tmo.tmo_info.roundNo))
         self.OutputLogger("[process_remote_timeout] Exit for round {} returning None".format(self.current_round))
 
         return None
 
     def advance_round_tc(self, tc):
-        self.OutputLogger("[advance_round_tc] Entry for round {} returning None".format(self.current_round))
+        self.OutputLogger("[advance_round_tc] Entry for round {}".format(self.current_round))
         #if tc = ⊥∨tc.round < current round then
         if (tc is None) or (tc.roundNo < self.current_round):
-            self.OutputLogger(" Either tc is None {}  or self.current_round {}".format( tc, self.current_round))
+            self.OutputLogger("[advance_round_tc] Either tc is None {}  or self.current_round {}".format( tc, self.current_round))
             return False
         #Psuedo code 
         # last round tc ←tc
         # start timer(tc.round + 1
         self.last_round_tc = tc
         self.start_timer(tc.roundNo + 1)
-        self.OutputLogger("[advance_round_tc] Exit for round {} returning None".format(self.current_round))
+        self.OutputLogger("[advance_round_tc] Exit for round {} returning true".format(self.current_round))
         return True
 
     def advance_round_qc(self, qc):
-        self.OutputLogger("[advance_round_qc] Entry for round {} returning None".format(self.current_round))
-        self.OutputLogger(" Attempting to advance round for qc {} from {}".format( qc.vote_info.roundNo, self.current_round))
+        self.OutputLogger("[advance_round_qc] Entry for round {}".format(self.current_round))
+        self.OutputLogger("[advance_round_tc] Attempting to advance round for qc {} from {}".format( qc.vote_info.roundNo, self.current_round))
         #Psuedo code 
         #if qc.vote info.round < current round then
         if qc.vote_info.roundNo < self.current_round:
-            self.OutputLogger(" VoteInfo round {} is less than current round {}".format( qc.vote_info.roundNo, self.current_round))
+            self.OutputLogger("[advance_round_tc] VoteInfo round {} is less than current round {}".format( qc.vote_info.roundNo, self.current_round))
             return False
         #Psuedo code 
         #last round tc ←⊥

@@ -31,8 +31,8 @@ class Replica_forged(process):
         self.firstRequestProcess = False
         self.waiting = False
         self.timedOut = False
-
-
+        
+        self.specialArgs = specialArgs
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
         self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
@@ -159,7 +159,7 @@ class Replica_forged(process):
         self.OutputReplica("[request] Waiting state {}".format( self.waiting))
         self.waiting = False
 
-        self.memPool.insert_command(cmd, source)
+        self.memPool.insert_command(cmd)
         if not self.firstRequestProcess:
             if self.replicaID == 0:
                 self.paceMaker.advance_round_qc(self.blockTree._high_qc)
@@ -182,7 +182,8 @@ class Replica_forged(process):
         if P is None:
             self.OutputReplica("[process_proposal_msg] Received a null proposal")
             return
-        
+        self.OutputReplica('[process_proposal_msg] Processing with qc as  {} '.format(P.block.qc))
+
         self.memPool.markState(P.block.payload)
         self.process_certificate(P.block.qc)
         self.process_certificate(P.high_commit_qc)
@@ -229,11 +230,17 @@ class Replica_forged(process):
 
         if qc:
             self.OutputReplica("[process_vote_msg] Formed QC from votes at round {}".format( self.paceMaker.current_round))
-            qc.signatures = ["abc"]
+            # ============> Changes Fault injection Start
+            if self.specialArgs['forge']:
+                qc.signatures = self.specialArgs['faulty_signature']
+                self.specialArgs['forge']=False
+            
+            self.process_certificate(qc)
             self.OutputReplica("[process_vote_msg]Modifying qc {}".format(self.replicaID))
             self.OutputReplica("[process_vote_msg]QC signature state {}".format(qc.verify_self_signature_qc()))
             self.OutputReplica("[process_vote_msg]QC formed is {}".format(qc))
-            self.process_certificate(qc)
+            # ============> Changes Fault injection End
+            
             self.process_next_round_event(None)
             self.OutputReplica("[process_vote_msg] Exit")
 

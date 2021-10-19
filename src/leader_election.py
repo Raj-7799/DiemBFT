@@ -31,8 +31,13 @@ class LeaderElection:
             #current block ←Ledger.committed block(current qc.vote info.parent id)
             current_block = self.ledger.committed_block(current_qc.vote_info.parent_id)
             # Change if block is the genesis block stop iteration
-            if current_block.id == 0:
+            if  current_block is None or current_block.id == 0:
                 break
+            #check for dummy block
+            if current_block.payload is "empty":
+                self.OutputLogger("[elect_reputation_leaders] Empty payload dummy blocks for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
+                current_qc = current_block.qc
+                continue
             #block author ←current block.author
             block_author = current_block.author
 
