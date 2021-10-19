@@ -55,12 +55,13 @@ class Pacemaker:
         self.OutputLogger("[start_timer] Exit for round {}".format(self.current_round))
     
     def start_timeout_timer(self, timeout_msg):
-        self.OutputLogger("[start_timer] Starting timer for timeout message at round {}".format(timeout_msg.tmo_info.roundNo))
-        self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo] = threading.Timer(self.get_round_timer(), self.on_timeout_timer, [timeout_msg])
-        self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo].start()
+        if timeout_msg and timeout_msg.tmo_info:
+            self.OutputLogger("[start_timer] Starting timer for timeout message at round {}".format(timeout_msg.tmo_info.roundNo))
+            self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo] = threading.Timer(self.get_round_timer(), self.on_timeout_timer, [timeout_msg])
+            self.dict_of_timeout_timers[timeout_msg.tmo_info.roundNo].start()
     
     def stop_timeout_timer(self, tmo_info):
-        if tmo_info.roundNo in self.dict_of_timeout_timers:
+        if tmo_info and tmo_info.roundNo in self.dict_of_timeout_timers:
             self.OutputLogger("[stop_timeout_timer] Stopping timer for timeout message")
             self.dict_of_timeout_timers[tmo_info.roundNo].cancel()
     
