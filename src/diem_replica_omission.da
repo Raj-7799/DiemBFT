@@ -57,7 +57,7 @@ class Replica_Omission(process):
 
     
     def OutputReplica(log):
-        output("[Replica][ReplicaID-{}][{}]".format(self.replicaID,log))
+        output("[Replica][ReplicaOmissionID-{}][{}]".format(self.replicaID,log))
 
     def OutputMempool(log):
         output("[Mempool][ReplicaID-{}][{}]".format(self.replicaID,log))
