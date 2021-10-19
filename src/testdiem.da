@@ -123,7 +123,7 @@ class RunDiemBFT(process):
 def getConfigs():
   configs = [
     {
-      'Name'          : "Normal Replicas",
+      'Name'          : "0. Normal Replicas",
       'faultyReplicas': 1,                 # number of replicas which can go faulty
       'timeoutDelta'  : 2500,              # milliseconds
       'clients'       : 1,
@@ -135,7 +135,7 @@ def getConfigs():
       }
     },
     {
-      'Name'          : "Normal Replicas with multiple clients",
+      'Name'          : "1. Normal Replicas with multiple clients",
       'faultyReplicas': 1,                                       # number of replicas which can go faulty
       'timeoutDelta'  : 2500,                                    # milliseconds
       'clients'       : 2,
@@ -147,7 +147,7 @@ def getConfigs():
       }
     },
     {
-      'Name'          : "Client small timeout with request resubmission and handling de-deuplication",
+      'Name'          : "2. Client small timeout with request resubmission and handling de-deuplication",
       'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
       'timeoutDelta'  : 2500,                                                                          # milliseconds
       'clients'       : 1,
@@ -159,7 +159,7 @@ def getConfigs():
       }
     },
     {
-      'Name'          : "Faulty replica having omission failures",
+      'Name'          : "3. Faulty replica having omission failures",
       'faultyReplicas': 1,                                         # number of replicas which can go faulty
       'timeoutDelta'  : 2500,                                      # milliseconds
       'clients'       : 1,
@@ -171,10 +171,10 @@ def getConfigs():
       },
     },
     {
-      'Name'          : "Forge signature",
+      'Name'          : "4. Forge signature",
       'faultyReplicas': 1,                 # number of replicas which can go faulty
       'timeoutDelta'  : 500,               # milliseconds
-      'clients'       : 1,
+      'clients'       : 2,
       'requests'      : 5,
       'clientTimeout' : 2,
       'testcase'      : {
@@ -186,7 +186,7 @@ def getConfigs():
       },
     },
     {
-		"Name"          : "Faulty replicas having delay failures",
+		"Name"          : "5. Faulty replicas having delay failures",
 		"faultyReplicas": 1,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
@@ -195,14 +195,14 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "delay",
 			"specialArguments": {
-				"randomSeed"                   : 50,
+				"randomSeed"   : 50,
         "faulty_round": 1
 			}
 		}
     }
   ]
 
-  return configs[5]
+  return configs[3]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
