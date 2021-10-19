@@ -16,7 +16,7 @@ import time
 from collections import defaultdict
 
 
-class Replica_VoteDrop(process):
+class Replica_setAttrFailure(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
@@ -236,11 +236,12 @@ class Replica_VoteDrop(process):
                     break
             
             self.OutputReplica("[process_proposal_msg] Exit Sending vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
-            if vote_message.vote_info.roundNo != self.specialArgs["faultyRound"]: 
-                SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
-                send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
-            else:#Dropping Votemessages for round 3
-                self.OutputReplica("Dropping Vote messages for Round {} for replica {}".format(vote_message.vote_info.roundNo, replicaInfo.replicaID))
+            
+            SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
+            send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
+            if vote_message.vote_info.roundNo == self.specialArgs["faultyCurrentRound"]: 
+                self.OutputReplica("[process_proposal_msg] Forging Pacemaker's current_round for replica {} to {}".format(replicaInfo.replicaID, self.specialArgs["faultyCurrentRound"]))
+                self.paceMaker.current_round = self.specialArgs["faultyCurrentRound"]
         else:
             self.OutputReplica("[process_proposal_msg] Exit Unable to make vote for block {}".format( P.block.id))
 
