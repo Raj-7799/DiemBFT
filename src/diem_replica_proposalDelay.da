@@ -151,6 +151,7 @@ class Replica_Delay(process):
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
                 self.OutputReplica("Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
+                # =========================> Changes Fault Injection START
                 if proposal_msg.block.roundNo == self.specialArgs["faultyRound"] and (replicaInfo.replicaID == 0 or replicaInfo.replicaID == 1 or replicaInfo.replicaID == 4):#Delaying proposal messages
                     self.OutputReplica("Delaying proposal messages for Round {} fro replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
                     random.seed(self.specialArgs["randomSeed"])
@@ -158,7 +159,7 @@ class Replica_Delay(process):
                     self.OutputReplica("[process_next_round_event] Random delay start node sleep for {} for round {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
                     time.sleep(t//1000)
                     self.OutputReplica("[process_next_round_event] Random delay end node up from sleep for {} for round {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                    
+                # =========================>Changes Fault Injection END
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
                 

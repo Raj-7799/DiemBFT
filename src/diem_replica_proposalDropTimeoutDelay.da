@@ -83,12 +83,14 @@ class Replica_Drop_Delay(process):
         return replicaIDs
 
     def pacemaker_broadcast_timeout(tmo_message):
+        # =========================> Changes Fault Injection START
         if(tmo_message.tmo_info.roundNo == self.specialArgs["randomSeed"]):
             random.seed(self.specialArgs["randomSeed"])
             t =random.randint(1,4)*self.tDelta
             self.OutputReplica("[process_next_round_event] Random delay start. sleep for round {}".format(tmo_message.tmo_info.roundNo))
             time.sleep(t//1000)
             self.OutputReplica("[process_next_round_event] Random delay end. up from sleep for round {}".format(tmo_message.tmo_info.roundNo))
+        # =========================>Changes Fault Injection END
         self.OutputReplica("[pacemaker_broadcast_timeout] Entry")
         SIGNED_MSG = Util.sign_object_dup(tmo_message, self.privateKey)
         self.broadcast_helper("process_timeout_msg", [tmo_message, SIGNED_MSG])
@@ -157,12 +159,13 @@ class Replica_Drop_Delay(process):
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
                 self.OutputReplica("Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
+                # =========================> Changes Fault Injection START
                 if proposal_msg.block.roundNo != self.specialArgs["faultyRound"]: #Dropping packets for Round 3 
                     SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                     send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
                 else:
                     self.OutputReplica("Dropping proposal messages for Round {} fro replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                
+                # =========================>Changes Fault Injection END
                     
         self.OutputReplica("[process_next_round_event] Exit")
 

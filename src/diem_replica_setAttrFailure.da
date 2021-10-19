@@ -239,9 +239,11 @@ class Replica_setAttrFailure(process):
             
             SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
             send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
+            # =========================> Changes Fault Injection START
             if vote_message.vote_info.roundNo == self.specialArgs["faultyCurrentRound"]: 
                 self.OutputReplica("[process_proposal_msg] Forging Pacemaker's current_round for replica {} to {}".format(replicaInfo.replicaID, self.specialArgs["faultyCurrentRound"]))
                 self.paceMaker.current_round = self.specialArgs["faultyCurrentRound"]
+            # =========================>Changes Fault Injection END
         else:
             self.OutputReplica("[process_proposal_msg] Exit Unable to make vote for block {}".format( P.block.id))
 
