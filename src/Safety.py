@@ -3,12 +3,6 @@ import TimeoutInfo as Timeoutinfo
 import Ledger as Ledger
 import BlockTree as Blocktree
 
-
-
-import os
-
-
-
 class Safety():
 
     def __init__(self, blocktree: bt.BlockTree, public_keys, sender,OutputLogger):
@@ -25,6 +19,7 @@ class Safety():
         
         self.OutputLogger=OutputLogger
         self.OutputLogger("__init__")
+    
     def _increase_highest_vote_round(self, roundNo):
         # commit not to vote in rounds lower than round
         self.highest_vote_round = max(roundNo, self.highest_vote_round)
@@ -41,13 +36,13 @@ class Safety():
         return self._consecutive(block_round, tc.roundNo) and (qc_round >= max(tc.tmo_high_qc_rounds))
 
     def _safe_to_vote(self, block_round, qc_round, tc):
-
         if (block_round <= max(self.highest_vote_round, qc_round)):
             # // 1. must vote in monotonically increasing rounds
             # // 2. must extend a smaller round
             self.OutputLogger("[_safe_to_vote] Block round {} is less than qc_round {} or high vote round {}".format(block_round, qc_round, self.highest_vote_round))
             return False
             # // Extending qc from previous round or safe to extend due to tc
+        
         return self._consecutive(block_round, qc_round) or self._safe_to_extend(block_round, qc_round, tc)
 
     def _safe_to_timeout(self, roundNo, qc_round, tc):
@@ -81,7 +76,6 @@ class Safety():
             return False
 
     def make_vote(self, b, last_tc):
-        self.OutputLogger("[make_vote] Entry  block {}".format(b))
         qc_round = b.qc.vote_info.roundNo
         if self._validate_signatures(b.qc, last_tc) and self._safe_to_vote(b.roundNo, qc_round, last_tc):
             self._update_highest_qc_round(qc_round) # // Protect qc round
@@ -89,22 +83,19 @@ class Safety():
             # // VoteInfo carries the potential QC info with ids and rounds of the parent QC
             vote_info = bt.VoteInfo(id=b.id, roundNo=b.roundNo, parent_id=b.qc.vote_info.id, parent_round=b.qc.vote_info.roundNo,exec_state_id=self.ledger.pending_state(b.id))
             ledger_commit_info = bt.LedgerCommitInfo(self._commit_state_id_candidate(b.roundNo, b.qc), vote_info)
-            self.OutputLogger("[make_vote] Exit returning vote msg")
             return bt.VoteMsg(vote_info, ledger_commit_info, self.blocktree.high_commit_qc,self.sender,self.pvt_key,self.pbc_key)
-        self.OutputLogger("[make_vote] Exit returning None")
+        
+        self.OutputLogger("[make_vote] Unable to make vote")
         return None
 
     def make_timeout(self, roundNo, high_qc, last_tc):
-        self.OutputLogger("[make_timeout] Entry")
-
         qc_round = high_qc.vote_info.roundNo
 
         if self._validate_signatures(high_qc, last_tc) and self._safe_to_timeout(roundNo, qc_round, last_tc):
             self._increase_highest_vote_round(roundNo) # // Stop voting for round
             timeoutinfo = Timeoutinfo.TimeoutInfo(roundNo, high_qc, self.sender, self.pvt_key, self.pbc_key)
-            self.OutputLogger("[make_timeout] Exit returning timeoutinfo")
-
             return timeoutinfo
-        self.OutputLogger("[make_timeout] Exit returning None")
+        
+        self.OutputLogger("[make_timeout] Unable to make timeout")
         return None
 
