@@ -1,6 +1,4 @@
-
-
-import os
+# helper class for holding the information for a replica
 class ReplicaInfo:
     def __init__(self, process, public_key, replicaID):
         self.process = process

@@ -20,7 +20,7 @@ class Client(process):
     self.pendingVerification = {}
     self.transactionMap      = {}
     self.runner_process      = runner_process
-    self.timeoutHandler = rth.RequestTimeoutHandler(broadcast, self.pID,self.OutputRequestTimeOutHandler)
+    self.timeoutHandler      = rth.RequestTimeoutHandler(broadcast, self.pID,self.OutputRequestTimeOutHandler)
 
   
   def OutputClient(log):
@@ -45,14 +45,17 @@ class Client(process):
       broadcast(client_request)
       self.timeoutHandler.start_timer(client_request, self.timeout)
 
+    # wait for the requests to process
     await(self.nReq == 0)
     
+    # perform validation checks
     for block_id, info in self.transactionMap.items():
       replica_id = info["replicas"][0]
       block_id = info["block_id"]
       self.OutputClient("Checking validation for {} and {}".format(replica_id, block_id))
       send(("validate", block_id), to=get_replica_info(replica_id).process)
 
+    # if transactions get verified exit client and send client_done message to test runner
     await(self.verified == 0)
     self.OutputClient("Exit client")
 
@@ -60,6 +63,7 @@ class Client(process):
 
 
   def get_replica_info(replicaID):
+    # helper function that fetches the replica Info based on it's ID
     for _, replicaInfo in self.replicaInfos.items():
       if replicaInfo.replicaID == replicaID:
           return replicaInfo
@@ -72,10 +76,11 @@ class Client(process):
       self.OutputClient("Verified signature for block with id {}".format(block.id))
       self.verified -= 1
     else:
-      self.OutputClient("Unable to verify signature")
+      self.OutputClient("Unable to verify signature for the block")
     
   
   def check_block_state(transaction):
+    # function to check if f + 1 consistent transactions are received from the replicas
     transaction_counts = defaultdict(int)
     for entry in self.responses[transaction]:
       transaction_counts[entry[0]]+=1
