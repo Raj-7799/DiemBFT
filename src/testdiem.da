@@ -20,20 +20,15 @@ import diem_replica_voteDrop
 import diem_replica_setAttrFailure
 import diem_replica_multiple
 
-import os
-from diembft_logger import get_logger
-
-diem_logger = get_logger(os.path.basename(__file__))
-
 class RunDiemBFT(process): 
   def setup(config:dict): 
       self.faulty_replicas   = config["faultyReplicas"]
       self.replicas_required = 3 * faulty_replicas + 1
       self.delta             = config["timeoutDelta"]
-      self.clientNo           = config["clients"]
+      self.clientNo          = config["clients"]
       self.requests          = config["requests"]
       self.clientTimeout     = config["clientTimeout"]
-      self.scenario =  config["testcase"]['type']
+      self.scenario          = config["testcase"]['type']
       #output("Type is {}".format(config["testcase"]['type']))
       self.specialArguments = config["testcase"]['specialArguments']
 
@@ -76,8 +71,9 @@ class RunDiemBFT(process):
     specialArgs = {}
     
     i = 0
-    # spawning faulty replicas
-    if (self.scenario == "ProposalDrop" or self.scenario == "ProposalDelay" or self.scenario == "ProposalDropTimeoutDelay" or self.scenario == "VoteDrop" or self.scenario == "SetAttrFailure" or self.scenario in ["probablisticdrop","votedelay","proposaldroptwice"]):
+    # replicas where network plays a heavy role
+    
+    if self.scenario in ["ProposalDrop", "ProposalDelay", "ProposalDropTimeoutDelay", "VoteDrop", "SetAttrFailure", "probablisticdrop", "votedelay", "proposaldroptwice"]:
       while i < replicas_required:
         replica, special = self.getReplicafromConfiguration(self.scenario)
         specialArgs[i] = special
@@ -97,14 +93,17 @@ class RunDiemBFT(process):
         replicas.append(replica)
         i += 1
 
+    # iterate through replicas and generate metadata
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
       replicaInfos[replica] = ReplicaInfo(replica, KeySet.public_key, i)
       replicaToPvtKeys[i] = KeySet.private_key
 
+    # iterate through clients and generate metadata
     for i in clients:
       clientInfo[i] = ClientInfo(KeySets[-1].public_key, i)
 
+    # perform setup for each replica
     for i, replica in enumerate(replicas):
       setup(replica, (
             i,
@@ -117,8 +116,10 @@ class RunDiemBFT(process):
             specialArgs[i]
         ))
 
+    # start replicas
     start(replicas)
 
+    # setup clients
     for i, client in enumerate(clients):
       setup(client, (
         i,
@@ -131,9 +132,13 @@ class RunDiemBFT(process):
         current_runner_process
       ))
     
+    # start clients
     start(clients)
+
+    # wait for clients to exit
     await(self.clientNo == 0)
 
+    # once clients have stopped, send client_end messages to replica in-order for them to stop
     for _,replicaInfo in replicaInfos.items():
       output("sending close message to replica {}".format(replicaInfo.replicaID))
       send(("client_end"), to=replicaInfo.process)
@@ -147,217 +152,234 @@ class RunDiemBFT(process):
 def getConfigs():
   configs = [
     {
-      'Name'          : "0. Normal Replicas",
-      'faultyReplicas': 1,                 # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,              # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 5,
-      'testcase'      : {
-        "type"            : "normal",
+      'Name': "0. Normal Replicas",
+      'faultyReplicas': 1,
+      #number of replicas which can go faulty 'timeoutDelta': 2500,
+      #milliseconds 'clients': 1,
+      'requests': 10,
+      'clientTimeout': 5,
+      'testcase': {
+        "type": "normal",
         "specialArguments": {}
       }
     },
     {
-      'Name'          : "1. Normal Replicas with multiple clients",
-      'faultyReplicas': 1,                                       # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,                                    # milliseconds
-      'clients'       : 2,
-      'requests'      : 10,
-      'clientTimeout' : 5,
-      'testcase'      : {
-        "type"            : "normal",
+      'Name': "1. Normal Replicas with multiple clients",
+      'faultyReplicas': 1,
+      #number of replicas which can go faulty 'timeoutDelta': 2500,
+      #milliseconds 'clients': 2,
+      'requests': 10,
+      'clientTimeout': 5,
+      'testcase': {
+        "type": "normal",
         "specialArguments": {}
       }
     },
     {
-      'Name'          : "2. Client small timeout with request resubmission and handling de-deuplication",
-      'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,                                                                          # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 0.5,
-      'testcase'      : {
-        "type"            : "normal",
+      'Name': "2. Client small timeout with request resubmission and handling de-deuplication",
+      'faultyReplicas': 1,
+      #number of replicas which can go faulty 'timeoutDelta': 2500,
+      #milliseconds 'clients': 1,
+      'requests': 10,
+      'clientTimeout': 0.5,
+      'testcase': {
+        "type": "normal",
         "specialArguments": {}
       }
     },
     {
-      'Name'          : "3. Faulty replica having omission failures",
-      'faultyReplicas': 1,                                         # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,                                      # milliseconds
-      'clients'       : 1,
-      'requests'      : 5,
-      'clientTimeout' : 5,
-      'testcase'      : {
-        "type"            : "omission",
+      'Name': "3. Faulty replica having omission failures",
+      'faultyReplicas': 1,
+      #number of replicas which can go faulty 'timeoutDelta': 2500,
+      #milliseconds 'clients': 1,
+      'requests': 5,
+      'clientTimeout': 5,
+      'testcase': {
+        "type": "omission",
         "specialArguments": {}
       }
     },
     {
-      'Name'          : "4. Forge signature",
-      'faultyReplicas': 1,                 # number of replicas which can go faulty
-      'timeoutDelta'  : 500,               # milliseconds
-      'clients'       : 1,
-      'requests'      : 5,
-      'clientTimeout' : 2,
-      'testcase'      : {
-        "type"            : "forge_signature",
+      'Name': "4. Forge signature",
+      'faultyReplicas': 1,
+      #number of replicas which can go faulty 'timeoutDelta': 500,
+      #milliseconds 'clients': 1,
+      'requests': 5,
+      'clientTimeout': 2,
+      'testcase': {
+        "type": "forge_signature",
         "specialArguments": {
           "forge": True,
-          "faulty_signature" : "diembft"
+          "faulty_signature": "diembft"
         }
-      },
-    },
-    {
-		"Name"          : "5. Faulty replicas having delay failures",
-		"faultyReplicas": 1,
-		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
-		"clientTimeout" : 5,
-		"testcase"      : {
-			"type"            : "delay",
-			"specialArguments": {
-				"randomSeed"                   : 50,
-        "faulty_round": 1,
-        "start": 4,
-        "end":7
-			}
-		  }
-    },
-    {
-		"Name"          : "6. Proposal Messages Dropped at validators 1 and 2",
-		"faultyReplicas": 1,
-		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
-		"clientTimeout" : 5,
-		"testcase"      : {
-			"type"            : "ProposalDrop",
-			"specialArguments": {
-        "faultyRound" : 2
       }
-		}
     },
     {
-		"Name"          : "7. Proposal Messages Delayed at validators 1 and 2 and 5",
-		"faultyReplicas": 2,
-		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
-		"clientTimeout" : 5,
-		"testcase"      : {
-			"type"            : "ProposalDelay",
-			"specialArguments": {
-				"randomSeed"                   : 50,
-        "faultyRound"                   : 2
-			}
-		}
-    },
-    {
-		"Name"          : "8. Proposal Drop and Timeout Delay in round 3",
-		"faultyReplicas": 2,
-		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
-		"clientTimeout" : 5,
-		"testcase"      : {
-			"type"            : "ProposalDropTimeoutDelay",
-			"specialArguments": {
-				"randomSeed"                   : 50,
-        "faultyRound"                   : 2
-			}
-		}
-    },
-    {
-		"Name"          : "9. Vote Message drop for round 3",
-		"faultyReplicas": 2,
-		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
-		"clientTimeout" : 5,
-		"testcase"      : {
-			"type"            : "VoteDrop",
-			"specialArguments": {
-				"randomSeed"                   : 50,
-        "faultyRound"                   : 2
-			}
-		}
-    },
-    {
-		"Name"          : "10. SetAttrFailure",
-		"faultyReplicas": 2,
-		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
-		"clientTimeout" : 5,
-		"testcase"      : {
-			"type"            : "SetAttrFailure",
-			"specialArguments": {
-				"randomSeed"                   : 50,
-        "faultyCurrentRound"           : 4
-		  	  }
-         }
-      },
-      {
-      "Name"          : "11. Proposal drop twice",
+      "Name": "5. Faulty replicas having delay failures",
       "faultyReplicas": 1,
-      "timeoutDelta"  : 2500,
-      "clients"       : 5,
-      "requests"      : 5,
-      "clientTimeout" : 5,
-      "testcase"      : {
-        "type"            : "proposaldroptwice",
+      "timeoutDelta": 2500,
+      "clients": 1,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "delay",
         "specialArguments": {
-            "rounds": [3,4],
-            "validator":[4],
-            "subtype": "proposaldrop"
-             }
-          }
-        },
-        {
-          "Name"          : "12. Vote delay twice",
-          "faultyReplicas": 1,
-          "timeoutDelta"  : 2500,
-          "clients"       : 5,
-          "requests"      : 5,
-          "clientTimeout" : 5,
-          "testcase"      : {
-            "type"            : "votedelay",
-            "specialArguments": {
-                "rounds": [2,3],
-                "validator":[1,3],
-                "subtype": "votedelay",
-                "randomSeed"                   : 50,
-                "start": 4,
-                "end":7 
-              }
-          }
-        },
-        {
-          "Name"          : "13. Probabilistic Drop with f=2:",
-          "faultyReplicas": 2,
-          "timeoutDelta"  : 2500,
-          "clients"       : 5,
-          "requests"      : 20,
-          "clientTimeout" : 5,
-          "testcase"      : {
-            "type"            : "probablisticdrop",
-            "specialArguments": {
-                "rounds": [2,3,5,6,8,9],
-                
-                "subtype": "probablisticdrop",
-                "randomSeed"                   : 1234567,
-                "start": 4,
-                "end":7,
-                "probability": 0.15
-              }
-          }
+          "randomSeed": 50,
+          "faulty_round": 1,
+          "start": 4,
+          "end": 7
         }
+      }
+    },
+    {
+      "Name": "6. Proposal Messages Dropped at validators 1 and 2",
+      "faultyReplicas": 1,
+      "timeoutDelta": 2500,
+      "clients": 1,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "ProposalDrop",
+        "specialArguments": {
+          "faultyRound": 2
+        }
+      }
+    },
+    {
+      "Name": "7. Proposal Messages Delayed at validators 1 and 2 and 5",
+      "faultyReplicas": 2,
+      "timeoutDelta": 2500,
+      "clients": 1,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "ProposalDelay",
+        "specialArguments": {
+          "randomSeed": 50,
+          "faultyRound": 2
+        }
+      }
+    },
+    {
+      "Name": "8. Proposal Drop and Timeout Delay in round 3",
+      "faultyReplicas": 2,
+      "timeoutDelta": 2500,
+      "clients": 1,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "ProposalDropTimeoutDelay",
+        "specialArguments": {
+          "randomSeed": 50,
+          "faultyRound": 2
+        }
+      }
+    },
+    {
+      "Name": "9. Vote Message drop for round 3",
+      "faultyReplicas": 2,
+      "timeoutDelta": 2500,
+      "clients": 1,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "VoteDrop",
+        "specialArguments": {
+          "randomSeed": 50,
+          "faultyRound": 2
+        }
+      }
+    },
+    {
+      "Name": "10. SetAttrFailure",
+      "faultyReplicas": 2,
+      "timeoutDelta": 2500,
+      "clients": 1,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "SetAttrFailure",
+        "specialArguments": {
+          "randomSeed": 50,
+          "faultyCurrentRound": 4
+        }
+      }
+    },
+    {
+      "Name": "11. Proposal drop twice",
+      "faultyReplicas": 1,
+      "timeoutDelta": 2500,
+      "clients": 5,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "proposaldroptwice",
+        "specialArguments": {
+          "rounds": [
+            3,
+            4
+          ],
+          "validator": [
+            4
+          ],
+          "subtype": "proposaldrop"
+        }
+      }
+    },
+    {
+      "Name": "12. Vote delay twice",
+      "faultyReplicas": 1,
+      "timeoutDelta": 2500,
+      "clients": 5,
+      "requests": 5,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "votedelay",
+        "specialArguments": {
+          "rounds": [
+            2,
+            3
+          ],
+          "validator": [
+            1,
+            3
+          ],
+          "subtype": "votedelay",
+          "randomSeed": 50,
+          "start": 4,
+          "end": 7
+        }
+      }
+    },
+    {
+      "Name": "13. Probabilistic Drop with f=2:",
+      "faultyReplicas": 2,
+      "timeoutDelta": 2500,
+      "clients": 5,
+      "requests": 20,
+      "clientTimeout": 5,
+      "testcase": {
+        "type": "probablisticdrop",
+        "specialArguments": {
+          "rounds": [
+            2,
+            3,
+            5,
+            6,
+            8,
+            9
+          ],
+          "subtype": "probablisticdrop",
+          "randomSeed": 1234567,
+          "start": 4,
+          "end": 7,
+          "probability": 0.15
+        }
+      }
+    }
   ]
 
-  return configs[10]
+  return configs[0]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
