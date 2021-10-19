@@ -53,7 +53,7 @@ class QC:
         self.signature = Util.sign_object_dup(self.signatures, pvt_key)
     
     def __str__(self):
-        return "VoteInfo - {}  author - {}".format(self.vote_info, self.author)
+        return "[Qc : VoteInfo - {}  author - {} senders - {}]".format(self.vote_info, self.author, self.signatures)
     
     def get_signers(self):
         signers = []
