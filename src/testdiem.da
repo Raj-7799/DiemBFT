@@ -265,8 +265,8 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "ProposalDropTimeoutDelay",
 			"specialArguments": {
-				"randomSeed"                   : 50,
-        "faultyRound"                   : 2
+				"randomSeed" : 50,
+        "faultyRound" : 2
 			}
 		}
     },
@@ -319,7 +319,7 @@ def getConfigs():
         {
           "Name"          : "12. Vote delay twice",
           "faultyReplicas": 1,
-          "timeoutDelta"  : 2500,
+          "timeoutDelta"  : 500,
           "clients"       : 5,
           "requests"      : 5,
           "clientTimeout" : 5,
@@ -329,9 +329,9 @@ def getConfigs():
                 "rounds": [2,3],
                 "validator":[1,3],
                 "subtype": "votedelay",
-                "randomSeed"                   : 50,
-                "start": 4,
-                "end":7 
+                "randomSeed" : 50,
+                "start": 2,
+                "end": 4 
               }
           }
         },
@@ -357,7 +357,7 @@ def getConfigs():
         }
   ]
 
-  return configs[10]
+  return configs[12]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
