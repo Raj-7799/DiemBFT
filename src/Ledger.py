@@ -43,7 +43,7 @@ class Ledger:
             # commit the block
             self._db.put(block_id,pickle.dumps([entry.prev_node_id,entry.block]))
             block = self.committed_block(bk_id)
-            self.OutputLogger("[commit] Commited block {}".format(bk_id))
+            print("[commit] Commited block {}".format(bk_id))
             # setting transaction into mempool committed blocks cache
             self.memPool.remove_transaction(block.payload)
             # returning tuple to client ,given tuples are immutatble it ensure object is untrampered
