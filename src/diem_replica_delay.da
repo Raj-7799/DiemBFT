@@ -158,7 +158,7 @@ class Replica_Delay(process):
                 if self.paceMaker.current_round == self.specialArgs['faulty_round']:
                     self.specialArgs['faulty_round']= -1
                     random.seed(self.specialArgs["randomSeed"])
-                    t =(random.randint(4, 8) * self.tDelta)//1000
+                    t =(random.randint(self.specialArgs['start'],self.specialArgs['end'])*self.tDelta)//1000
                     self.OutputReplica("[process_next_round_event] Random delay start for byzantine node sleep for {} for round {} start time {}".format(t,self.paceMaker.current_round,time.time()))
                     time.sleep(t)
                     self.OutputReplica("[process_next_round_event] Random delay end for byzantine node up from sleep for {} for round {} end time {} ".format(t,self.paceMaker.current_round,time.time()))

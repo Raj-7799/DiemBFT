@@ -219,8 +219,10 @@ def getConfigs():
 		"testcase"      : {
 			"type"            : "delay",
 			"specialArguments": {
-				"randomSeed"   : 50,
-        "faulty_round": 1
+				"randomSeed"                   : 50,
+        "faulty_round": 1,
+        "start": 4,
+        "end":7
 			}
 		  }
     },

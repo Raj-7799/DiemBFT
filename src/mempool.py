@@ -59,7 +59,6 @@ class MemPool:
 
 
 class EmptyRequest():
-
     def  __init__(self):
         self.payload = "empty"
         self.source = None
