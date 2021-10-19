@@ -54,7 +54,7 @@ a system. The steps for Anaconda installation is provided in Manual.
 - Total code lines is 2316
 - Non essential code (tests, helper methods etc) is 353
 ## 7. Language Feature usage
-- **List Comprehensions =** Total 2 : 1 in client.da and 1 in diem_replica.da
+- **List Comprehensions =** Total 4 : 1 in client.da and 1 in diem_replica.da
 - **Dictionary Comprehensions =** 0
 - **set comprehensions =** 0
 - **aggregations  =** 0
