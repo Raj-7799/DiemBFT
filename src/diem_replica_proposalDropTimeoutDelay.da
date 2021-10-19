@@ -182,7 +182,7 @@ class Replica_Drop_Delay(process):
         self.OutputReplica("[request] Waiting state {}".format( self.waiting))
         self.waiting = False
 
-        self.memPool.insert_command(cmd, source)
+        self.memPool.insert_command(cmd)
         if not self.firstRequestProcess:
             if self.replicaID == 0:
                 self.paceMaker.advance_round_qc(self.blockTree._high_qc)

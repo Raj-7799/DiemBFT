@@ -302,7 +302,7 @@ def getConfigs():
     }
   ]
 
-  return configs[7]
+  return configs[6]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
