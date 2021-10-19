@@ -330,7 +330,7 @@ def getConfigs():
       "Name": "12. Vote delay twice",
       "faultyReplicas": 1,
       "timeoutDelta": 2500,
-      "clients": 5,
+      "clients": 1,
       "requests": 5,
       "clientTimeout": 5,
       "testcase": {
@@ -379,7 +379,7 @@ def getConfigs():
     }
   ]
 
-  return configs[0]
+  return configs[5]
 
 
 def main():
