@@ -14,6 +14,7 @@ import diem_replica_forge
 import diem_replica_omission
 import diem_replica_delay
 import diem_replica_proposalDrop
+import diem_replica_proposalDelay
 print(sys.path)
 
 
@@ -45,6 +46,8 @@ class RunDiemBFT(process):
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
     elif scenario== "ProposalDrop":
       return new(diem_replica_proposalDrop.Replica_Drop), self.specialArguments 
+    elif scenario== "ProposalDelay":
+      return new(diem_replica_proposalDelay.Replica_Delay), self.specialArguments 
         
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
@@ -63,7 +66,7 @@ class RunDiemBFT(process):
     
     i = 0
     # spawning faulty replicas
-    if self.scenario != "ProposalDrop":
+    if (self.scenario != "ProposalDrop" and self.scenario != "ProposalDelay"):
       while i < self.faulty_replicas:
         replica, special = self.getReplicafromConfiguration(self.scenario)
         specialArgs[i] = special
@@ -76,7 +79,13 @@ class RunDiemBFT(process):
         specialArgs[i] = special
         replicas.append(replica)
         i += 1
-    else:
+    elif self.scenario == "ProposalDrop":
+      while i < replicas_required:
+        replica, special = self.getReplicafromConfiguration(self.scenario)
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
+    elif self.scenario == "ProposalDelay":
       while i < replicas_required:
         replica, special = self.getReplicafromConfiguration(self.scenario)
         specialArgs[i] = special
@@ -178,7 +187,7 @@ def getConfigs():
       'testcase'      : {
         "type"            : "omission",
         "specialArguments": {}
-      },
+      }
     },
     {
       'Name'          : "Forge signature",
@@ -190,7 +199,7 @@ def getConfigs():
       'testcase'      : {
         "type"            : "forge_signature",
         "specialArguments": {}
-      },
+      }
     },
     {
 		"Name"          : "Faulty replicas having delay failures",
@@ -204,7 +213,7 @@ def getConfigs():
 			"specialArguments": {
 				"randomSeed"                   : 50
 			}
-		}
+		  }
     },
     {
 		"Name"          : "Proposal Messages Dropped at validators 1 and 2",
@@ -217,10 +226,24 @@ def getConfigs():
 			"type"            : "ProposalDrop",
 			"specialArguments": {}
 		}
+    },
+    {
+		"Name"          : "Proposal Messages Delayed at validators 1 and 2 and 5",
+		"faultyReplicas": 2,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "ProposalDelay",
+			"specialArguments": {
+				"randomSeed"                   : 50
+			}
+		}
     }
   ]
-
-  return configs[6]
+  # output("Config name =".format(configs[7]))
+  return configs[7]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
