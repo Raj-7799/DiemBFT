@@ -33,6 +33,11 @@ class LeaderElection:
             # Change if block is the genesis block stop iteration
             if  current_block is None or current_block.id == 0:
                 break
+            #check for dummy block
+            if current_block.payload is "empty":
+                self.OutputLogger("[elect_reputation_leaders] Empty payload dummy blocks for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
+                current_qc = current_block.qc
+                continue
             #block author ←current block.author
             block_author = current_block.author
 
