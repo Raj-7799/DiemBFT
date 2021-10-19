@@ -13,6 +13,12 @@ import glob
 import diem_replica_forge
 import diem_replica_omission
 import diem_replica_delay
+import diem_replica_proposalDrop
+import diem_replica_proposalDelay
+import diem_replica_proposalDropTimeoutDelay
+import diem_replica_voteDrop
+import diem_replica_setAttrFailure
+
 print(sys.path)
 
 
@@ -30,6 +36,7 @@ class RunDiemBFT(process):
       self.requests          = config["requests"]
       self.clientTimeout     = config["clientTimeout"]
       self.scenario =  config["testcase"]['type']
+      #output("Type is {}".format(config["testcase"]['type']))
       self.specialArguments = config["testcase"]['specialArguments']
 
 
@@ -42,6 +49,18 @@ class RunDiemBFT(process):
       return new(diem_replica_forge.Replica_forged), self.specialArguments
     elif scenario == "delay":
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
+    elif scenario == "ProposalDrop":
+      return new(diem_replica_proposalDrop.Replica_Drop), self.specialArguments 
+    elif scenario == "ProposalDelay":
+      return new(diem_replica_proposalDelay.Replica_Delay), self.specialArguments 
+    elif scenario == "ProposalDropTimeoutDelay":
+      return new(diem_replica_proposalDropTimeoutDelay.Replica_Drop_Delay), self.specialArguments 
+    elif scenario == "ProposalDropTimeoutDelay":
+      return new(diem_replica_proposalDropTimeoutDelay.Replica_Drop_Delay), self.specialArguments
+    elif scenario == "VoteDrop":
+      return new(diem_replica_voteDrop.Replica_VoteDrop), self.specialArguments
+    elif scenario == "SetAttrFailure":
+      return new(diem_replica_setAttrFailure.Replica_setAttrFailure), self.specialArguments
         
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
@@ -60,18 +79,25 @@ class RunDiemBFT(process):
     
     i = 0
     # spawning faulty replicas
-    while i < self.faulty_replicas:
-      replica, special = self.getReplicafromConfiguration(self.scenario)
-      specialArgs[i] = special
-      replicas.append(replica)
-      i += 1
-    
-    # spawning normal replicas
-    while i < replicas_required:
-      replica, special = self.getReplicafromConfiguration("normal")
-      specialArgs[i] = special
-      replicas.append(replica)
-      i += 1
+    if (self.scenario == "ProposalDrop" or self.scenario == "ProposalDelay" or self.scenario == "ProposalDropTimeoutDelay" or self.scenario == "VoteDrop" or self.scenario == "SetAttrFailure"):
+      while i < replicas_required:
+        replica, special = self.getReplicafromConfiguration(self.scenario)
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
+    else:
+      while i < self.faulty_replicas:
+        replica, special = self.getReplicafromConfiguration(self.scenario)
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
+      
+      # spawning normal replicas
+      while i < replicas_required:
+        replica, special = self.getReplicafromConfiguration("normal")
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -122,67 +148,67 @@ class RunDiemBFT(process):
 
 def getConfigs():
   configs = [
-    {
-      'Name'          : "Normal Replicas",
-      'faultyReplicas': 1,                 # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,              # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 5,
-      'testcase'      : {
+    {#0
+      "Name"          : "Normal Replicas",
+      "faultyReplicas": 1,                 # number of replicas which can go faulty
+      "timeoutDelta"  : 2500,              # milliseconds
+      "clients"       : 1,
+      "requests"      : 10,
+      "clientTimeout" : 5,
+      "testcase"      : {
         "type"            : "normal",
         "specialArguments": {}
       }
     },
-    {
-      'Name'          : "Normal Replicas with multiple clients",
-      'faultyReplicas': 1,                                       # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,                                    # milliseconds
-      'clients'       : 2,
-      'requests'      : 10,
-      'clientTimeout' : 5,
-      'testcase'      : {
+    {#1
+      "Name"          : "Normal Replicas with multiple clients",
+      "faultyReplicas": 1,                                       # number of replicas which can go faulty
+      "timeoutDelta"  : 2500,                                    # milliseconds
+      "clients"       : 2,
+      "requests"      : 10,
+      "clientTimeout" : 5,
+      "testcase"      : {
         "type"            : "normal",
         "specialArguments": {}
       }
     },
-    {
-      'Name'          : "Client small timeout with request resubmission and handling de-deuplication",
-      'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,                                                                          # milliseconds
-      'clients'       : 1,
-      'requests'      : 10,
-      'clientTimeout' : 0.5,
-      'testcase'      : {
+    {#2
+      "Name"          : "Client small timeout with request resubmission and handling de-deuplication",
+      "faultyReplicas": 1,                                                                             # number of replicas which can go faulty
+      "timeoutDelta"  : 2500,                                                                          # milliseconds
+      "clients"       : 1,
+      "requests"      : 10,
+      "clientTimeout" : 0.5,
+      "testcase"      : {
         "type"            : "normal",
         "specialArguments": {}
       }
     },
-    {
-      'Name'          : "Faulty replica having omission failures",
-      'faultyReplicas': 1,                                         # number of replicas which can go faulty
-      'timeoutDelta'  : 2500,                                      # milliseconds
-      'clients'       : 1,
-      'requests'      : 5,
-      'clientTimeout' : 5,
-      'testcase'      : {
+    {#3
+      "Name"          : "Faulty replica having omission failures",
+      "faultyReplicas": 1,                                         # number of replicas which can go faulty
+      "timeoutDelta"  : 2500,                                      # milliseconds
+      "clients"       : 1,
+      "requests"      : 5,
+      "clientTimeout" : 5,
+      "testcase"      : {
         "type"            : "omission",
         "specialArguments": {}
-      },
+      }
     },
-    {
-      'Name'          : "Forge signature",
-      'faultyReplicas': 1,                 # number of replicas which can go faulty
-      'timeoutDelta'  : 500,               # milliseconds
-      'clients'       : 1,
-      'requests'      : 5,
-      'clientTimeout' : 2,
-      'testcase'      : {
+    {#4
+      "Name"          : "Forge signature",
+      "faultyReplicas": 1,                 # number of replicas which can go faulty
+      "timeoutDelta"  : 500,               # milliseconds
+      "clients"       : 1,
+      "requests"      : 5,
+      "clientTimeout" : 2,
+      "testcase"      : {
         "type"            : "forge_signature",
         "specialArguments": {}
-      },
+      }
     },
-    {
+    {#5
 		"Name"          : "Faulty replicas having delay failures",
 		"faultyReplicas": 1,
 		"timeoutDelta"  : 2500,
@@ -194,11 +220,84 @@ def getConfigs():
 			"specialArguments": {
 				"randomSeed"                   : 50
 			}
+		  }
+    },
+    {#6
+		"Name"          : "Proposal Messages Dropped at validators 1 and 2",
+		"faultyReplicas": 1,#2 Please change in File diem_replica_proposalDrop.da line 153
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "ProposalDrop",
+			"specialArguments": {
+        "faultyRound"                   : 2
+      }
+		}
+    },
+    {#7
+		"Name"          : "Proposal Messages Delayed at validators 1 and 2 and 5",
+		"faultyReplicas": 2,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "ProposalDelay",
+			"specialArguments": {
+				"randomSeed"                   : 50,
+        "faultyRound"                   : 2
+			}
+		}
+    },
+    {#8
+		"Name"          : "Proposal Drop and Timeout Delay in round 3",
+		"faultyReplicas": 2,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "ProposalDropTimeoutDelay",
+			"specialArguments": {
+				"randomSeed"                   : 50,
+        "faultyRound"                   : 2
+			}
+		}
+    },
+    {#9
+		"Name"          : "Vote Message drop for round 3",
+		"faultyReplicas": 2,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "VoteDrop",
+			"specialArguments": {
+				"randomSeed"                   : 50,
+        "faultyRound"                   : 2
+			}
+		}
+    },
+    {#10
+		"Name"          : "SetAttrFailure",
+		"faultyReplicas": 2,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "SetAttrFailure",
+			"specialArguments": {
+				"randomSeed"                   : 50,
+        "faultyCurrentRound"           : 4
+			}
 		}
     }
   ]
-
-  return configs[1]
+  return configs[8]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
