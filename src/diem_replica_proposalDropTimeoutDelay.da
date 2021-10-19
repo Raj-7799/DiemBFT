@@ -84,7 +84,7 @@ class Replica_Drop_Delay(process):
 
     def pacemaker_broadcast_timeout(tmo_message):
         # =========================> Changes Fault Injection START
-        if(tmo_message.tmo_info.roundNo == self.specialArgs["randomSeed"]):
+        if(tmo_message.tmo_info.roundNo == self.specialArgs["faultyRound"]):
             random.seed(self.specialArgs["randomSeed"])
             t =random.randint(1,4)*self.tDelta
             self.OutputReplica("[process_next_round_event] Random delay start. sleep for round {}".format(tmo_message.tmo_info.roundNo))
