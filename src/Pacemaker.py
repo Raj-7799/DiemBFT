@@ -28,12 +28,15 @@ class Pacemaker:
         return 4 * int(self.delta) // 1000 
         
 
-    def _on_timeout(self):
+    def _on_timeout(self, roundNo):
+        self.OutputLogger("[_on_timeout] On timeout called {}".format(roundNo))
+        self.dict_of_timer[roundNo].cancel()
+        del self.dict_of_timer[roundNo]
         self.local_timeout_round()
 
     def _start_timer(self, roundNo):
         self.OutputLogger("[_start_timer] Starting timer for round {}".format( roundNo))
-        self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout)
+        self.dict_of_timer[roundNo] = threading.Timer(self.get_round_timer(), self._on_timeout, [roundNo])
         self.dict_of_timer[roundNo].start()
 
     def _stop_timer(self, roundNo):
@@ -44,6 +47,8 @@ class Pacemaker:
         if roundNo in self.dict_of_timer:
             self.OutputLogger(" Stopping timer for roundNo {}".format( roundNo))
             self.dict_of_timer[roundNo].cancel()
+            del self.dict_of_timer[roundNo]
+        
         self.OutputLogger("[_stop_timer] Exit for round {}".format(roundNo))
 
 
@@ -83,7 +88,9 @@ class Pacemaker:
         # tmo info ←tmo.tmo info
         tmo_info = tmo.tmo_info
         if tmo_info.roundNo < self.current_round:
+            self.OutputLogger("TMO info round {} is less than current_round {}".format( tmo.tmo_info.roundNo, self.current_round))
             return None
+        
         #Psuedo code
         # if tmo info.sender 6∈pending timeouts[tmo info.round].senders then
         #     pending timeouts[tmo info.round] ←pending timeouts[tmo info.round] ∪{tmo info}
