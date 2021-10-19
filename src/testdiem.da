@@ -53,8 +53,6 @@ class RunDiemBFT(process):
       return new(diem_replica_proposalDelay.Replica_Delay), self.specialArguments 
     elif scenario == "ProposalDropTimeoutDelay":
       return new(diem_replica_proposalDropTimeoutDelay.Replica_Drop_Delay), self.specialArguments 
-    elif scenario == "ProposalDropTimeoutDelay":
-      return new(diem_replica_proposalDropTimeoutDelay.Replica_Drop_Delay), self.specialArguments
     elif scenario == "VoteDrop":
       return new(diem_replica_voteDrop.Replica_VoteDrop), self.specialArguments
     elif scenario == "SetAttrFailure":
@@ -302,7 +300,7 @@ def getConfigs():
     }
   ]
 
-  return configs[7]
+  return configs[4]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
