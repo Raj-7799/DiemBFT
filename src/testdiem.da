@@ -13,6 +13,7 @@ import glob
 import diem_replica_forge
 import diem_replica_omission
 import diem_replica_delay
+import diem_replica_proposalDrop
 print(sys.path)
 
 
@@ -42,6 +43,8 @@ class RunDiemBFT(process):
       return new(diem_replica_forge.Replica_forged), self.specialArguments
     elif scenario == "delay":
       return new(diem_replica_delay.Replica_Delay), self.specialArguments 
+    elif scenario== "ProposalDrop":
+      return new(diem_replica_proposalDrop.Replica_Drop), self.specialArguments 
         
   def run():
     output("Creating {} DiemBFT Replicas".format(self.replicas_required))
@@ -60,18 +63,25 @@ class RunDiemBFT(process):
     
     i = 0
     # spawning faulty replicas
-    while i < self.faulty_replicas:
-      replica, special = self.getReplicafromConfiguration(self.scenario)
-      specialArgs[i] = special
-      replicas.append(replica)
-      i += 1
-    
-    # spawning normal replicas
-    while i < replicas_required:
-      replica, special = self.getReplicafromConfiguration("normal")
-      specialArgs[i] = special
-      replicas.append(replica)
-      i += 1
+    if self.scenario != "ProposalDrop":
+      while i < self.faulty_replicas:
+        replica, special = self.getReplicafromConfiguration(self.scenario)
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
+      
+      # spawning normal replicas
+      while i < replicas_required:
+        replica, special = self.getReplicafromConfiguration("normal")
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
+    else:
+      while i < replicas_required:
+        replica, special = self.getReplicafromConfiguration(self.scenario)
+        specialArgs[i] = special
+        replicas.append(replica)
+        i += 1
 
     for i, replica in enumerate(replicas):
       KeySet = KeySets[i]
@@ -195,10 +205,22 @@ def getConfigs():
 				"randomSeed"                   : 50
 			}
 		}
+    },
+    {
+		"Name"          : "Proposal Messages Dropped at validators 1 and 2",
+		"faultyReplicas": 1,
+		"timeoutDelta"  : 2500,
+		"clients"       : 1,
+		"requests"      : 5,
+		"clientTimeout" : 5,
+		"testcase"      : {
+			"type"            : "ProposalDrop",
+			"specialArguments": {}
+		}
     }
   ]
 
-  return configs[1]
+  return configs[6]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))
