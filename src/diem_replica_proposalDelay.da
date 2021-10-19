@@ -14,9 +14,10 @@ import os
 import Util
 import time
 from collections import defaultdict
+import random
 
 
-class Replica(process):
+class Replica_Delay(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
         self.replicaInfos = replicaInfos
@@ -59,7 +60,7 @@ class Replica(process):
 
     
     def OutputReplica(log):
-        output("[Replica][ReplicaID-{}][{}]".format(self.replicaID,log))
+        output("[Replica][Replica_Delay-{}][{}]".format(self.replicaID,log))
 
     def OutputMempool(log):
         output("[Mempool][ReplicaID-{}][{}]".format(self.replicaID,log))

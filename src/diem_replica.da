@@ -14,7 +14,7 @@ import os
 import Util
 import time
 from collections import defaultdict
-
+import random
 
 class Replica(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
