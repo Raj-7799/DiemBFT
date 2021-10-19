@@ -148,62 +148,62 @@ class RunDiemBFT(process):
 
 def getConfigs():
   configs = [
-    {#0
-      "Name"          : "Normal Replicas",
-      "faultyReplicas": 1,                 # number of replicas which can go faulty
-      "timeoutDelta"  : 2500,              # milliseconds
-      "clients"       : 1,
-      "requests"      : 10,
-      "clientTimeout" : 5,
-      "testcase"      : {
+    {
+      'Name'          : "0. Normal Replicas",
+      'faultyReplicas': 1,                 # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,              # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 5,
+      'testcase'      : {
         "type"            : "normal",
         "specialArguments": {}
       }
     },
-    {#1
-      "Name"          : "Normal Replicas with multiple clients",
-      "faultyReplicas": 1,                                       # number of replicas which can go faulty
-      "timeoutDelta"  : 2500,                                    # milliseconds
-      "clients"       : 2,
-      "requests"      : 10,
-      "clientTimeout" : 5,
-      "testcase"      : {
+    {
+      'Name'          : "1. Normal Replicas with multiple clients",
+      'faultyReplicas': 1,                                       # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                    # milliseconds
+      'clients'       : 2,
+      'requests'      : 10,
+      'clientTimeout' : 5,
+      'testcase'      : {
         "type"            : "normal",
         "specialArguments": {}
       }
     },
-    {#2
-      "Name"          : "Client small timeout with request resubmission and handling de-deuplication",
-      "faultyReplicas": 1,                                                                             # number of replicas which can go faulty
-      "timeoutDelta"  : 2500,                                                                          # milliseconds
-      "clients"       : 1,
-      "requests"      : 10,
-      "clientTimeout" : 0.5,
-      "testcase"      : {
+    {
+      'Name'          : "2. Client small timeout with request resubmission and handling de-deuplication",
+      'faultyReplicas': 1,                                                                             # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                                                          # milliseconds
+      'clients'       : 1,
+      'requests'      : 10,
+      'clientTimeout' : 0.5,
+      'testcase'      : {
         "type"            : "normal",
         "specialArguments": {}
       }
     },
-    {#3
-      "Name"          : "Faulty replica having omission failures",
-      "faultyReplicas": 1,                                         # number of replicas which can go faulty
-      "timeoutDelta"  : 2500,                                      # milliseconds
-      "clients"       : 1,
-      "requests"      : 5,
-      "clientTimeout" : 5,
-      "testcase"      : {
+    {
+      'Name'          : "3. Faulty replica having omission failures",
+      'faultyReplicas': 1,                                         # number of replicas which can go faulty
+      'timeoutDelta'  : 2500,                                      # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 5,
+      'testcase'      : {
         "type"            : "omission",
         "specialArguments": {}
       }
     },
-    {#4
-      "Name"          : "Forge signature",
-      "faultyReplicas": 1,                 # number of replicas which can go faulty
-      "timeoutDelta"  : 500,               # milliseconds
-      "clients"       : 1,
-      "requests"      : 5,
-      "clientTimeout" : 2,
-      "testcase"      : {
+    {
+      'Name'          : "4. Forge signature",
+      'faultyReplicas': 1,                 # number of replicas which can go faulty
+      'timeoutDelta'  : 500,               # milliseconds
+      'clients'       : 1,
+      'requests'      : 5,
+      'clientTimeout' : 2,
+      'testcase'      : {
         "type"            : "forge_signature",
         "specialArguments": {
           "forge": True,
@@ -211,8 +211,8 @@ def getConfigs():
         }
       },
     },
-    {#5
-		"Name"          : "Faulty replicas having delay failures",
+    {
+		"Name"          : "5. Faulty replicas having delay failures",
 		"faultyReplicas": 1,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
@@ -228,8 +228,8 @@ def getConfigs():
 			}
 		  }
     },
-    {#6
-		"Name"          : "Proposal Messages Dropped at validators 1 and 2",
+    {
+		"Name"          : "6. Proposal Messages Dropped at validators 1 and 2",
 		"faultyReplicas": 1,#2 Please change in File diem_replica_proposalDrop.da line 153
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
@@ -242,8 +242,8 @@ def getConfigs():
       }
 		}
     },
-    {#7
-		"Name"          : "Proposal Messages Delayed at validators 1 and 2 and 5",
+    {
+		"Name"          : "7. Proposal Messages Delayed at validators 1 and 2 and 5",
 		"faultyReplicas": 2,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
@@ -257,8 +257,8 @@ def getConfigs():
 			}
 		}
     },
-    {#8
-		"Name"          : "Proposal Drop and Timeout Delay in round 3",
+    {
+		"Name"          : "8. Proposal Drop and Timeout Delay in round 3",
 		"faultyReplicas": 2,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
@@ -272,8 +272,8 @@ def getConfigs():
 			}
 		}
     },
-    {#9
-		"Name"          : "Vote Message drop for round 3",
+    {
+		"Name"          : "9. Vote Message drop for round 3",
 		"faultyReplicas": 2,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
@@ -287,8 +287,8 @@ def getConfigs():
 			}
 		}
     },
-    {#10
-		"Name"          : "SetAttrFailure",
+    {
+		"Name"          : "10. SetAttrFailure",
 		"faultyReplicas": 2,
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,

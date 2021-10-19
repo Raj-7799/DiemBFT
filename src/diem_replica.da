@@ -105,7 +105,6 @@ class Replica(process):
 
     def process_certificate(qc):
         self.OutputReplica("[process_certificate] Entry Processing QC {} for vote_info {} at round {}".format( qc, qc.vote_info.id, self.paceMaker.current_round))
-        # ============> Changes to be propagate in other diem file
         if qc.verify_self_signature_qc():
             self.blockTree.process_qc(qc)
             self.leaderElection.update_leaders(qc)

@@ -230,11 +230,12 @@ class Replica_forged(process):
 
         if qc:
             self.OutputReplica("[process_vote_msg] Formed QC from votes at round {}".format( self.paceMaker.current_round))
-            self.process_certificate(qc)
             # ============> Changes Fault injection Start
             if self.specialArgs['forge']:
                 qc.signatures = self.specialArgs['faulty_signature']
                 self.specialArgs['forge']=False
+            
+            self.process_certificate(qc)
             self.OutputReplica("[process_vote_msg]Modifying qc {}".format(self.replicaID))
             self.OutputReplica("[process_vote_msg]QC signature state {}".format(qc.verify_self_signature_qc()))
             self.OutputReplica("[process_vote_msg]QC formed is {}".format(qc))
