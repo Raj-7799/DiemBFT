@@ -150,7 +150,7 @@ class Replica_Drop(process):
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
             for _, replicaInfo in self.replicaInfos.items():
                 self.OutputReplica("YOLO Broadcasting process_proposal_msg of round {} for replica {}".format(proposal_msg.block.roundNo, replicaInfo.replicaID))
-                if not (proposal_msg.block.roundNo == 3 and (replicaInfo.replicaID == 0 or replicaInfo.replicaID ==1)): #Droppign proposal messages
+                if not (proposal_msg.block.roundNo == 3 and (replicaInfo.replicaID == 0 or replicaInfo.replicaID ==1)):# """or replicaInfo.replicaID == 4""")): #Droppign proposal messages
                     SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                     send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
                 else:

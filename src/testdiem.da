@@ -208,7 +208,7 @@ def getConfigs():
     },
     {
 		"Name"          : "Proposal Messages Dropped at validators 1 and 2",
-		"faultyReplicas": 1,
+		"faultyReplicas": 1,#2 Please change in File diem_replica_proposalDrop.da line 153
 		"timeoutDelta"  : 2500,
 		"clients"       : 1,
 		"requests"      : 5,
