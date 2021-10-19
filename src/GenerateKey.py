@@ -64,7 +64,6 @@ class GenerateKey():
 
         for dic_key in self._key_pairs.keys():
             with open(CONF_FILE_PATH+"diem_key_"+str(dic_key)+".sec.conf","w") as file:
-                # print("private key ",self._key_pairs[dic_key][1].decode())
                 entry = ["private_key="+   (self._key_pairs[dic_key][1]).decode(),"\npublic_key="+  (self._key_pairs[dic_key][0]).decode()]
                 file.writelines(entry) 
 

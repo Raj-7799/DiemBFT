@@ -130,7 +130,6 @@ class Replica_Delay(process):
                 self.waiting = True
                 self.timedOut = False
                 self.OutputReplica("Waiting for transactions in mempool")
-                self.OutputReplica("Mempoool state {}".format( self.memPool.print()))
                 --request
                 await(self.waiting == False)
             

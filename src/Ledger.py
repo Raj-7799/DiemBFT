@@ -69,7 +69,7 @@ class Ledger:
 
     def get_next_block(self,id):
         it = self._db.iterator(include_key=False)
-        it.seek(bytes(str(id)),"utf-8")
+        it.seek(bytes(str(id),'utf-8'))
         block = next(it)
         it.close()
         if block is not None:
