@@ -73,14 +73,14 @@ a system. The steps for Anaconda installation is provided in Manual.
     - Clients
     - Synchronization
     - Mempool
-    - 3 TestCases
+    - TestCases
     - Bug fixes, all module integration and debugging
     - Test report and documentation
 * Prince Kumar Maurya (114354075)
     - Ledger
     - BlockTree
     - Logging
-    - 2 Test Case
+    - Test Case
     - Debugging
     - Crytography
     - Block Sync
@@ -88,7 +88,7 @@ a system. The steps for Anaconda installation is provided in Manual.
     - PaceMaker
     - Safety
     - Signature Verification
-    - 1 Test Case
+    - Test Cases
     - Readme and Manual
 
 ## 9. Other
