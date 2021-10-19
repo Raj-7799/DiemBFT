@@ -38,6 +38,7 @@ class LeaderElection:
                 self.OutputLogger("[elect_reputation_leaders] Empty payload dummy blocks for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
                 current_qc = current_block.qc
                 continue
+            
             #block author ←current block.author
             block_author = current_block.author
 
@@ -48,13 +49,16 @@ class LeaderElection:
                 signers = current_qc.get_signers()
                 for signer in signers:
                     active_validators[signer] = True
+            
             # if |last authors|< exclude size then
             #     last authors ←last authors ∪{block author}
             if len(last_authors) < self.exclude_size:
                 last_authors[block_author] = True
+            
             # current qc ←current block.qc
             current_qc = current_block.qc
             i += 1
+        
         #active validators ←active validators \last authors // contains at least 1 validator
         for author in last_authors:
             if author in active_validators:
@@ -67,12 +71,11 @@ class LeaderElection:
             return None
         #active validators.pick one(seed ←qc.voteinfo.round
         random.seed(qc.vote_info.roundNo)
-        self.OutputLogger("[elect_reputation_leaders] Entry for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
+        self.OutputLogger("[elect_reputation_leaders] Exit for qc.info.roundNo {} ".format(qc.vote_info.roundNo))
         return active_validators[random.randint(0, len(active_validators) - 1)]
 
         
     def update_leaders(self, qc):
-        self.OutputLogger("[update_leaders] Entry for qc.info.roundNo {} self.paceMaker.current_round {} ".format(qc.vote_info.roundNo, self.paceMaker.current_round))
         #extended round ←qc.vote info.parent round
         extended_round = qc.vote_info.parent_round
         #qc round ←qc.vote info.round
@@ -89,16 +92,14 @@ class LeaderElection:
             # This will return no elected_leader
             if elected_leader is not None:
                 self.reputation_leaders[current_round + 1] = elected_leader
-        self.OutputLogger("[update_leaders] Exit for qc.info.roundNo {} self.paceMaker.current_round {} ".format(qc.vote_info.roundNo, self.paceMaker.current_round))
-
 
     
     def get_leader(self, roundNo):
-        self.OutputLogger("[get_leader] Entry roundNo {} ".format(roundNo))
+        # base condition for genesis round such that chain starts with replica 0
         if roundNo < 0:
             self.OutputLogger("[get_leader] Exit roundNo {} leader {} ".format(roundNo,0))
             return 0
-        #if 〈round,leader〉∈reputation leaders then
+        # if 〈round,leader〉∈ reputation leaders then
         if roundNo in self.reputation_leaders:
             self.OutputLogger("[get_leader] Exit roundNo {} leader {}".format(roundNo,self.reputation_leaders[roundNo]))
             return self.reputation_leaders[roundNo] # // Reputation-based leader

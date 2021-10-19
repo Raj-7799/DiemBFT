@@ -26,23 +26,25 @@ class Ledger:
         value = pickle.dumps([prev_block_id,txns])      
         self._db_speculate.put(block_id,value,sync=True)  
 
+
     #// find the pending state for the given block id or ⊥ if not present
     def pending_state(self,bk_id):
-
         if bk_id in self.specluate_ledger.cache.keys() or bk_id == 0 or bk_id=="0":
             return bk_id 
         return None
-
 
     #commit the pending prefix of the given block id and prune other branches
     def commit(self,bk_id):
         block_id = bytes(str(bk_id),'utf-8')
         
+        # fetch block from speculate ledger cache
         entry =  self.specluate_ledger.cache[bk_id] if bk_id in self.specluate_ledger.cache.keys() else None
         if  entry is not None:
+            # commit the block
             self._db.put(block_id,pickle.dumps([entry.prev_node_id,entry.block]))
             block = self.committed_block(bk_id)
-            
+            self.OutputLogger("[commit] Commited block {}".format(bk_id))
+            # setting transaction into mempool committed blocks cache
             self.memPool.remove_transaction(block.payload)
             # returning tuple to client ,given tuples are immutatble it ensure object is untrampered
             self.clientResponseHandler((bk_id, block.payload,self.replicaID))
@@ -51,31 +53,23 @@ class Ledger:
 
     #returns a committed block given its id
     def committed_block(self, bk_id):
-        
         block_id=bytes(str(bk_id),'utf-8')
         ledger_entry = self._db.get(block_id)
         if ledger_entry:
             entry = pickle.loads(ledger_entry)
             return entry[1]
-            #print("[committed_block] Fetching commited block successfull {} {}".format(bk_id,self.replicaID)) 
         else:
-            #print("[committed_block] Failed fetching block {} {}".format( bk_id,self.replicaID)) 
             return None
-        
-
 
     def print_ledger(self):
-        
         it =  self._db.iterator()
         with self._db.iterator() as it:
             for k,v  in it:
                 print("key: {}  value {}".format(k,pickle.loads(v)[1]))
 
-    
-
     def get_next_block(self,id):
         it = self._db.iterator(include_key=False)
-        it.seek(bytes(str(id)),"utf-8")
+        it.seek(bytes(str(id),'utf-8'))
         block = next(it)
         it.close()
         if block is not None:

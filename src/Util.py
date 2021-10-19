@@ -27,21 +27,6 @@ def hash(object):
     digest = hasher(pickle.dumps(object), encoder=nacl.encoding.HexEncoder)
     return digest
 
-def sign_object(obj, pvt_key, pbc_key):
-    seralized_msg =  pickle.dumps(obj)
-    return sign_message(seralized_msg, pvt_key, pbc_key)
-
-def sign_message(pickled_msg, pvt_key, pbc_key):    
-    
-    signed_hex = pvt_key.sign(pickled_msg ,encoder=HexEncoder)
-    verify_key = pbc_key
-    verify_key_hex = verify_key.encode(encoder=HexEncoder)
-    return [signed_hex,verify_key_hex]
-
-def check_authenticity(obj, signed_msg):
-    objIdentity = verify_message(signed_msg)
-    return pickle.dumps(obj) == objIdentity
-
 def verify_message(signed_msg):
     signed_hex, verify_key_hex=signed_msg
     signature_bytes = HexEncoder.decode(signed_hex.signature)
@@ -70,7 +55,6 @@ def encode_key_dup(key):
 
 def check_authenticity_dup(obj, signed_msg, pbc_key):
     objIdentity = verify_message_dup(signed_msg, pbc_key)
-    # print("[check_authenticity_dup] {} ".format(pickle.dumps(obj) == objIdentity))
     return pickle.dumps(obj) == objIdentity
 
 def verify_message_dup(signed_msg, pbc_key):

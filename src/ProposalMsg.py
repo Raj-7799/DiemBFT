@@ -15,6 +15,6 @@ class ProposalMsg:
         self.signature = Util.sign_object_dup(self.block.id, pvt_key)
     
     def __str__(self):
-        return "{ Block - {} Last_round_tc - {} High_commit_qc - {} }".format(self.block, self.last_round_tc, self.high_commit_qc)
+        return "[Proposal Msg :  Block - {} Last_round_tc - {} High_commit_qc - {} ]".format(self.block, self.last_round_tc, self.high_commit_qc)
 
 

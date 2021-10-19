@@ -19,26 +19,26 @@ from collections import defaultdict
 class Replica_Delay(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
         self.replicaID = replicaID
-        self.replicaInfos = replicaInfos
-        self.fCount = faulty_replica_count
-        self.rCount = replica_count
-        self.tDelta = delta
-        self.privateKey = privateKey
-        self.publicKey = get_replica_public_key(self.replicaID)
-        self.clientInfos = clientInfos
-        self.memPool = mempool.MemPool(self.OutputMempool)
+        self.replicaInfos        = replicaInfos
+        self.fCount              = faulty_replica_count
+        self.rCount              = replica_count
+        self.tDelta              = delta
+        self.privateKey          = privateKey
+        self.publicKey           = get_replica_public_key(self.replicaID)
+        self.clientInfos         = clientInfos
+        self.memPool             = mempool.MemPool(self.OutputMempool)
         self.firstRequestProcess = False
-        self.waiting = False
-        self.timedOut = False
+        self.waiting             = False
+        self.timedOut            = False
         
 
-        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
-        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
-        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
+        self.blockTree      = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
+        self.safety         = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
+        self.paceMaker      = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID,self.OutputLeaderElection)
 
 
-        self.pending_blocks=defaultdict(list)
+        self.pending_blocks = defaultdict(list)
 
         self.OutputReplica("__init__")
     
@@ -130,7 +130,6 @@ class Replica_Delay(process):
                 self.waiting = True
                 self.timedOut = False
                 self.OutputReplica("Waiting for transactions in mempool")
-                self.OutputReplica("Mempoool state {}".format( self.memPool.print()))
                 --request
                 await(self.waiting == False)
             
@@ -154,6 +153,7 @@ class Replica_Delay(process):
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 ##Adding random delay for byzantine leader 
+                
                 # ============> Changes Fault injection Start
                 if self.paceMaker.current_round == self.specialArgs['faulty_round']:
                     self.specialArgs['faulty_round']= -1
@@ -251,15 +251,13 @@ class Replica_Delay(process):
                     nextLeaderInfo = replicaInfo
                     break
             
-            self.OutputReplica("[process_proposal_msg] Exit Sending vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
+            self.OutputReplica("[process_proposal_msg] Sending vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
             SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)
             send(("process_vote_msg", [vote_message, SIGNED_MSG]), to=nextLeaderInfo.process)
         else:
-            self.OutputReplica("[process_proposal_msg] Exit Unable to make vote for block {}".format( P.block.id))
+            self.OutputReplica("[process_proposal_msg] Unable to make vote for block {}".format( P.block.id))
 
     def receive(msg=("process_vote_msg", M), from_=source):
-        self.OutputReplica('[process_vote_msg] Entry Inside process_vote_msg receive handler')
-
         #Validating the vote message received from other validators(replicas)
         if not Util.verify_message_dup(M[1], self.replicaInfos[source].public_key):
            self.OutputReplica("[process_vote_msg] Validation Failed")
@@ -267,23 +265,23 @@ class Replica_Delay(process):
             self.OutputReplica("[process_vote_msg] Validation Successful")
         
         M=M[0]
+
         self.OutputReplica("[process_vote_msg] Received vote message from {} for block {} at round {}".format( M.sender, M.vote_info.id, self.paceMaker.current_round))
+        
         #Psuedocode
         #qc ← Block-Tree.process vote(M)
         qc = self.blockTree.process_vote(M)
+        
         #Psuedocode
         # if qc != ⊥ then
         #     process certificate qc(qc)
         #     process new round event(⊥)
-
         if qc:
             self.OutputReplica("[process_vote_msg] Formed QC from votes at round {}".format( self.paceMaker.current_round))
             self.process_certificate(qc)
             self.process_next_round_event(None)
-            self.OutputReplica("[process_vote_msg] Exit")
 
     def receive(msg=("process_timeout_msg", M), from_=source):
-        self.OutputReplica('[process_timeout_msg] Entry Inside process_timeout_msg receive handler')
         if not Util.verify_message_dup(M[1], self.replicaInfos[source].public_key):
            self.OutputReplica("[process_timeout_msg] Exit Validation Failed")
            return
@@ -294,20 +292,24 @@ class Replica_Delay(process):
         if self.waiting:
             self.waiting = False
             self.timedOut = True
+        
         #Psuedocode
         #process certificate qc(M.tmo info.high qc)
         self.process_certificate(M.tmo_info.high_qc)
+        
         #Psuedocode
         #process certificate qc(M.high commit q)
         self.process_certificate(M.high_commit_qc)
+        
         #Psuedocode
         #Pacemaker.advance round tc(M.last round tc)
         self.paceMaker.advance_round_tc(M.last_round_tc)
+        
         #Psuedocode
         #tc ←Pacemaker.process remote timeout(M)
         tc = self.paceMaker.process_remote_timeout(M)
         if tc:
-            self.OutputReplica("[process_timeout_msg] Processing TC  ")
+            self.OutputReplica("[process_timeout_msg] Formed time out certificate {}".format(tc))
             # In paper Pacemaker.advance_round(tc)
             # it should be Pacemaker.adbance_round_tc(tc)
             
@@ -315,7 +317,7 @@ class Replica_Delay(process):
             #Psuedocode
             #process new round event(tc)
             self.process_next_round_event(tc)
-        self.OutputReplica("[process_timeout_msg] Exit")           
+               
     
     def receive(msg=("client_end"), from_=source):
         self.OutputReplica("[client_end] Received message to close the replica")
@@ -327,7 +329,6 @@ class Replica_Delay(process):
         self.OutputReplica("[validate] Exit")
 
     
-
     def send_sync_message(sync_status_object):
         self.OutputReplica("[send_sync_message] Entry broadcast message")
         for _, replicaInfo in self.replicaInfos.items():
@@ -335,7 +336,6 @@ class Replica_Delay(process):
         self.OutputReplica("[send_sync_message] Exit")
 
 
-    
     def receive(msg=("BlockSyncMessage",M), from_=source):
         self.OutputReplica("[BlockSyncMessage] Entry received block id {} ".format(M[0].id))
         if source==self.replicaID:
@@ -357,7 +357,6 @@ class Replica_Delay(process):
 
 
     def receive(msg=("SyncMsgRequest",M), from_=source):
-
         self.OutputReplica("[SyncMsgRequest] Entry ")
         if source != M[1]:
             next_block =  self.blockTree._ledger.get_next_block(M[0])
