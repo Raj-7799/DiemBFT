@@ -36,9 +36,7 @@ a system. The steps for Anaconda installation is provided in Manual.
 - For get_round_timer in Pacemaker, We use the formula 4* **delta** where delta is passed as the timeout value from setup.
 
 ## 4. Bugs and Limitations
-- Limitation 1 - Currently due to design of mempool if there is a timeout and client resends a transaction. Mempool considers it as a duplicate. Hence, during timeouts the blocks which were pending or getting processed are lost.
-    - This can be worked around by not keeping a state for transactions which are currently processing in diem chain. Instead, we can simply remove them from other replica queue's when a proposal message is sent. 
-- Limitation 2 - Use of dummy blocks for chain termination. More details in Chain Termination under Implementation section in report.
+- Limitation 1 - Use of dummy blocks for chain termination. More details in Chain Termination under Implementation section in report.
 
 ## 5. Main files
 - **DiemBFT/src/diem_replica.da :** Replica code . It mainly contains the Main fucntion as mentioned in the Pseudocode
