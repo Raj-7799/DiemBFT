@@ -25,6 +25,7 @@ class Safety():
         
         self.OutputLogger=OutputLogger
         self.OutputLogger("__init__")
+
     def _increase_highest_vote_round(self, roundNo):
         # commit not to vote in rounds lower than round
         self.highest_vote_round = max(roundNo, self.highest_vote_round)
@@ -55,6 +56,7 @@ class Safety():
         if (qc_round < self.highest_qc_round) or (roundNo <= max((self.highest_vote_round - 1), qc_round)):
             return False
         
+        self.OutputLogger("[_safe_to_timeout] Initial checks passed for ".format(block_round, qc_round, self.highest_vote_round))
         consecutive_qc = self._consecutive(roundNo, qc_round)
         consecutive_tc = self._consecutive(roundNo, tc.roundNo) if tc is not None else True
         # // qc or tc must allow entering the round to timeout

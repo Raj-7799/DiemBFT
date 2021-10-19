@@ -150,6 +150,7 @@ class Replica_Delay(process):
                     time.sleep(t//1000)
                     self.OutputReplica("[process_next_round_event] Random delay end for byzantine node up from sleep for {} for round {}".format(t,self.paceMaker.current_round))
                     return
+                
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 
         self.OutputReplica("[process_next_round_event] Exit")
@@ -167,7 +168,7 @@ class Replica_Delay(process):
         self.OutputReplica("[request] Waiting state {}".format( self.waiting))
         self.waiting = False
 
-        self.memPool.insert_command(cmd, source)
+        self.memPool.insert_command(cmd)
         if not self.firstRequestProcess:
             if self.replicaID == 0:
                 self.paceMaker.advance_round_qc(self.blockTree._high_qc)
@@ -184,6 +185,7 @@ class Replica_Delay(process):
            return
         else:
             self.OutputReplica("[process_proposal_msg] Validation Successful")
+        
         P=P[0]
         self.OutputReplica("[process_proposal_msg] Received proposal msg with Block ID : {} at round {}".format(P.block.id, self.paceMaker.current_round))
 
@@ -202,7 +204,6 @@ class Replica_Delay(process):
         sourceReplica = self.replicaInfos[source]
 
         if P.block.roundNo != current_round or sourceReplica.replicaID != current_leader or P.block.author != sourceReplica.replicaID:
-
             self.OutputReplica("[process_proposal_msg] Exit Inconsistency {} {} {} {} {} {} {}".format( P.block.id, P.block.roundNo, current_round, sourceReplica.replicaID, current_leader, P.block.author, sourceReplica.replicaID))
             return
         
@@ -236,7 +237,7 @@ class Replica_Delay(process):
         qc = self.blockTree.process_vote(M)
 
         if qc:
-            self.OutputReplica("[process_vote_msg] Formed QC from votes at round {}".format( self.paceMaker.current_round))
+            self.OutputReplica("[process_vote_msg] Formed QC from votes at round {} {}".format( self.paceMaker.current_round, qc))
             self.process_certificate(qc)
             self.process_next_round_event(None)
             self.OutputReplica("[process_vote_msg] Exit")
