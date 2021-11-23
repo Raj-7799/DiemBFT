@@ -1,5 +1,9 @@
 from collections import deque
 import os
+from diembft_logger import get_logger
+
+diem_logger = get_logger(os.path.basename(__file__))
+
 
 class MemPool:
     def __init__(self, OutputMempool):

@@ -18,28 +18,28 @@ import random
 
 class Replica_Multiple_Failure(process):
     def setup(replicaID: int, replicaInfos, faulty_replica_count: int, replica_count: int, delta: int, privateKey: str, clientInfos: "dict[int, ClientInfo]", specialArgs: dict):
-        self.replicaID           = replicaID
-        self.replicaInfos        = replicaInfos
-        self.fCount              = faulty_replica_count
-        self.rCount              = replica_count
-        self.tDelta              = delta
-        self.privateKey          = privateKey
-        self.publicKey           = get_replica_public_key(self.replicaID)
-        self.clientInfos         = clientInfos
-        self.memPool             = mempool.MemPool(self.OutputMempool)
+        self.replicaID = replicaID
+        self.replicaInfos = replicaInfos
+        self.fCount = faulty_replica_count
+        self.rCount = replica_count
+        self.tDelta = delta
+        self.privateKey = privateKey
+        self.publicKey = get_replica_public_key(self.replicaID)
+        self.clientInfos = clientInfos
+        self.memPool = mempool.MemPool(self.OutputMempool)
         self.firstRequestProcess = False
-        self.waiting             = False
-        self.timedOut            = False
-        self.specialArgs         = specialArgs
+        self.waiting = False
+        self.timedOut = False
+        self.specialArgs = specialArgs
         
 
-        self.blockTree      = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
-        self.safety         = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
-        self.paceMaker      = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
+        self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
+        self.safety = sf.Safety(blockTree, get_replica_public_keys(), self.replicaID,self.OutputLoggerSafety)
+        self.paceMaker = PM.Pacemaker(self.safety, self.blockTree, self.tDelta, self.fCount, pacemaker_broadcast_timeout, self.replicaID,self.OutputLoggerPacemaker)
         self.leaderElection = le.LeaderElection(self.fCount, self.paceMaker, self.blockTree._ledger, get_replica_ids(), self.replicaID,self.OutputLeaderElection)
 
 
-        self.pending_blocks = defaultdict(list)
+        self.pending_blocks=defaultdict(list)
 
         self.OutputReplica("__init__")
     
@@ -57,6 +57,7 @@ class Replica_Multiple_Failure(process):
     def OutputLeaderElection(log):
         output("[LeaderElection][ReplicaID-{}][{}]".format(self.replicaID,log))
 
+    
     def OutputReplica(log):
         output("[Replica][ReplicaID-{}][{}]".format(self.replicaID,log))
 
@@ -104,10 +105,12 @@ class Replica_Multiple_Failure(process):
 
 
     def process_certificate(qc):
+        self.OutputReplica("[process_certificate] Entry Processing QC {} for vote_info {} at round {}".format( qc, qc.vote_info.id, self.paceMaker.current_round))
         if qc.verify_self_signature_qc():
             self.blockTree.process_qc(qc)
             self.leaderElection.update_leaders(qc)
             self.paceMaker.advance_round_qc(qc)
+            self.OutputReplica("[process_certificate] Exit Processing QC {} for vote_info {} at round {}".format( qc, qc.vote_info.id, self.paceMaker.current_round))
         else:
             self.OutputReplica("[process_certificate] Exit QC invalid")
 
@@ -128,6 +131,7 @@ class Replica_Multiple_Failure(process):
                 self.waiting = True
                 self.timedOut = False
                 self.OutputReplica("Waiting for transactions in mempool")
+                self.OutputReplica("Mempoool state {}".format( self.memPool.print()))
                 --request
                 await(self.waiting == False)
             
@@ -188,6 +192,8 @@ class Replica_Multiple_Failure(process):
         self.OutputReplica("[request] Exit") 
 
     def receive(msg=("process_proposal_msg", P), from_=source):
+        self.OutputReplica('[process_proposal_msg] Entry') 
+
         if not Util.verify_message_dup(P[1], self.replicaInfos[source].public_key):
            self.OutputReplica("[process_proposal_msg]  Validation Failed")
            return
@@ -202,6 +208,7 @@ class Replica_Multiple_Failure(process):
 
         self.OutputReplica('[process_proposal_msg] Processing with qc as  {} '.format(P.block.qc))
 
+        
         self.memPool.markState(P.block.payload)
         #Psuedocode 
         #process certificate qc(P.block.qc)
@@ -294,7 +301,6 @@ class Replica_Multiple_Failure(process):
            return
         else:
             self.OutputReplica("[process_timeout_msg] Validation Successful")        
-        
         M=M[0]
 
         if self.waiting:
@@ -313,7 +319,7 @@ class Replica_Multiple_Failure(process):
         #tc ←Pacemaker.process remote timeout(M)
         tc = self.paceMaker.process_remote_timeout(M)
         if tc:
-            self.OutputReplica("[process_timeout_msg] Formed time out certificate {}".format(tc))
+            self.OutputReplica("[process_timeout_msg] Processing TC  ")
             # In paper Pacemaker.advance_round(tc)
             # it should be Pacemaker.adbance_round_tc(tc)
             
@@ -321,13 +327,13 @@ class Replica_Multiple_Failure(process):
             #Psuedocode
             #process new round event(tc)
             self.process_next_round_event(tc)
-        
         self.OutputReplica("[process_timeout_msg] Exit")           
     
     def receive(msg=("client_end"), from_=source):
         self.OutputReplica("[client_end] Received message to close the replica")
     
     def receive(msg=("validate", block_id), from_=source):         
+        self.OutputReplica("[validate] Entry Received validate")
         block = self.blockTree._ledger.committed_block(block_id)
         send(("validation_block", block), to=source)
         self.OutputReplica("[validate] Exit")
@@ -335,6 +341,7 @@ class Replica_Multiple_Failure(process):
     
 
     def send_sync_message(sync_status_object):
+        self.OutputReplica("[send_sync_message] Entry broadcast message")
         for _, replicaInfo in self.replicaInfos.items():
             send(("SyncMsgRequest",sync_status_object),to=replicaInfo.process)
         self.OutputReplica("[send_sync_message] Exit")
@@ -342,6 +349,7 @@ class Replica_Multiple_Failure(process):
 
     
     def receive(msg=("BlockSyncMessage",M), from_=source):
+        self.OutputReplica("[BlockSyncMessage] Entry received block id {} ".format(M[0].id))
         if source==self.replicaID:
             self.pending_blocks[M[0].id]+=1
         
