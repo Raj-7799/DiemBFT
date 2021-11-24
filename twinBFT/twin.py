@@ -9,8 +9,10 @@ probability_partition_has_overlap = 0.5 # probability that a network partition c
 
 
 total_nodes = 3 * F + 1
+Partitions = []
 
 def assign_leaders(type = "random", assignments = {}):
+
     '''
     assign leaders assigns leaders at each round. 
     type = random does random assignments for each rounds
@@ -18,9 +20,10 @@ def assign_leaders(type = "random", assignments = {}):
 
     assignments is a dictionary which can be used to deterministically to assign leaders at each round
     '''
-    if not (len(assignments) <= N and max(assignments) <= N):
-        print("Leader assignments should not exceed round numbers")
-        return None
+
+    # if not (len(assignments) <= N and max(assignments) <= N):
+    #     print("Leader assignments should not exceed round numbers")
+    #     return None
 
     pending_assignments = []
     final_assignments = {}
@@ -72,18 +75,23 @@ def liveness_properties(assignments = [], blocks_to_commit = 1):
 
 import copy
 def generatePartitionRec(index, arr, current_partition, partitions):
-    if index==len(arr):
+    if index == len(arr):
         partitions.append(copy.deepcopy(current_partition))
     else:
         current_partition[-1].append(arr[index])
         generatePartitionRec(index+1, arr, current_partition, partitions)
 
         current_partition[-1].pop()
-        new_partition=[]
+        new_partition = []
         new_partition.append(arr[index])
         current_partition.append(new_partition)
         generatePartitionRec(index+1, arr, current_partition, partitions)
         current_partition.pop()
+
+def generatePartition(Set):
+    current_partition = []
+    current_partition.append([Set[0]])
+    generatePartitionRec(1, Set, current_partition, Partitions)
 
 def prune_duplicate_partition(partitions):
     for p in partitions:
@@ -184,7 +192,8 @@ def populate_conensus_partition(network_partition, leader, twin_nodes):
             network_partition[i][j] = nodes_shuffled.pop()
     
     return network_partition
-        
+
+
 def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     # generate the number of partition per round
     partition_choices = [i for i in range(1, M + 1)]
@@ -194,9 +203,11 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
         partition_per_round[i] = random.choice(partition_choices)
     
     # generate all network partition scenarios from sum of total nodes and its twins
-    partition_scenarios, major_partitions = get_partition_scenarios(total_nodes + F)
+    partition_scenarios, major_partitions = get_partition_scenarios(total_nodes, F)
     final_assignments = {}
 
+    for i in range(1, N + 4):
+        final_assignments[i] = []
     for i in range(1, N + 1):
         # partitions can be populated randomly expect for last partition 
         if i in parition_assignments:
@@ -204,10 +215,11 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
             continue
         
         for j in range(partition_per_round[i] - 1):
-            final_assignments[i].append(populate_partition(
-                random.choice(partition_scenarios),
-                leader_assignments[i]
-                ))
+            # final_assignments[i].append(populate_partition(
+            #     random.choice(partition_scenarios),
+            #     leader_assignments[i]
+            #     ))
+            final_assignments[i].append(random.choice(partition_scenarios))
         
         # ensuring that the last partition trigger will have super majority
         final_assignments[i].append(populate_conensus_partition(
@@ -217,10 +229,25 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
             ))
     
     # adding three extra rounds with super majority to ensure liveness
-    for i in range(3):
+    for i in range(1, 4):
         final_assignments[N + i].append(populate_conensus_partition(
                 random.choice(major_partitions),
-                leader_assignments[i]
+                leader_assignments[i], 
+                twin_nodes
         ))
     
     return final_assignments
+
+
+# Set = ["1", "2", "3", "4"]
+# generatePartition(Set)
+# print(Partitions)
+# Partitions = prune_duplicate_partition(Partitions)
+# print(Partitions)
+leader_assignments = assign_leaders()
+# print(leader_assignments)
+twin_nodes = set(["1"])
+final_assignments = round_assignment(leader_assignments, twin_nodes)
+for key, value in final_assignments.items():
+    print(key, ":", value)
+
