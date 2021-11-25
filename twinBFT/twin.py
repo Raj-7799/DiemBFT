@@ -254,12 +254,8 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
 # print(Partitions)
 leader_assignments = assign_leaders()
 print(leader_assignments)
-for key,value in leader_assignments.items():
-    print(value,",")
 twin_nodes = set(["1"])
 final_assignments = round_assignment(leader_assignments, twin_nodes)
 for key, value in final_assignments.items():
-    # print(key, ":", value)
-    print(value,",")
-
+    print(key, ":", value)
 
