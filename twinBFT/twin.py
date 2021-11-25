@@ -41,7 +41,7 @@ def assign_leaders(type = "random", assignments = {}):
     elif type == "random":
         for  i in range(1, N + 1):
             if i not in assignments:
-                final_assignments[i] = random.randint(1, total_nodes)
+                final_assignments[i] = random.randint(0, total_nodes-1)
             else:
                 final_assignments[i] = assignments[i]
     else:
@@ -120,7 +120,7 @@ def get_majority_partitions(partitions, F):
     return majority_partitions
 
 def get_partition_scenarios(N, F):
-    arr = [i for i in range(N)]
+    arr = [i for i in range(N + F)]
     current_partition = []
     current_partition.append([arr[0]])
     partitions = []
@@ -204,6 +204,14 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     
     # generate all network partition scenarios from sum of total nodes and its twins
     partition_scenarios, major_partitions = get_partition_scenarios(total_nodes, F)
+    # print("----------------")
+    # print(partition_scenarios)
+    # print("----------------")
+    # print(major_partitions)
+    # print("----------------")
+    # print(leader_assignments)
+    # print("----------------")
+
     final_assignments = {}
 
     for i in range(1, N + 4):
@@ -245,7 +253,7 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
 # Partitions = prune_duplicate_partition(Partitions)
 # print(Partitions)
 leader_assignments = assign_leaders()
-# print(leader_assignments)
+print(leader_assignments)
 twin_nodes = set(["1"])
 final_assignments = round_assignment(leader_assignments, twin_nodes)
 for key, value in final_assignments.items():
