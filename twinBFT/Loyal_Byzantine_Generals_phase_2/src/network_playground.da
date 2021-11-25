@@ -1,0 +1,162 @@
+import json
+from logger_util import LOGGER
+from collections import defaultdict
+from validator import Validator
+
+class NetworkPlayground(process,Validator):
+
+
+    def setup(twin_config:dict,validators,twin_node_cache:dict(),number_of_nodes:int,public_keys_validators,public_keys_clients):
+
+        config_id=0
+        LOGGER.process_id = "NetworkPlayGround"
+        LOGGER.filename = '../logs/config' + str(config_id) + '/' \
+            + LOGGER.process_id + ".log"
+
+        LOGGER.log_action("Initial configuration", twin_config)
+
+
+        self.leaders =  twin_config["round_leaders"]
+        self.partitions =  twin_config["round_partitions"]
+        self.public_keys_validators= public_keys_validators
+        self.number_of_nodes = number_of_nodes
+        self.twin_node_cache=twin_node_cache
+        print("twin_config ",twin_config)
+        print("twin_node_cache",twin_node_cache)
+
+            
+        self.validators =validators
+        self.state = defaultdict(dict)
+
+        
+
+
+    def run():
+        output("Creating {} NetworkPlayGround  ")
+
+
+
+
+
+    def receive(msg=('Timeout', msg), from_=p):
+        LOGGER.log_event("Playground: Received  ", "Timeout", msg, p)
+
+        current_round =  msg["payload"].timeout_info.round
+        network_partition =  self.partitions[current_round]
+        
+        request  = {
+            "type": 'Timeout',
+            "_from": msg["from"],
+            "_to" : msg["to"],
+            "payload": msg["payload"],
+            "networ_partition": network_partition
+        }
+
+        process_request(request)
+
+
+
+    def receive(msg=('Proposal', msg), from_=p):
+        print("Proposal ",msg)
+        LOGGER.log_event("Playground: Received  ", "Proposal", msg, p)
+
+        current_round =  msg["payload"].block.round
+        network_partition = self.partitions[current_round]
+
+        request  = {
+            "type": 'Proposal',
+            "_from": msg["from"], 
+            "_to" : msg["to"],
+            "payload": msg["payload"],
+            "networ_partition": network_partition
+
+        }
+        process_request(request)
+
+
+    def receive(msg=('Vote', msg), from_=p):
+        LOGGER.log_event("Playground: Received  ", "Vote", msg, p)
+
+        current_round =  msg["payload"].vote_info.round
+        network_partition = self.partitions[current_round]
+
+        request  = {
+            "type": 'Vote',
+            "_from": msg["from"],
+            "_to" : msg["to"],
+            "payload": msg["payload"],
+            "_round":current_round
+
+        }
+        process_request(request)
+
+
+
+
+    def process_request(request):
+
+        request_type = request.type
+        _from =  request._from
+        _to =  request._to
+        payload = request.payload
+        
+        current_round = request.current_round
+        network_partition =  request.network_partition
+        current_round =  request._round
+
+        current_partitions = network_partition[current_round]
+
+        is_broadcast =  True if len(_to) > 1 else False
+        sender_id = _from.validator_id
+
+        if is_broadcast:
+            for node in _to:
+                node_id =  validators.index(node)
+                twin_id =  validators.index(node) + self.number_of_nodes
+
+                if same_partition(_round,sender_id, node_id):
+                    send((request_type, payload), to=node)
+
+                if same_partition(_round,sender_id, twin_id):
+                    send((request_type, payload), to=self.twin_node_cache[twin_id])
+
+        else:
+            
+            if same_partition(_round,_to.validator_id,sender_id):
+                send((request_type, payload), to=_to)
+            
+            twin_id = validators.index(_to)+self.number_of_nodes
+
+            if same_partition(_round,sender_id,twin_id):
+                send((request_type, payload), to=self.twin_node_cache[twin_id])
+            
+        
+        state[sender_id][current_round]=+1
+        LOGGER.log_event("Playground: process_request  ", request_type, payload, p)
+
+
+    def same_partition(_round,sender,receiver):
+
+
+        if( _round in state[sender].keys() ):
+            partition_id =  min( state[_from][current_round], len(current_partitions)-1 )
+        else:
+            state[_from][current_round]=0
+            partition_id=0
+
+        
+        for partition in current_partitions[partition_id]:
+            if sender in partition and receiver in partition:
+                return True              
+        return False
+        
+
+        
+
+
+
+
+
+
+
+
