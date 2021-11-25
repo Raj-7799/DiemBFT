@@ -165,7 +165,7 @@ def populate_conensus_partition(network_partition, leader, twin_nodes):
     nodes_shuffled = set(random.sample(nodes, total_nodes + F))
 
     if len(network_partition) == 1:
-        return nodes
+        return [nodes]
     
     majority_partition = network_partition[0]
     # place the leader in majority partition
@@ -204,11 +204,11 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     
     # generate all network partition scenarios from sum of total nodes and its twins
     partition_scenarios, major_partitions = get_partition_scenarios(total_nodes, F)
-    # print("----------------")
-    # print(partition_scenarios)
-    # print("----------------")
-    # print(major_partitions)
-    # print("----------------")
+    print("----------------")
+    print(partition_scenarios)
+    print("----------------")
+    print(major_partitions)
+    print("----------------")
     # print(leader_assignments)
     # print("----------------")
 
