@@ -1,7 +1,7 @@
 import random
 from collections import defaultdict
 
-N = 10 # total number of rounds
+R = 10 # total number of rounds
 M = 3 # max partitions per round
 F = 1 # number of twins
 probability_of_overlap = 0.5 # probability of overlapping partition
@@ -21,25 +21,25 @@ def assign_leaders(type = "random", assignments = {}):
     assignments is a dictionary which can be used to deterministically to assign leaders at each round
     '''
 
-    # if not (len(assignments) <= N and max(assignments) <= N):
+    # if not (len(assignments) <= R and max(assignments) <= R):
     #     print("Leader assignments should not exceed round numbers")
     #     return None
 
     pending_assignments = []
     final_assignments = {}
 
-    for i in range(1, N + 4):
+    for i in range(1, R + 4):
         if i not in assignments:
             pending_assignments.append(i)
         
     if type == "sequential":
-        for  i in range(1, N + 1):
+        for  i in range(1, R + 1):
             if i not in assignments:
                 final_assignments[i] = i % total_nodes
             else:
                 final_assignments[i] = assignments[i]
     elif type == "random":
-        for  i in range(1, N + 1):
+        for  i in range(1, R + 1):
             if i not in assignments:
                 final_assignments[i] = random.randint(0, total_nodes-1)
             else:
@@ -57,7 +57,7 @@ def liveness_properties(assignments = [], blocks_to_commit = 1):
     blocks_to_commit dictates how many blocks should be committed
     '''
 
-    if len(assignments) >= blocks_to_commit or len(assignments) > N - 2 or max(assignments) > N - 2 or min(assignments) < 3:
+    if len(assignments) >= blocks_to_commit or len(assignments) > R - 2 or max(assignments) > R - 2 or min(assignments) < 3:
         print("invalid assignment for round block commits")
         return None
     
@@ -65,7 +65,7 @@ def liveness_properties(assignments = [], blocks_to_commit = 1):
     rounds_remaining = []
     final_assignments = [].extend(assignments)
 
-    for i in range(3, N - 2):
+    for i in range(3, R - 2):
         if i not in assignments:
             rounds_remaining.append(i)
     
@@ -199,7 +199,7 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     partition_choices = [i for i in range(1, M + 1)]
     partition_per_round = {}
 
-    for i in range(1, N + 1):
+    for i in range(1, R + 1):
         partition_per_round[i] = random.choice(partition_choices)
     
     # generate all network partition scenarios from sum of total nodes and its twins
@@ -214,9 +214,9 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
 
     final_assignments = {}
 
-    for i in range(1, N + 4):
+    for i in range(1, R + 4):
         final_assignments[i] = []
-    for i in range(1, N + 1):
+    for i in range(1, R + 1):
         # partitions can be populated randomly expect for last partition 
         if i in parition_assignments:
             final_assignments[i] = parition_assignments[i]
@@ -238,7 +238,7 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     
     # adding three extra rounds with super majority to ensure liveness
     for i in range(1, 4):
-        final_assignments[N + i].append(populate_conensus_partition(
+        final_assignments[R + i].append(populate_conensus_partition(
                 random.choice(major_partitions),
                 leader_assignments[i], 
                 twin_nodes
