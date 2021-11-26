@@ -95,6 +95,8 @@ class Ledger:
                         'Ledger: commit skipping txn as already committed', txn)
                     continue
                 else:
+                    # TODO : Verify that the changes are working as expected
+                    self.request_cache[txn['req_id']] = True
                     LOGGER.log('Ledger: commit committing a txn', txn)
                     fp.write(txn['command']+'\n')
             self.recently_committed_block_ids.append(block_id)
