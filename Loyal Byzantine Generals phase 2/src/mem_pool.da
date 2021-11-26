@@ -3,9 +3,10 @@ from logger_util import LOGGER
 
 class MemPool:
 
-    def __init__(self, validator_id):
+    def __init__(self, validator_id, request_cache):
         self.pending_txns = dict()
         self.validator_id = validator_id
+        self.request_cache = request_cache
 
     def add_transaction(self, txn):
         LOGGER.log('MemPool: add_transaction', txn)
@@ -34,6 +35,8 @@ class MemPool:
         keys = list(self.pending_txns.keys())
         send_txns = [self.pending_txns[keys[0]]]
         del self.pending_txns[keys[0]]
+        if keys[0] in self.request_cache:
+            return self.get_transactions()
         LOGGER.log('MemPool: get_transactions: returns', send_txns)
         return send_txns
 

@@ -38,7 +38,7 @@ class Validator (process):
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
             validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
-        self.mempool = MemPool(validator_id)
+        self.mempool = MemPool(validator_id, self.request_cache)
         self.leader_election = LeaderElection(
             validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'])
 
