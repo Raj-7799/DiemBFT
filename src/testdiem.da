@@ -28,13 +28,12 @@ diem_logger = get_logger(os.path.basename(__file__))
 class RunDiemBFT(process): 
   def setup(config:dict): 
       self.faulty_replicas   = config["faultyReplicas"]
-      self.replicas_required = 3 * faulty_replicas + 1
+      self.replicas_required = 3 * faulty_replicas
       self.delta             = config["timeoutDelta"]
       self.clientNo           = config["clients"]
       self.requests          = config["requests"]
       self.clientTimeout     = config["clientTimeout"]
       self.scenario =  config["testcase"]['type']
-      #output("Type is {}".format(config["testcase"]['type']))
       self.specialArguments = config["testcase"]['specialArguments']
 
 
@@ -244,8 +243,8 @@ def getConfigs():
 		"Name"          : "7. Proposal Messages Delayed at validators 1 and 2 and 5",
 		"faultyReplicas": 2,
 		"timeoutDelta"  : 2500,
-		"clients"       : 1,
-		"requests"      : 5,
+		"clients"       : 5,
+		"requests"      : 4,
 		"clientTimeout" : 5,
 		"testcase"      : {
 			"type"            : "ProposalDelay",
@@ -348,7 +347,7 @@ def getConfigs():
                 "rounds": [2,3,5,6,8,9],
                 
                 "subtype": "probablisticdrop",
-                "randomSeed"                   : 1234567,
+                "randomSeed" : 1234567,
                 "start": 4,
                 "end":7,
                 "probability": 0.15
@@ -357,7 +356,7 @@ def getConfigs():
         }
   ]
 
-  return configs[12]
+  return configs[0]
 
 def printLedger(replicaIDs):
   # output("Printing Ledger  {} ".format(replicaIDs))

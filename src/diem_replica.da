@@ -31,6 +31,7 @@ class Replica(process):
         self.waiting = False
         self.timedOut = False
         self.specialArgs = specialArgs
+        self.done = False
         
 
         self.blockTree = bt.BlockTree(self.fCount, self.replicaID, self.privateKey, get_replica_public_key(self.replicaID), self.memPool, client_response_handler,send_sync_message,self.OutputLoggerBlockTree)
@@ -131,7 +132,6 @@ class Replica(process):
                 self.waiting = True
                 self.timedOut = False
                 self.OutputReplica("Waiting for transactions in mempool")
-                self.OutputReplica("Mempoool state {}".format( self.memPool.print()))
                 --request
                 await(self.waiting == False)
             
@@ -152,6 +152,9 @@ class Replica(process):
             self.OutputReplica("Broadcasting proposal message for block with block_id {} at round {}".format( block.id, paceMaker.current_round))
             #Psuedocode
             #broadcast ProposalMsg〈b,last tc,Block-Tree.high commit qc〉
+            if paceMaker.current_round == 3 and not self.done and self.replicaID == 1:
+                self.done = True
+                return
             for _, replicaInfo in self.replicaInfos.items():
                 SIGNED_MSG = Util.sign_object_dup(proposal_msg, self.privateKey)
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
