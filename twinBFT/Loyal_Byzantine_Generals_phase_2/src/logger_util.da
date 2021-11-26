@@ -36,7 +36,7 @@ class LOGGER:
             "ProcessId:", LOGGER.process_id, "|",
             "Event:", event, "|",
             "MsgType:", msg_type, "|",
-            to_from, other_proc, "|",
+            to_from, other_proc, proc,"|",
             "Msg:", msg,
             file=f
         )

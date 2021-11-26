@@ -1,12 +1,12 @@
 import json
 from logger_util import LOGGER
 from collections import defaultdict
-from validator import Validator
-
-class NetworkPlayground(process,Validator):
 
 
-    def setup(twin_config:dict,validators,twin_node_cache:dict(),number_of_nodes:int,public_keys_validators,public_keys_clients):
+class NetworkPlayground(process):
+
+
+    def setup(twin_config:dict,validators,number_of_nodes:int,public_keys_validators,public_keys_clients):
 
         config_id=0
         LOGGER.process_id = "NetworkPlayGround"
@@ -20,28 +20,30 @@ class NetworkPlayground(process,Validator):
         self.partitions =  twin_config["round_partitions"]
         self.public_keys_validators= public_keys_validators
         self.number_of_nodes = number_of_nodes
-        self.twin_node_cache=twin_node_cache
-        print("twin_config ",twin_config)
-        print("twin_node_cache",twin_node_cache)
 
-            
-        self.validators =validators
+        #List of validators 
+        self.validators =validators 
         self.state = defaultdict(dict)
+        self.completed = False
 
         
 
 
     def run():
-        output("Creating {} NetworkPlayGround  ")
+        output("Creating NetworkPlayGround  ",self.completed)
+        await(self.completed == True)
+        output("Exiting  NetworkPlayGround  ")
+
+
 
 
 
 
 
     def receive(msg=('Timeout', msg), from_=p):
-        LOGGER.log_event("Playground: Received  ", "Timeout", msg, p)
+        LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Timeout", "msg", p)
 
-        current_round =  msg["payload"].timeout_info.round
+        current_round =  msg["payload"].tmo_info.round
         network_partition =  self.partitions[current_round]
         
         request  = {
@@ -49,7 +51,10 @@ class NetworkPlayground(process,Validator):
             "_from": msg["from"],
             "_to" : msg["to"],
             "payload": msg["payload"],
-            "networ_partition": network_partition
+            "network_partition": network_partition,
+            "current_round":current_round,
+            "is_broadcast": True
+
         }
 
         process_request(request)
@@ -57,10 +62,9 @@ class NetworkPlayground(process,Validator):
 
 
     def receive(msg=('Proposal', msg), from_=p):
-        print("Proposal ",msg)
-        LOGGER.log_event("Playground: Received  ", "Proposal", msg, p)
+        LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Proposal", "msg", p)
 
-        current_round =  msg["payload"].block.round
+        current_round =  msg["payload"].block.round-1
         network_partition = self.partitions[current_round]
 
         request  = {
@@ -68,14 +72,18 @@ class NetworkPlayground(process,Validator):
             "_from": msg["from"], 
             "_to" : msg["to"],
             "payload": msg["payload"],
-            "networ_partition": network_partition
+            "network_partition": network_partition,
+            "current_round":current_round,
+            "is_broadcast": True
+
+
 
         }
         process_request(request)
 
 
     def receive(msg=('Vote', msg), from_=p):
-        LOGGER.log_event("Playground: Received  ", "Vote", msg, p)
+        LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Vote", "msg", p)
 
         current_round =  msg["payload"].vote_info.round
         network_partition = self.partitions[current_round]
@@ -85,7 +93,9 @@ class NetworkPlayground(process,Validator):
             "_from": msg["from"],
             "_to" : msg["to"],
             "payload": msg["payload"],
-            "_round":current_round
+            "network_partition": network_partition,
+            "current_round":current_round,
+            "is_broadcast": False
 
         }
         process_request(request)
@@ -94,58 +104,83 @@ class NetworkPlayground(process,Validator):
 
 
     def process_request(request):
-
-        request_type = request.type
-        _from =  request._from
-        _to =  request._to
-        payload = request.payload
         
-        current_round = request.current_round
-        network_partition =  request.network_partition
-        current_round =  request._round
+        request_type = request["type"]
+        _from =  request["_from"]
+        _to =  request["_to"]
+        payload = request["payload"]
+        
+        current_round = request["current_round"]
+        network_partition =  request["network_partition"]
 
-        current_partitions = network_partition[current_round]
+        print(request)
 
-        is_broadcast =  True if len(_to) > 1 else False
-        sender_id = _from.validator_id
+        LOGGER.log_event("Playground:  process_request ", request_type, "payload", _from)
+        sender_id = _from
 
+        is_broadcast = request["is_broadcast"]
         if is_broadcast:
-            for node in _to:
-                node_id =  validators.index(node)
-                twin_id =  validators.index(node) + self.number_of_nodes
 
-                if same_partition(_round,sender_id, node_id):
-                    send((request_type, payload), to=node)
+            for node_id,node in enumerate(self.validators):
+                twin_id =  node_id + self.number_of_nodes
+                
 
-                if same_partition(_round,sender_id, twin_id):
-                    send((request_type, payload), to=self.twin_node_cache[twin_id])
+                if same_partition(current_round,network_partition,sender_id, node_id):
+                    LOGGER.log_event("Playground: process_request broadcast Send request from  {} to {}".format(sender_id,node_id), request_type, payload, node)
+
+                    send((request_type, (payload,sender_id)), to=node)
+
+                if same_partition(current_round,network_partition,twin_id,node_id):
+                    LOGGER.log_event("Playground: process_request broadcast Send request from Twin  {} to {}".format(twin_id,node_id), request_type, payload, node)
+                    send((request_type, (payload,twin_id)), to=node)
 
         else:
-            
-            if same_partition(_round,_to.validator_id,sender_id):
-                send((request_type, payload), to=_to)
-            
-            twin_id = validators.index(_to)+self.number_of_nodes
+            print("Receiver ID ",_to,len(self.validators),self.validators)
+            receiverID = self.validators.index(_to)
+            if same_partition(current_round,network_partition,sender_id,receiverID):
+                LOGGER.log_event("Playground: process_request Send request {} to {}".format(sender_id,receiverID), request_type, payload, _to)
 
-            if same_partition(_round,sender_id,twin_id):
-                send((request_type, payload), to=self.twin_node_cache[twin_id])
+                send((request_type, (payload,sender_id)), to=_to)
+            
+            twin_id = sender_id +self.number_of_nodes
+
+            if same_partition(current_round,network_partition,twin_id,receiverID):
+                LOGGER.log_event("Playground: process_request Send request from Twin {} to {}".format(twin_id,receiverID),  request_type, payload, _to)
+
+                send((request_type, (payload,twin_id)), to=_to)
             
         
         state[sender_id][current_round]=+1
-        LOGGER.log_event("Playground: process_request  ", request_type, payload, p)
+
+        all_executed = False
+        if current_round == len(self.partitions):
+            for k,v in state:
+                if (v[current_round]==len(network_partition)):
+                    all_executed=True
+                else:
+                    all_executed=False
+                    break
+
+        self.completed=all_executed
+                
+        LOGGER.log_event("Playground: process_request completed = {} ".format(self.completed), request_type, payload,_from)
 
 
-    def same_partition(_round,sender,receiver):
+    def same_partition(_round,round_network_partition,sender,receiver):
 
+        current_partitions =round_network_partition 
 
         if( _round in state[sender].keys() ):
-            partition_id =  min( state[_from][current_round], len(current_partitions)-1 )
+            partition_id =  min( state[sender][_round], len(current_partitions)-1 )
         else:
-            state[_from][current_round]=0
+            state[sender][_round]=0
             partition_id=0
 
         
         for partition in current_partitions[partition_id]:
+            print("partition  ",current_partitions,partition,type(partition),sender,receiver)
+            LOGGER.log_event("Playground: process_request receiver {} sender {} ".format(receiver,sender) ,_round, partition,sender)
+
             if sender in partition and receiver in partition:
                 return True              
         return False

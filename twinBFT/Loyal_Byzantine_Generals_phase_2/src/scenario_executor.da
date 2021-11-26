@@ -56,6 +56,13 @@ class ScenarioExecutor(process):
             private_keys_validators[v] = private_key
             public_keys_validators[v] = public_key
 
+        twin_node_cache = {}
+        for i, v in enumerate(twins,start=len(validators)):
+            private_keys_validators[v]=private_keys_validators[validators[i-len(validators)]]
+            public_keys_validators[v]=public_keys_validators[validators[i-len(validators)]]
+            twin_node_cache[i]=v
+
+
         print(private_keys_validators)
 
         for c in clients:
@@ -69,13 +76,12 @@ class ScenarioExecutor(process):
             setup({v}, (config, config_id, i, all_nodes, list(clients),
                         private_keys_validators[v], public_keys_validators, public_keys_clients))
 
-        twin_node_cache = {}
+        
         for i, v in enumerate(twins,start=len(validators)):
             print("enumberate : ",i,v)
             print("validators[i-len(validators)] ",validators[i-len(validators)])
-            twin_node_cache[i]=v
             setup({v}, (config, config_id, i, all_nodes, list(clients),
-                        private_keys_validators[validators[i-len(validators)]], public_keys_validators, public_keys_clients))
+                        private_keys_validators[v], public_keys_validators, public_keys_clients))
 
 
 
@@ -85,7 +91,7 @@ class ScenarioExecutor(process):
 
         
 
-        setup(network_playground, (twin_config,validators,twin_node_cache,nvalidators ,public_keys_validators, public_keys_clients))
+        setup(network_playground, (twin_config,all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
 
         start(network_playground)
         start(validators)
@@ -131,7 +137,9 @@ def main():
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
 
-    file = "../config/twinconfig.json"
+    #file = "../config/twinconfig.json"
+    file = "../config/twinconfig_all_good.json"
+
     twin_config = read_config(file)
     number_of_nodes =  int(twin_config["number_of_nodes"])
 
@@ -142,10 +150,10 @@ def main():
         "nfaulty": (number_of_nodes-1)/3,
         "twin_config": twin_config,
         'sleeptime': 1,
-        'clienttimeout': 10,
-        'nclientops': 5,
+        'clienttimeout': 20,
+        'nclientops': 1,
         'delta': 2,
-        'window_size': 5,
+        'window_size': 3,
         'exclude_size': 0,
         'failure_config': FailureConfig(
             failures=[],

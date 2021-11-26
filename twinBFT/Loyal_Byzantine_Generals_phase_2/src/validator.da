@@ -70,7 +70,7 @@ class Validator(process):
     def send_timeout_msg(timeout_msg):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
         # send(('Timeout', timeout_msg), to=self.replicas)
-        send(('Timeout', ({"from":self.validator_id, "to":self.replicas, "payload":timeout_msg })), to=self.network_playground)
+        send(('Timeout', ({"from":self.validator_id, "to": self.replicas, "payload":timeout_msg })), to=self.network_playground)
         LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.replicas)
 
     '''Procedure start event processing(M)'''
@@ -167,9 +167,10 @@ class Validator(process):
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
-
+        msg,sender= proposal_msg
+        proposal_msg=msg
         signature_verified = Cryptography.get_verified_message(
-            proposal_msg.signature, public_keys_validators[p])
+            proposal_msg.signature, public_keys_validators[self.replicas[sender]])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified ProposalMsg signature", True)
@@ -231,8 +232,14 @@ class Validator(process):
     def receive(msg=('Vote', vote_msg), from_=p):
         LOGGER.log_event("Received", "Vote", vote_msg, p)
 
+        ''' Changes, message receiver from network playground
+         will have p as networkplayground process
+        '''
+        msg,sender= vote_msg
+        vote_msg=msg
+
         signature_verified = Cryptography.get_verified_message(
-            vote_msg.signature, public_keys_validators[p])
+            vote_msg.signature, public_keys_validators[self.replicas[sender]])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
@@ -255,8 +262,15 @@ class Validator(process):
     def receive(msg=('Timeout', timeout_msg), from_=p):
         LOGGER.log_event("Received", "Timeout", timeout_msg, p)
 
+        ''' Changes, message receiver from network playground
+            will have p as networkplayground process
+        '''
+        msg,sender= timeout_msg
+        timeout_msg=msg
+ 
+
         signature_verified = Cryptography.get_verified_message(
-            timeout_msg.tmo_info.author_signature, public_keys_validators[p])
+            timeout_msg.tmo_info.author_signature, public_keys_validators[self.replicas[sender]])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified TimeoutMsg signature", True)
