@@ -26,7 +26,7 @@ class LeaderElection:
             change for twins, injectin round leaders
             
         '''
-        LOGGER.log('LeaderElection: get_leader', round,self.round_leaders[round])
+        LOGGER.log('LeaderElection: get_leader', round)
 
 
         if round in self.round_leaders:
