@@ -1,15 +1,19 @@
 import random
 from collections import defaultdict
+import json
 
 R = 10 # total number of rounds
 M = 3 # max partitions per round
 F = 1 # number of twins
+S = 5 #number of scenarios
 probability_of_overlap = 0.5 # probability of overlapping partition
 probability_partition_has_overlap = 0.5 # probability that a network partition contains a overlap
 
 
 total_nodes = 3 * F + 1
 Partitions = []
+
+
 
 def assign_leaders(type = "random", assignments = {}):
 
@@ -204,11 +208,11 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     
     # generate all network partition scenarios from sum of total nodes and its twins
     partition_scenarios, major_partitions = get_partition_scenarios(total_nodes, F)
-    print("----------------")
-    print(partition_scenarios)
-    print("----------------")
-    print(major_partitions)
-    print("----------------")
+    # print("----------------")
+    # print(partition_scenarios)
+    # print("----------------")
+    # print(major_partitions)
+    # print("----------------")
     # print(leader_assignments)
     # print("----------------")
 
@@ -252,10 +256,31 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
 # print(Partitions)
 # Partitions = prune_duplicate_partition(Partitions)
 # print(Partitions)
-leader_assignments = assign_leaders()
-print(leader_assignments)
-twin_nodes = set(["1"])
-final_assignments = round_assignment(leader_assignments, twin_nodes)
-for key, value in final_assignments.items():
-    print(key, ":", value)
+array_of_scenarios = []
+def generateScenarios():
+    for i in range(0, S):
+        json_object_str = json.dumps({"num_of_nodes": total_nodes})
+        # print(type(json_object_str))
+        json_object = json.loads(json_object_str)
+        # print(type(json_object))
+        json_object.update({"num_of_twins": F})
+        json_object.update({"scenarios": []})
+        leader_assignments = assign_leaders()
+        twin_nodes = set(["1"])
+        final_assignments = round_assignment(leader_assignments, twin_nodes)
+        # for key, value in final_assignments.items():
+        #     print(key, ":", value)
+        # json_object = json.loads(final_assignments) 
+        scenario_json_object_str = json.dumps({"round_leaders" : leader_assignments})
+        # print(type(scenario_json_object_str))
+        scenario_json_object = json.loads(scenario_json_object_str)
+        scenario_json_object.update({"round_partitions" : final_assignments})
+        # scenario_json_object_str = json.dumps({"round_partitions" : final_assignments})
+        # print(type(scenario_json_object))
+        # json_object = json.loads(scenario_json_object_str)
+        json_object["scenarios"].append(scenario_json_object)
+        array_of_scenarios.append(json_object)
+
+for item in array_of_scenarios:
+    print(item)
 
