@@ -155,6 +155,7 @@ class Validator (process):
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
+        LOGGER.log_event("Received proposal_msg", " with block ", str(proposal_msg.block.id), p)
 
         signature_verified = Cryptography.get_verified_message(
             proposal_msg.signature, public_keys_validators[p])
@@ -164,6 +165,13 @@ class Validator (process):
 
             self.should_start_new_round = False
 
+            if p != replicas[validator_id]:
+                # Validate (and remove) the transactions in current mempool with the received txns
+                if not self.mempool.validate_and_remove_transactions(proposal_msg.block.payload):
+                    LOGGER.log(
+                        "Not processing the Proposal message as transactions are not valid", None)
+                    return
+            
             if proposal_msg.block.qc is not None and p != replicas[validator_id]:
                 '''process certificate qc(P.block.qc)'''
                 process_certificate_qc(proposal_msg.block.qc)
@@ -185,12 +193,6 @@ class Validator (process):
                 LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], leader)
                 return
 
-            if p != replicas[validator_id]:
-                # Validate (and remove) the transactions in current mempool with the received txns
-                if not self.mempool.validate_and_remove_transactions(proposal_msg.block.payload):
-                    LOGGER.log(
-                        "Not processing the Proposal message as transactions are not valid", None)
-                    return
 
             if len(proposal_msg.block.payload) == 0:
                 self.should_start_new_round = True
