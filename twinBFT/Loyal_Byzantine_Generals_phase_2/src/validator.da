@@ -28,6 +28,7 @@ class Validator (process):
         self.validator_id=validator_id
         
         self.network_playground =  config["network_playground"]
+        self.partition_round=0
 
         self.id_block = dict()
         self.request_cache = dict()
@@ -70,7 +71,7 @@ class Validator (process):
     def send_timeout_msg(timeout_msg):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
         # send(('Timeout', timeout_msg), to=self.replicas)
-        current_round = max(timeout_msg.tmo_info.round,self.pacemaker.current_round)
+        current_round = max(timeout_msg.tmo_info.round,self.partition_round)
         send(('Timeout', ({"from":self.validator_id, "to": self.replicas, "payload":timeout_msg, "current_round":current_round })), to=self.network_playground)
         LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.replicas)
 
@@ -159,7 +160,7 @@ class Validator (process):
             )
             print("Proposal sending ",self.network_playground)
             # send(('Proposal', proposal_msg), to=self.replicas)
-            current_round=max(proposal_msg.block.round,self.pacemaker.current_round)
+            current_round=max(proposal_msg.block.round,self.partition_round)
             send(('Proposal', ({"from":self.validator_id,"to":self.replicas,"payload":proposal_msg, "current_round":current_round})), to=self.network_playground)
 
             LOGGER.log_event("Sent", "Proposal",
@@ -170,7 +171,7 @@ class Validator (process):
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
-        msg,sender= proposal_msg
+        msg,sender,self.partition_round= proposal_msg
         proposal_msg=msg
         signature_verified = Cryptography.get_verified_message(
             proposal_msg.signature, public_keys_validators[self.replicas[sender]])
@@ -224,7 +225,7 @@ class Validator (process):
                 next_leader = self.leader_election.get_leader(round + 1)
                 # send(('Vote', vote_msg),
                 #      to=next_leader)
-                current_round=max(vote_msg.vote_info.round,self.pacemaker.current_round)
+                current_round=max(vote_msg.vote_info.round,self.partition_round)
                 send(('Vote', ({"from":self.validator_id,"to": next_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
 
                 LOGGER.log_event("Sent", "Vote", vote_msg, next_leader)
@@ -239,7 +240,7 @@ class Validator (process):
         ''' Changes, message receiver from network playground
          will have p as networkplayground process
         '''
-        msg,sender= vote_msg
+        msg,sender,self.partition_round= vote_msg
         vote_msg=msg
 
         signature_verified = Cryptography.get_verified_message(
@@ -269,7 +270,7 @@ class Validator (process):
         ''' Changes, message receiver from network playground
             will have p as networkplayground process
         '''
-        msg,sender= timeout_msg
+        msg,sender,self.partition_round= timeout_msg
         timeout_msg=msg
  
 
