@@ -194,7 +194,7 @@ class NetworkPlayground(process):
                 else:
                     print("=======Error node {} current_round {} rounds {} network_partition ".format(node,current_round,rounds,network_partition))
                     all_executed=False
-                    break;
+                    break
             
         self.completed = all_executed
         print("===== completed {} ".format(self.completed))
