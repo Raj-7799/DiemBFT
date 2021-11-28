@@ -97,6 +97,7 @@ class LeaderElection:
             '''current qc ← current block.qc'''
             current_qc = current_block.qc
             i = i + 1
+        '''active validators ← active validators \ last authors // contains at least 1 validator'''
         #Select active validators which were not leaders recently
         active_validators = active_validators.difference(
             last_authors)

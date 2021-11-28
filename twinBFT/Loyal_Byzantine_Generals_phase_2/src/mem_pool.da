@@ -19,7 +19,6 @@ class MemPool:
         length = len(self.pending_txns.keys())
         LOGGER.log('MemPool: peek_pool: returns',
                    length, self.pending_txns.keys())
-
         return length
 
     '''Function get transactions()'''

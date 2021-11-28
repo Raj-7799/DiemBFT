@@ -13,7 +13,7 @@ from pacemaker import Pacemaker
 from safety import Safety
 
 
-class Validator(process):
+class Validator (process):
 
     def setup(config, config_id: int, validator_id: int, replicas: list, clients: list, private_key, public_keys_validators, public_keys_clients):
 
@@ -309,7 +309,6 @@ class Validator(process):
                 # Directly reply with the cached response
                 response = self.request_cache[req['req_id']]
                 send(('Response', response), to=client)
-                
                 LOGGER.log_event("Sent", "Cached Response", response, client)
                 return
 
@@ -321,10 +320,6 @@ class Validator(process):
                 self.should_start_new_round = False
         else:
             LOGGER.log_action("Verified Client Request signature", False)
-
-
-
-
 
 
 class ValidatorFI (process, Validator):
