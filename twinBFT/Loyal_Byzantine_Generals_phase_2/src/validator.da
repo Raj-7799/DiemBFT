@@ -78,6 +78,7 @@ class Validator(process):
     def run():
         self.pacemaker.start_timer(1)
         LOGGER.log(replicas[validator_id])
+        print("Done validator ")
         await(received(('Done',), from_=parent()))
         self.pacemaker.stop_timer(self.pacemaker.current_round)
         output("Validator", self.validator_id, "is exiting")

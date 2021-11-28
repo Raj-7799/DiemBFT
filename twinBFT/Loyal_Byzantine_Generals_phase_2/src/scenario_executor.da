@@ -97,10 +97,24 @@ class ScenarioExecutor(process):
         start(validators)
         start(twins)
         start(clients)
+        await(each(c in clients, has=received(('Done',), from_=c)))
+        # In case where client doesnt' send Done signal, and rounds in scenario are over
+        # await(each(c in clients, has=received(('Done',), from_=c)) or received(('Done',), from_=network_playground))
+        output("All clients done, informing all network playground.", config_id)
+        # send(('Done',), to=network_playground)
+        # await(received(('Done',), from_=network_playground))
+        output("Network Playground closed, informing all validators.", config_id)  
+        print("Closeing validator ")
+        send(('Done',), to=validators)
+        print("CLosed validator ")
+        send(('Done',), to=twins)
+        print("CLosed twin ")
+    
+        send(('Done',), to=network_playground)
 
-        # await(each(c in clients, has=received(('Done',), from_=c)))
-        output("All clients done, informing all validators.", config_id)
-        # send(('Done',), to=validators)
+        output("All nodes exited ", config_id)
+
+
 
 
     def is_config_valid(config):
@@ -151,7 +165,7 @@ def main():
         "twin_config": twin_config,
         'sleeptime': 1,
         'clienttimeout': 20,
-        'nclientops': 1,
+        'nclientops': 2,
         'delta': 2,
         'window_size': 3,
         'exclude_size': 0,

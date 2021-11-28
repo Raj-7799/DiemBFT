@@ -32,95 +32,109 @@ class NetworkPlayground(process):
 
     def run():
         output("Creating NetworkPlayGround  ",self.completed)
-        await(self.completed == True)
-        output("Exiting  NetworkPlayGround  ")
+        # await(received(('Done',), from_=parent()))
+        # await(self.completed == True)
+        output("Informing parent about Exiting  NetworkPlayGround  ",parent())
+        # send(('Done',), to=parent())
+        output("Exiting  NetworkPlayGround 1 ",parent())
+        # in case parent process is not sending done but rounds in partition are over,
+        await(received(('Done',), from_=parent()) or (self.completed == True))
+        send(('Done',), to=parent())
+        output("Exiting  NetworkPlayGround 2 ",parent())
 
 
 
-
+ 
+ 
 
 
 
     def receive(msg=('Timeout', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Timeout", "msg", p)
-
-        current_round =  msg["payload"].tmo_info.round
-        if current_round < len(self.partitions):
-            network_partition =  self.partitions[current_round]
+        if self.completed:
+            print("Timeout ")
+            return
+        # current_round =  msg["payload"].tmo_info.round
+        # if current_round < len(self.partitions):
+        #     network_partition =  self.partitions[current_round]
             
-            request  = {
-                "type": 'Timeout',
-                "_from": msg["from"],
-                "_to" : msg["to"],
-                "payload": msg["payload"],
-                "network_partition": network_partition,
-                "current_round":msg["current_round"],
-                "is_broadcast": True
+        request  = {
+            "type": 'Timeout',
+            "_from": msg["from"],
+            "_to" : msg["to"],
+            "payload": msg["payload"],
+            "network_partition": self.partitions[msg["current_round"]],
+            "current_round":msg["current_round"],
+            "is_broadcast": True
 
-            }
+        }
 
-            process_request(request)
+        process_request(request)
         
-        else:
-            pass
-        print("current_round=========== ",current_round,p)
+        # else:
+        #     pass
+        # print("current_round=========== ",current_round,p)
 
 
 
     def receive(msg=('Proposal', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Proposal", "msg", p)
+        if self.completed:
+            print("Proposal ")
+            return
+        # current_round =  msg["payload"].block.round-1
+        # if current_round < len(self.partitions):
 
-        current_round =  msg["payload"].block.round-1
-        if current_round < len(self.partitions):
+        # network_partition = self.partitions[current_round]
 
-            network_partition = self.partitions[current_round]
-
-            request  = {
-                "type": 'Proposal',
-                "_from": msg["from"], 
-                "_to" : msg["to"],
-                "payload": msg["payload"],
-                "network_partition": network_partition,
-                "current_round":msg["current_round"],
-                "is_broadcast": True
+        request  = {
+            "type": 'Proposal',
+            "_from": msg["from"], 
+            "_to" : msg["to"],
+            "payload": msg["payload"],
+            "network_partition": self.partitions[msg["current_round"]],
+            "current_round":msg["current_round"],
+            "is_broadcast": True
 
 
 
-            }
-            process_request(request)
-
-        else:
-            pass
-        print("current_round=========== ",current_round)
+        }
+        process_request(request)
+        # print("current_round=========== ",current_round)
 
     def receive(msg=('Vote', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Vote", "msg", p)
+        if self.completed:
+            print("Vote ")
+            return
+        # current_round =  msg["payload"].vote_info.round
+        # print(msg["payload"],msg["payload"].vote_info,msg["payload"].vote_info.parent_round)
+        # if current_round < len(self.partitions):
 
-        current_round =  msg["payload"].vote_info.round
-        print(msg["payload"],msg["payload"].vote_info,msg["payload"].vote_info.parent_round)
-        if current_round < len(self.partitions):
+        #     network_partition = self.partitions[current_round]
 
-            network_partition = self.partitions[current_round]
+        request  = {
+            "type": 'Vote',
+            "_from": msg["from"],
+            "_to" : msg["to"],
+            "payload": msg["payload"],
+            "network_partition": self.partitions[msg["current_round"]],
+            "current_round":msg["current_round"],
+            "is_broadcast": False
 
-            request  = {
-                "type": 'Vote',
-                "_from": msg["from"],
-                "_to" : msg["to"],
-                "payload": msg["payload"],
-                "network_partition": network_partition,
-                "current_round":msg["current_round"],
-                "is_broadcast": False
-
-            }
-            process_request(request)
+        }
+        process_request(request)
         
-        else:
-            pass
-        print("current_round=========== ",current_round)
+        # else:
+        #     pass
+        # print("current_round=========== ",current_round)
 
 
 
     def process_request(request):
+        if self.completed:
+            print("process_request")
+            return
         
         request_type = request["type"]
         _from =  request["_from"]
@@ -128,6 +142,7 @@ class NetworkPlayground(process):
         payload = request["payload"]
         
         current_round = request["current_round"]
+        print("=====current_round {} message_type {} from {} to {}".format(current_round,request_type,_from,_to))
         network_partition =  request["network_partition"]
 
         print(request,payload)
@@ -141,8 +156,6 @@ class NetworkPlayground(process):
             for node_id,node in enumerate(self.validators):
 
                 twin_id =  node_id + self.number_of_nodes
-                
-                
                 if same_partition(current_round,network_partition,sender_id, node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from  {} to {}".format(sender_id,node_id), request_type, payload, node)
 
@@ -173,20 +186,39 @@ class NetworkPlayground(process):
         all_executed = False
         print("Checking for exit =============== ",sender_id,current_round,len(self.partitions))
 
-        if current_round == len(self.partitions)-1:
-            print("Checking for exit =============== ",current_round)
-            for k,v in state.items():
-                for index,partition in enumerate(self.partitions[1:],start=1):
-                    print(k,v,partition,v[index],len(partition))
-                    if (v[index]==len(partition)):
-                        all_executed=True
-                    else:
-                        print("mismatch ",k,v,partition,v[index],len(partition))
-                        all_executed=False
-                        break
-            print("===============================",all_executed)
 
-        self.completed=all_executed
+
+        if current_round == len(self.partitions)-1:
+            print("Checking if all nodes are now in same round ")
+            for node,rounds in state.items():
+                if current_round in rounds and rounds[current_round]==len(network_partition):
+                    all_executed=True
+                else:
+                    print("=======Error node {} current_round {} rounds {} network_partition ".format(node,current_round,rounds,network_partition))
+                    all_executed=False
+                    break;
+            
+        self.completed = all_executed
+        print("===== completed {} ".format(self.completed))
+
+
+
+
+
+        # if current_round == len(self.partitions)-1:
+        #     print("Checking for exit =============== ",current_round)
+        #     for k,v in state.items():
+        #         for index,partition in enumerate(self.partitions[1:],start=1):
+        #             print(k,v,partition,v[index],len(partition))
+        #             if (v[index]==len(partition)):
+        #                 all_executed=True
+        #             else:
+        #                 print("mismatch ",k,v,partition,v[index],len(partition))
+        #                 all_executed=False
+        #                 break
+        #     print("===============================",all_executed)
+
+        # self.completed=all_executed
                 
         LOGGER.log_event("Playground: process_request completed = {}  {} {} ".format(current_round,self.completed,self.state), request_type, "payload",_from)
 
