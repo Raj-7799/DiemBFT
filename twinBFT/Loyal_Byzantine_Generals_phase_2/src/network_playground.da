@@ -32,14 +32,11 @@ class NetworkPlayground(process):
 
     def run():
         output("Creating NetworkPlayGround  ",self.completed)
-        # await(received(('Done',), from_=parent()))
-        # await(self.completed == True)
+        await(self.completed == True)
         output("Informing parent about Exiting  NetworkPlayGround  ",parent())
-        # send(('Done',), to=parent())
         output("Exiting  NetworkPlayGround 1 ",parent())
         # in case parent process is not sending done but rounds in partition are over,
-        await(received(('Done',), from_=parent()) or (self.completed == True))
-        send(('Done',), to=parent())
+        send(('DonePlayground',), to=parent())
         output("Exiting  NetworkPlayGround 2 ",parent())
 
 

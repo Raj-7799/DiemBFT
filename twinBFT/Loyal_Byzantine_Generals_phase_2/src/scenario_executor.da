@@ -24,6 +24,7 @@ class ScenarioExecutor(process):
         config['round_leaders']=self.round_leaders
         print("ScenarioExecutor ")
         del config['twin_config']
+        self.exit=False
 
     def run():
 
@@ -35,7 +36,7 @@ class ScenarioExecutor(process):
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
-        validators = list(new(Validator, num=nvalidators))
+        self.validators = list(new(Validator, num=nvalidators))
         clients = new(Client, num=nclients)
 
 
@@ -43,10 +44,10 @@ class ScenarioExecutor(process):
 
         ntwins = int(twin_config["number_of_twins"])
 
-        twins =  new(Validator,num=ntwins)
+        self.twins =  new(Validator,num=ntwins)
 
 
-        network_playground =  new(NetworkPlayground,num=1)
+        self.network_playground =  new(NetworkPlayground,num=1)
         config['network_playground']=network_playground
 
         
@@ -97,22 +98,34 @@ class ScenarioExecutor(process):
         start(validators)
         start(twins)
         start(clients)
-        await(each(c in clients, has=received(('Done',), from_=c)))
+        # await(each(c in clients, has=received(('Done',), from_=c)) or (received(('DonePlayground',), from_=network_playground)))
+        print("Awaiting for Playground to exit")
+        await(some(received(('DonePlayground',))))
         # In case where client doesnt' send Done signal, and rounds in scenario are over
         # await(each(c in clients, has=received(('Done',), from_=c)) or received(('Done',), from_=network_playground))
         output("All clients done, informing all network playground.", config_id)
         # send(('Done',), to=network_playground)
         # await(received(('Done',), from_=network_playground))
         output("Network Playground closed, informing all validators.", config_id)  
-        print("Closeing validator ")
+
+        print("Closing validator ")
+
         send(('Done',), to=validators)
         print("CLosed validator ")
         send(('Done',), to=twins)
         print("CLosed twin ")
-    
-        send(('Done',), to=network_playground)
-
+        # send(('Done',), to=clients)
         output("All nodes exited ", config_id)
+
+    # def receive(msg=('DonePlayground',), from_=p):
+    #     print("DonePlayground")
+    #     self.exit=True
+    #     print("DonePlayground ",some(received(('DonePlayground',))),p)
+    #     print("Closing validator ")
+    #     send(('Done',), to=validators)
+    #     print("CLosed validator ")
+    #     send(('Done',), to=twins)
+    #     print("CLosed twin ")
 
 
 
