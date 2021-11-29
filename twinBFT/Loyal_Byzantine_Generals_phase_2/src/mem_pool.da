@@ -3,9 +3,10 @@ from logger_util import LOGGER
 
 class MemPool:
 
-    def __init__(self, validator_id):
+    def __init__(self, validator_id, request_cache):
         self.pending_txns = dict()
         self.validator_id = validator_id
+        self.request_cache = request_cache
 
     def add_transaction(self, txn):
         LOGGER.log('MemPool: add_transaction', txn)
@@ -34,6 +35,8 @@ class MemPool:
         keys = list(self.pending_txns.keys())
         send_txns = [self.pending_txns[keys[0]]]
         del self.pending_txns[keys[0]]
+        if keys[0] in self.request_cache:
+            return self.get_transactions()
         LOGGER.log('MemPool: get_transactions: returns', send_txns)
         return send_txns
 
@@ -41,14 +44,15 @@ class MemPool:
         LOGGER.log('MemPool: validate_and_remove_transactions', txns)
         to_remove = []
         for txn in txns:
-            if txn['req_id'] in self.pending_txns:
+            if txn['req_id'] in self.pending_txns and txn['req_id'] not in self.request_cache:
                 to_remove.append(txn['req_id'])
             else:
                 LOGGER.log(
-                    'MemPool: validate_and_remove_transactions: returns', False)
+                    'MemPool: validate_and_remove_transactions: returns', False, txn['req_id'] in self.pending_txns, txn['req_id'] not in self.request_cache)
                 return False
 
         for req_id in to_remove:
+            LOGGER.log('MemPool: Removed transaction ', req_id)
             del self.pending_txns[req_id]
         LOGGER.log('MemPool: validate_and_remove_transactions: returns', True)
         return True

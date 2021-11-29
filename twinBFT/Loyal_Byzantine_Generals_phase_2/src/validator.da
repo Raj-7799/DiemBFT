@@ -45,7 +45,7 @@ class Validator (process):
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
             validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
-        self.mempool = MemPool(validator_id)
+        self.mempool = MemPool(validator_id, self.request_cache)
         self.leader_election = LeaderElection(config['round_leaders'],
             validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'])
 
@@ -151,6 +151,7 @@ class Validator (process):
                     Pacemaker.current round )'''
             block = self.blocktree.generate_block(
                 self.mempool.get_transactions(), self.pacemaker.current_round)
+            
             LOGGER.log_action('Created a new block', block)
 
             '''broadcast ProposalMsghb, last tc, Block-Tree.high commit qci'''
@@ -189,6 +190,12 @@ class Validator (process):
             LOGGER.log_action("Verified ProposalMsg signature", True)
 
             self.should_start_new_round = False
+            if p != replicas[validator_id]:
+                # Validate (and remove) the transactions in current mempool with the received txns
+                if not self.mempool.validate_and_remove_transactions(proposal_msg.block.payload):
+                    LOGGER.log(
+                        "Not processing the Proposal message as transactions are not valid", None)
+                    return
 
             if proposal_msg.block.qc is not None and p != replicas[validator_id]:
                 '''process certificate qc(P.block.qc)'''
@@ -210,13 +217,6 @@ class Validator (process):
             if proposal_msg.block.round != round or replicas[proposal_msg.sender] != leader or replicas[proposal_msg.block.author] != leader:
                 LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], leader)
                 return
-
-            if p != replicas[validator_id]:
-                # Validate (and remove) the transactions in current mempool with the received txns
-                if not self.mempool.validate_and_remove_transactions(proposal_msg.block.payload):
-                    LOGGER.log(
-                        "Not processing the Proposal message as transactions are not valid", None)
-                    return
 
             if len(proposal_msg.block.payload) == 0:
                 self.should_start_new_round = True
