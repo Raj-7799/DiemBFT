@@ -5,11 +5,11 @@ from logger_util import LOGGER
 class LeaderElection:
 
     def __init__(self,round_leaders, validator_id, replicas, ledger, pacemaker, window_size, exclude_size):
-        LOGGER.replicas = replicas
-        LOGGER.process_id = "Leader_" + str(validator_id)
+        # LOGGER.replicas = replicas
+        # LOGGER.process_id = "Leader_" + str(validator_id)
         
-        LOGGER.filename = '../logs/config' + str(0) + '/' \
-            + LOGGER.process_id + ".log"
+        # LOGGER.filename = '../logs/config' + str(0) + '/' \
+        #     + LOGGER.process_id + ".log"
        
         self.validator = replicas[validator_id]
         self.validator_id = validator_id

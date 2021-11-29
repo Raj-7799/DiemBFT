@@ -171,11 +171,12 @@ class Validator (process):
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
+       
         msg,sender,self.partition_round= proposal_msg
         proposal_msg=msg
         signature_verified = Cryptography.get_verified_message(
             proposal_msg.signature, public_keys_validators[self.replicas[sender]])
-
+        p = self.replicas[sender]
         if signature_verified is not None:
             LOGGER.log_action("Verified ProposalMsg signature", True)
 
