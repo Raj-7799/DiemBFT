@@ -61,7 +61,6 @@ class NetworkPlayground(process):
             "_from": msg["from"],
             "_to" : msg["to"],
             "payload": msg["payload"],
-            "network_partition": self.partitions[msg["current_round"]],
             "current_round":msg["current_round"],
             "is_broadcast": True
 
@@ -91,7 +90,6 @@ class NetworkPlayground(process):
             "_from": msg["from"], 
             "_to" : msg["to"],
             "payload": msg["payload"],
-            "network_partition": self.partitions[msg["current_round"]],
             "current_round":msg["current_round"],
             "is_broadcast": True
 
@@ -118,7 +116,6 @@ class NetworkPlayground(process):
             "_from": msg["from"],
             "_to" : msg["to"],
             "payload": msg["payload"],
-            "network_partition": self.partitions[msg["current_round"]],
             "current_round":msg["current_round"],
             "is_broadcast": False
 
@@ -142,8 +139,14 @@ class NetworkPlayground(process):
         payload = request["payload"]
         
         current_round = request["current_round"]
+
+        if current_round == len(self.partitions):
+            self.completed = True
+
+        print("===== completed {} ".format(self.completed))
+
         print("=====current_round {} message_type {} from {} to {}".format(current_round,request_type,_from,_to))
-        network_partition =  request["network_partition"]
+        network_partition =  self.partitions[current_round]
 
         print(request,payload)
 
@@ -198,25 +201,6 @@ class NetworkPlayground(process):
 
         all_executed = False
         print("Checking for exit =============== ",sender_id,current_round,len(self.partitions))
-
-
-
-        if current_round == len(self.partitions)-1:
-            print("Checking if all nodes are now in same round ")
-            for node,rounds in state.items():
-                if current_round in rounds and rounds[current_round]==len(network_partition):
-                    all_executed=True
-                else:
-                    print("=======Error node {} current_round {} rounds {} network_partition ".format(node,current_round,rounds,network_partition))
-                    all_executed=False
-                    break
-            
-        self.completed = all_executed
-        print("===== completed {} ".format(self.completed))
-
-
-
-
 
         # if current_round == len(self.partitions)-1:
         #     print("Checking for exit =============== ",current_round)
