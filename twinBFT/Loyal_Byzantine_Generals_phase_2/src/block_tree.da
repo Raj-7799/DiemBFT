@@ -115,7 +115,7 @@ class BlockTree:
             print('BlockTree: process_vote: returns', qc)
             return qc
 
-        print('BlockTree: process_vote: returns', None)
+        print('BlockTree: process_vote: returns', None, len(self.pending_votes[vote_idx]))
         '''return ⊥'''
         return None
 

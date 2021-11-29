@@ -173,7 +173,7 @@ class Validator (process):
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
-       
+        # cache_msg = proposal_msg
         msg,sender,self.partition_round= proposal_msg
         proposal_msg=msg
         signature_verified = Cryptography.get_verified_message(
@@ -217,11 +217,7 @@ class Validator (process):
 
             '''Block-Tree.execute and insert(P) // Adds a new speculative state to the Ledger'''
             self.blocktree.execute_and_insert(proposal_msg.block)
-            round = 1 
-            if proposal_msg.block.qc is not None:
-                round=proposal_msg.block.qc.vote_info.round
-                
-            self.proposal_cache[round]=proposal_msg
+            self.proposal_cache[proposal_msg.block.round]=proposal_msg
 
             '''vote msg ← Safety.make vote(P.block, P.last round tc)'''
             vote_msg = self.safety.make_vote(
@@ -332,7 +328,7 @@ class Validator (process):
         # find the proposal against round
         # 
         if qc is None: 
-            round=1
+            round=0
         else:
             round = qc.vote_info.round
         
@@ -342,12 +338,6 @@ class Validator (process):
             send(('Proposal', proposal_msg), to=p)
         else:
             LOGGER.log_event("Not Replying to SyncRequest ","Proposal", "",p)
-
-
-
-
-
-
 
     def receive(msg=('Request', signed_req), from_=client):
         req = Cryptography.get_verified_message(
