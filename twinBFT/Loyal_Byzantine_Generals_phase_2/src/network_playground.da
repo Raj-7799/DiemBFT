@@ -77,7 +77,7 @@ class NetworkPlayground(process):
     def receive(msg=('Proposal', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Proposal", "msg", p)
         if self.completed:
-            print("Proposal ")
+            print("Proposal")
             return
         # current_round =  msg["payload"].block.round-1
         # if current_round < len(self.partitions):
@@ -150,15 +150,19 @@ class NetworkPlayground(process):
         is_broadcast = request["is_broadcast"]
         if is_broadcast:
 
-            for node_id,node in enumerate(self.validators):
+            for node_id,node in enumerate(self.validators):#.items():
 
                 twin_id =  node_id + self.number_of_nodes
                 if same_partition(current_round,network_partition,sender_id, node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from  {} to {}".format(sender_id,node_id), request_type, payload, node)
+                    print("Playground: process_request Send request {} to {}  {}".format(sender_id,node_id, request_type))
+
                     send((request_type, (payload,sender_id,current_round)), to=node)
 
                 if twin_id < len(self.validators) and same_partition(current_round,network_partition,twin_id,node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from Twin  {} to {}".format(twin_id,node_id), request_type, payload, node)
+                    print("Playground: process_request Send request twin : {} to {}   {} ".format(twin_id,node_id, request_type))
+
                     send((request_type, (payload,twin_id,current_round)), to=node)
               
                 
@@ -167,6 +171,7 @@ class NetworkPlayground(process):
             receiverID = self.validators.index(_to)
             if same_partition(current_round,network_partition,sender_id,receiverID):
                 LOGGER.log_event("Playground: process_request Send request {} to {}".format(sender_id,receiverID), request_type, payload, _to)
+                print("Playground: process_request Send request {} to {} {}".format(sender_id,receiverID, request_type))
                 send((request_type, (payload,sender_id,current_round)), to=_to)
 
             
@@ -174,11 +179,15 @@ class NetworkPlayground(process):
 
             if twin_id < len(self.validators)  and same_partition(current_round,network_partition,twin_id,receiverID):
                 LOGGER.log_event("Playground: process_request Send request from Twin {} to {}".format(twin_id,receiverID),  request_type, payload, _to)
+                print("Playground: process_request Send request twin : {} to {}   {}".format(twin_id,receiverID, request_type))
+
                 send((request_type, (payload,twin_id,current_round)), to=_to )
             
             # message originating from some now of node which has a twin node
             if receiverID+self.number_of_nodes < len(self.validators) and same_partition(current_round,network_partition,sender_id,receiverID+self.number_of_nodes):
                 LOGGER.log_event("Playground: process_request Send request {} to {}".format(sender_id,receiverID+self.number_of_nodes), request_type, payload, _to)
+                print("Playground: process_request Send request {} to twin : {}  {}".format(sender_id,receiverID+self.number_of_nodes , request_type))
+
                 send((request_type, (payload,sender_id,current_round)), to=self.validators[receiverID+self.number_of_nodes])
             
         
