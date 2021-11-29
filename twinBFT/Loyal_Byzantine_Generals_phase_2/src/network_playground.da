@@ -19,7 +19,7 @@ class NetworkPlayground(process):
         self.partitions =  twin_config["round_partitions"]
         self.public_keys_validators= public_keys_validators
         self.number_of_nodes = number_of_nodes
-
+        self.number_of_twins = twin_config["number_of_twins"]
         #List of validators 
         self.validators =validators 
         self.state = defaultdict(dict)
@@ -155,25 +155,31 @@ class NetworkPlayground(process):
                 twin_id =  node_id + self.number_of_nodes
                 if same_partition(current_round,network_partition,sender_id, node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from  {} to {}".format(sender_id,node_id), request_type, payload, node)
-
                     send((request_type, (payload,sender_id,current_round)), to=node)
 
-                if twin_id< len(self.validators) and same_partition(current_round,network_partition,twin_id,node_id):
+                if twin_id < len(self.validators) and same_partition(current_round,network_partition,twin_id,node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from Twin  {} to {}".format(twin_id,node_id), request_type, payload, node)
                     send((request_type, (payload,twin_id,current_round)), to=node)
-
+              
+                
         else:
             print("Receiver ID ",_to,len(self.validators),self.validators)
             receiverID = self.validators.index(_to)
             if same_partition(current_round,network_partition,sender_id,receiverID):
                 LOGGER.log_event("Playground: process_request Send request {} to {}".format(sender_id,receiverID), request_type, payload, _to)
                 send((request_type, (payload,sender_id,current_round)), to=_to)
+
             
             twin_id = sender_id +self.number_of_nodes
 
-            if twin_id< len(self.validators) and same_partition(current_round,network_partition,twin_id,receiverID):
+            if twin_id < len(self.validators)  and same_partition(current_round,network_partition,twin_id,receiverID):
                 LOGGER.log_event("Playground: process_request Send request from Twin {} to {}".format(twin_id,receiverID),  request_type, payload, _to)
-                send((request_type, (payload,twin_id,current_round)), to=_to)
+                send((request_type, (payload,twin_id,current_round)), to=_to )
+            
+            # message originating from some now of node which has a twin node
+            if receiverID+self.number_of_nodes < len(self.validators) and same_partition(current_round,network_partition,sender_id,receiverID+self.number_of_nodes):
+                LOGGER.log_event("Playground: process_request Send request {} to {}".format(sender_id,receiverID+self.number_of_nodes), request_type, payload, _to)
+                send((request_type, (payload,sender_id,current_round)), to=self.validators[receiverID+self.number_of_nodes])
             
         
         state[sender_id][current_round]=+1
