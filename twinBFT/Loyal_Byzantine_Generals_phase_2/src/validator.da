@@ -35,6 +35,8 @@ class Validator (process):
         self.recently_committed_block_ids = list()
         self.should_start_new_round = True
 
+        self.proposal_cache = dict()
+
         self.ledger = Ledger(
             config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
         self.blocktree = BlockTree(
@@ -215,6 +217,11 @@ class Validator (process):
 
             '''Block-Tree.execute and insert(P) // Adds a new speculative state to the Ledger'''
             self.blocktree.execute_and_insert(proposal_msg.block)
+            round = 1 
+            if proposal_msg.block.qc is not None:
+                round=proposal_msg.block.qc.vote_info.round
+                
+            self.proposal_cache[round]=proposal_msg
 
             '''vote msg ← Safety.make vote(P.block, P.last round tc)'''
             vote_msg = self.safety.make_vote(
@@ -273,8 +280,12 @@ class Validator (process):
         '''
         msg,sender,self.partition_round= timeout_msg
         timeout_msg=msg
- 
-
+        # extract round info, (qc.vote_info.round) compare with pacemaker round (ideally use high commit qc)
+        # send sync based on compare (send to sender, high_commit_qc) , 
+        # reciever to send proposal to the lagging node
+        if(timeout_msg.tmo_info is not None):
+            check_for_sync(timeout_msg.tmo_info.round,self.replicas[sender])
+        
         signature_verified = Cryptography.get_verified_message(
             timeout_msg.tmo_info.author_signature, public_keys_validators[self.replicas[sender]])
 
@@ -300,6 +311,43 @@ class Validator (process):
                 process_new_round_event(tc)
         else:
             LOGGER.log_action("Verified TimeoutMsg signature", False)
+
+
+        # extract round info, (qc.vote_info.round) compare with pacemaker round (ideally use high commit qc)
+        # send sync based on compare (send to sender, high_commit_qc) , 
+        # reciever to send proposal to the lagging node
+    def check_for_sync(round,p):
+        
+        if(self.blocktree.high_commit_qc is None or round > self.blocktree.high_commit_qc.round ):
+            # send sync message 
+            # 
+            LOGGER.log_event("Send","SyncRequest", self.blocktree.high_commit_qc,p)
+            send(('SyncRequest',self.blocktree.high_commit_qc), to=p)
+
+
+    def receive(msg=('SyncRequest', qc), from_=p):
+
+        #TODO: Validate qc signatures 
+
+        # find the proposal against round
+        # 
+        if qc is None: 
+            round=1
+        else:
+            round = qc.vote_info.round
+        
+        if round+1 in self.proposal_cache.keys():
+            proposal_msg = self.proposal_cache[round+1]
+            LOGGER.log_event("Replying to SyncRequest ","Proposal", proposal_msg,p)
+            send(('Proposal', proposal_msg), to=p)
+        else:
+            LOGGER.log_event("Not Replying to SyncRequest ","Proposal", "",p)
+
+
+
+
+
+
 
     def receive(msg=('Request', signed_req), from_=client):
         req = Cryptography.get_verified_message(

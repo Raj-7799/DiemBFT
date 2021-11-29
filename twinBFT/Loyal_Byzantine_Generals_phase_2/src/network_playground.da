@@ -165,7 +165,7 @@ class NetworkPlayground(process):
                 if twin_id < len(self.validators) and same_partition(current_round,network_partition,twin_id,node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from Twin  {} to {}".format(twin_id,node_id), request_type, payload, node)
                     print("Playground: process_request Send request twin : {} to {}   {} ".format(twin_id,node_id, request_type))
-
+                    
                     send((request_type, (payload,twin_id,current_round)), to=node)
               
                 

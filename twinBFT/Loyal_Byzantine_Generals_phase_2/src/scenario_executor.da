@@ -167,7 +167,10 @@ def main():
         shutil.rmtree('../ledgers/')
 
     #file = "../config/twinconfig.json"
-    file = "../config/twinconfig_all_good.json"
+    #file = "../config/twinconfig_all_good.json"
+    #file = "../config/twinconfig.json"
+
+    file = "../config/twinconfig_sync.json"
 
     twin_config = read_config(file)
     number_of_nodes =  int(twin_config["number_of_nodes"])
