@@ -279,8 +279,27 @@ def generateScenarios():
         # print(type(scenario_json_object))
         # json_object = json.loads(scenario_json_object_str)
         json_object["scenarios"].append(scenario_json_object)
+
+        drop_dict = {}
+        delay_dict ={}
+        for i in range (1, R+1):
+            drop_dict[i]=[{"VoteMsg":[]}, {"Proposal":[]}]
+        drop_dict={"Drop":drop_dict}
+        for i in range (1, R+1):
+            delay_dict[i]=[{"VoteMsg":[]}, {"Proposal":[]}]
+        delay_dict={"Delay":delay_dict}
+        dict_json_object_str = json.dumps(drop_dict)
+        # print(type(scenario_json_object_str))
+        dict_json_object = json.loads(dict_json_object_str)
+        dict_json_object.update(delay_dict)
+
+        json_object["scenarios"].append(dict_json_object)
+        # json_object["scenarios"].append(delay_dict)
         array_of_scenarios.append(json_object)
 
+
+generateScenarios()
 for item in array_of_scenarios:
     print(item)
+    print("\n")
 
