@@ -30,6 +30,11 @@ class BlockTree:
 
     def execute_and_insert(self, block):
         LOGGER.log('BlockTree: execute_and_insert', block)
+        
+        if not Cryptography.hash_validation_block(block):
+            LOGGER.log('[HashValidation]BlockTree: Block Validation failed')
+            return
+        
         self.id_block[block.id] = block
         if block.qc is None:
             '''Ledger.speculate(b.qc.block id, b.id, b.payload)'''
