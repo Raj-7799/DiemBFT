@@ -78,7 +78,7 @@ class ScenarioExecutor(process):
         for i, v in enumerate(all_nodes):
             setup({v}, (config, config_id, i, all_nodes, list(clients),
                         private_keys_validators[v], public_keys_validators, public_keys_clients))
-            
+        print("all_nodes  ",all_nodes)
         
         # for i, v in enumerate(twins,start=len(validators)):
         #     print("enumberate : ",i,v)
@@ -89,7 +89,7 @@ class ScenarioExecutor(process):
 
 
         for i, c in enumerate(clients):
-            setup({c}, (config, config_id, i, list(validators),
+            setup({c}, (config, config_id, i, all_nodes,
                         private_keys_clients[c], public_keys_validators))
 
         

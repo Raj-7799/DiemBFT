@@ -64,7 +64,7 @@ class Ledger:
     '''commit(block id) // commit the pending prefix of the given block id and prune other branches'''
     # This will commit the block which is specified and append the commited transactions to the Ledger file of the corresponding Validator
     def commit(self, block_id):
-        print('Ledger: commit', block_id)
+        print('Ledger: commit block_id {} validator_id {}'.format(block_id,self.validator_id))
         if block_id not in self.id_to_block:
             print('Ledger: commit: did not commit', None)
             return

@@ -48,6 +48,7 @@ class NetworkPlayground(process):
 
     def receive(msg=('Timeout', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Timeout", "msg", p)
+        print("Playground: Received  from {} {}".format(self.validators.index(p),p))
         if self.completed:
             print("Timeout ")
             return
@@ -76,6 +77,7 @@ class NetworkPlayground(process):
 
     def receive(msg=('Proposal', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Proposal", "msg", p)
+        print("Playground: Received  from {} {}".format(self.validators.index(p),p))
         if self.completed:
             print("Proposal")
             return
@@ -101,6 +103,7 @@ class NetworkPlayground(process):
 
     def receive(msg=('Vote', msg), from_=p):
         LOGGER.log_event("Playground: Received  from {}".format(self.validators.index(p)), "Vote", "msg", p)
+        print("Playground: Received  from {} {}".format(self.validators.index(p),p))
         if self.completed:
             print("Vote ")
             return

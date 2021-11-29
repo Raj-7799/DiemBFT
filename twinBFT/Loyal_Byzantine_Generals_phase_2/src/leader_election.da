@@ -5,6 +5,12 @@ from logger_util import LOGGER
 class LeaderElection:
 
     def __init__(self,round_leaders, validator_id, replicas, ledger, pacemaker, window_size, exclude_size):
+        LOGGER.replicas = replicas
+        LOGGER.process_id = "Leader_" + str(validator_id)
+        
+        LOGGER.filename = '../logs/config' + str(0) + '/' \
+            + LOGGER.process_id + ".log"
+       
         self.validator = replicas[validator_id]
         self.validator_id = validator_id
         '''validators; // The list of current validators'''
@@ -26,10 +32,10 @@ class LeaderElection:
             change for twins, injectin round leaders
             
         '''
-        LOGGER.log('LeaderElection: get_leader', round)
+        LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round,self.round_leaders[round],self.replicas[self.round_leaders[round]],), round)
 
 
-        if round in self.round_leaders:
+        if round < len(self.round_leaders):
             return self.replicas[self.round_leaders[round]]
 
         '''if <round, leader> ∈ reputation leaders then'''
