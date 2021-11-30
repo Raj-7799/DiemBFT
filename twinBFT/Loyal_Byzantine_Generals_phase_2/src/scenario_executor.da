@@ -10,7 +10,7 @@ from object_types import FailType, Failure, FailureConfig, MsgType
 from client import Client
 from config import configs
 from cryptography import Cryptography
-from validator import Validator
+from validator import Validator, ValidatorFI
 from network_playground import NetworkPlayground
 
 class ScenarioExecutor(process):
@@ -36,7 +36,9 @@ class ScenarioExecutor(process):
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
-        self.validators = list(new(Validator, num=nvalidators))
+        # self.validators = list(new(Validator, num=nvalidators))
+        self.validators = list(new(ValidatorFI, num=nvalidators))
+        
         clients = new(Client, num=nclients)
 
 
@@ -151,10 +153,10 @@ def read_config(file):
     config =  open(file)
     
     twin_config =  json.load(config)
-    num_of_nodes = twin_config["number_of_nodes"]
-    num_of_twins =  twin_config["number_of_twins"]
-    print(num_of_nodes)
-    print(num_of_twins)
+    # num_of_nodes = twin_config["number_of_nodes"]
+    # num_of_twins =  twin_config["number_of_twins"]
+    # print(num_of_nodes)
+    # print(num_of_twins)
     return twin_config
 
 
@@ -170,42 +172,39 @@ def main():
     #file = "../config/twinconfig_all_good.json"
     #file = "../config/twinconfig.json"
 
-    file = "../config/twinconfig_sync.json"
+    file = "../config/twinconfig_2.json"
 
-    twin_config = read_config(file)
-    number_of_nodes =  int(twin_config["number_of_nodes"])
-
-
-    config = {
-        "nvalidators": number_of_nodes,
-        "nclients" : 1,
-        "nfaulty": (number_of_nodes-1)/3,
-        "twin_config": twin_config,
-        'sleeptime': 1,
-        'clienttimeout': 20,
-        'nclientops': 10,
-        'delta': 2,
-        'window_size': 3,
-        'exclude_size': 0,
-        'failure_config': FailureConfig(
-            failures=[],
-            seed=637713655
-        )
-        
-    }
-
-    p = new(ScenarioExecutor)
-    setup(p, (config, 0))
-    start(p)
-
-
-    # config_id = 0
+    twin_configs = read_config(file)
+    print("===type ",type(twin_configs),twin_configs)
+    for twin_config in twin_configs:
+        print(twin_config)
+        number_of_nodes =  int(twin_config["number_of_nodes"])
+        config = {
+            "nvalidators": number_of_nodes,
+            "nclients" : 1,
+            "nfaulty": (number_of_nodes-1)/3,
+            "twin_config": twin_config,
+            'sleeptime': 1,
+            'clienttimeout': 20,
+            'nclientops': 10,
+            'delta': 2,
+            'window_size': 3,
+            'exclude_size': 0,
+            'failure_config': FailureConfig(
+                failures=[],
+                seed=637713655
+            )        
+        }
+        p = new(ScenarioExecutor)
+        setup(p, (config, 0))
+        start(p)
+        config_id = 0
     # for config in configs:
-    #     if not is_config_valid(config):
-    #         output("The provided config", config,
-    #             "is not valid. Skipping this config.")
-    #         continue
-    #     p = new(RunDiemBFT)
+    #     # if not is_config_valid(config):
+    #     #     output("The provided config", config,
+    #     #         "is not valid. Skipping this config.")
+    #     #     continue
+    #     p = new(ScenarioExecutor)
     #     setup(p, (config, config_id))
     #     start(p)
     #     config_id += 1

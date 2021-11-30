@@ -258,7 +258,7 @@ class Validator (process):
         '''
         msg,sender,self.partition_round= vote_msg
         vote_msg=msg
-        LOGGER.log_event("Received from {}".format(sender), "Vote", vote_msg, p)
+        LOGGER.log_event("Received from {} ".format(sender), "Vote", vote_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
             vote_msg.signature, public_keys_validators[self.replicas[sender]])

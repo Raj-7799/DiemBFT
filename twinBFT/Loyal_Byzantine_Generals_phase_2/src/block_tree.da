@@ -29,7 +29,7 @@ class BlockTree:
     # This function inserts the given block into the Ledger's speculate tree and also into pending block tree as well
 
     def execute_and_insert(self, block):
-        print('BlockTree: execute_and_insert block_id {} block_msg {} at validator {} '.format(block.id,block.payload,self.validator_id))
+        LOGGER.log('BlockTree: execute_and_insert block_id {} block_msg {} at validator {} '.format(block.id,block.payload,self.validator_id))
         self.id_block[block.id] = block
         if block.qc is None:
             '''Ledger.speculate(b.qc.block id, b.id, b.payload)'''
@@ -45,18 +45,18 @@ class BlockTree:
 
             '''pending block tree.add(b)'''
             if block.qc.vote_info.id not in self.id_block or self.id_block[block.qc.vote_info.id] not in self.pending_block_tree:
-                # print("Not in the self.pendingtree", block.qc.vote_info.id)
-                print(
+                # LOGGER.log("Not in the self.pendingtree", block.qc.vote_info.id)
+                LOGGER.log(
                     'BlockTree: execute_and_insert ends without adding anything', block)
                 return
             self.pending_block_tree[self.id_block[block.qc.vote_info.id]].append(
                 block)
             self.pending_block_tree[block] = []
-        print('BlockTree: execute_and_insert ends', block)
+        LOGGER.log('BlockTree: execute_and_insert ends', block)
 
     # This will generate a block with the given parameters
     def generate_block(self, txns, current_round):
-        print('BlockTree: generate_block ', txns, current_round,self.validator_id)
+        LOGGER.log('BlockTree: generate_block ', txns, current_round,self.validator_id)
         qc = self.high_qc
         if qc is None:
             id = Cryptography.hash(self.validator_id, current_round,
@@ -77,14 +77,14 @@ class BlockTree:
             self.high_qc,
             id
         )
-        print('BlockTree: generate_block: returns', block)
+        LOGGER.log('BlockTree: generate_block: returns', block)
         return block
 
     '''Function process vote(v)'''
     # This funciton will check if it has reached received 2*f +1 votes and generates a QC when it is acheived and returns the qc
 
     def process_vote(self, vote_msg):
-        print('BlockTree: process_vote', vote_msg,self.validator_id)
+        LOGGER.log('BlockTree: process_vote', vote_msg,self.validator_id)
         '''process qc(v.high commit qc)'''
         self.process_qc(vote_msg.high_commit_qc)
         '''vote idx ← hash(v.ledger commit info)'''
@@ -112,10 +112,10 @@ class BlockTree:
                 author=self.validator_id,
                 signers=self.pending_signers[vote_idx]
             )
-            print('BlockTree: process_vote: returns', qc)
+            LOGGER.log('BlockTree: process_vote: returns', qc)
             return qc
 
-        print('BlockTree: process_vote: returns', None, len(self.pending_votes[vote_idx]))
+        LOGGER.log('BlockTree: process_vote: returns', None, len(self.pending_votes[vote_idx]))
         '''return ⊥'''
         return None
 
@@ -123,7 +123,7 @@ class BlockTree:
     # Process_qc will check if qc.ledger_commit_info.commit_state_id is not none and commits the qc.vote_info.parent_id block and also prunes the pending block tree
 
     def process_qc(self, qc):
-        print('BlockTree: process_qc', qc,self.validator_id)
+        LOGGER.log('BlockTree: process_qc', qc,self.validator_id)
         '''if qc.ledger commit info.commit state id 6= ⊥ then'''
         if qc is not None and qc.ledger_commit_info.commit_state_id != None:
             '''Ledger.commit(qc.vote info.parent id)'''
@@ -169,4 +169,4 @@ class BlockTree:
                 qc, self.high_commit_qc)
         '''high qc ← maxround{qc, high qc}'''
         self.high_qc = get_qc_with_max_round(qc, self.high_qc)
-        print('BlockTree: process_qc ends', qc)
+        LOGGER.log('BlockTree: process_qc ends', qc)
