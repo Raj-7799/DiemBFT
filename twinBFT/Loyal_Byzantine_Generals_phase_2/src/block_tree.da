@@ -29,7 +29,7 @@ class BlockTree:
     # This function inserts the given block into the Ledger's speculate tree and also into pending block tree as well
 
     def execute_and_insert(self, block):
-        print('BlockTree: execute_and_insert', block,self.validator_id)
+        print('BlockTree: execute_and_insert block_id {} block_msg {} at validator {} '.format(block.id,block.payload,self.validator_id))
         self.id_block[block.id] = block
         if block.qc is None:
             '''Ledger.speculate(b.qc.block id, b.id, b.payload)'''
@@ -56,7 +56,7 @@ class BlockTree:
 
     # This will generate a block with the given parameters
     def generate_block(self, txns, current_round):
-        print('BlockTree: generate_block', txns, current_round,self.validator_id)
+        print('BlockTree: generate_block ', txns, current_round,self.validator_id)
         qc = self.high_qc
         if qc is None:
             id = Cryptography.hash(self.validator_id, current_round,
