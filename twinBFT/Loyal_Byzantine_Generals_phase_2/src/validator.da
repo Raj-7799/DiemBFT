@@ -263,6 +263,14 @@ class Validator (process):
         signature_verified = Cryptography.get_verified_message(
             vote_msg.signature, public_keys_validators[self.replicas[sender]])
 
+        p = self.replicas[sender]
+
+        if vote_msg.vote_info.round > self.pacemaker.current_round:
+            if p!=self.replicas[self.validator_id]:
+                LOGGER.log("SyncRequest trigged on recieving Vote msg  pacemaker round {} vote round {} to {}".format(self.pacemaker.current_round,vote_msg.vote_info.round, sender))
+                check_for_sync(vote_msg.vote_info.round, p)
+            return
+        
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
 
@@ -294,10 +302,11 @@ class Validator (process):
         # extract round info, (qc.vote_info.round) compare with pacemaker round (ideally use high commit qc)
         # send sync based on compare (send to sender, high_commit_qc) , 
         # reciever to send proposal to the lagging node
-        if(timeout_msg.tmo_info is not None):
+        if(timeout_msg.tmo_info is not None) and timeout_msg.tmo_info.round > self.pacemaker.current_round:
             if self.replicas[sender]!=self.replicas[self.validator_id]:
-                LOGGER.log("SyncRequest trigged on recieving Timeout pacemaker round {} ".format(self.pacemaker.current_round))
+                LOGGER.log("SyncRequest trigged on recieving Timeout with round {} and current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
                 check_for_sync(timeout_msg.tmo_info.round,self.replicas[sender])
+                return
         
         signature_verified = Cryptography.get_verified_message(
             timeout_msg.tmo_info.author_signature, public_keys_validators[self.replicas[sender]])
@@ -317,7 +326,7 @@ class Validator (process):
             tc = self.pacemaker.process_remote_timeout(timeout_msg)
             '''if tc != ⊥ then'''
             if tc is not None:
-                LOGGER.log_action("Generated a Timeout Certificate", tc)
+                LOGGER.log_action("Generated a Timeout Certificate at round {}".format(self.pacemaker.current_round), tc)
                 '''process certificate qc(qc)
                 process new round event(⊥)'''
                 self.pacemaker.advance_round_tc(tc)
