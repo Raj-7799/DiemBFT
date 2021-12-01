@@ -358,6 +358,7 @@ class Validator (process):
                 send(('Proposal', proposal_msg), to=p)
             else:
                 LOGGER.log_event("round in qc {} Not Replying to SyncRequest ".format(r),"Proposal", "",p)
+                break
 
     def receive(msg=('Request', signed_req), from_=client):
         req = Cryptography.get_verified_message(
