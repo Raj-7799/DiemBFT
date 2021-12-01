@@ -179,7 +179,7 @@ class NetworkPlayground(process):
         
         current_round = request["current_round"]
 
-        if current_round == len(self.partitions)+1:
+        if current_round == len(self.partitions):#+1:
             self.completed = True
 
         LOGGER.log("===== completed {} ".format(self.completed))
