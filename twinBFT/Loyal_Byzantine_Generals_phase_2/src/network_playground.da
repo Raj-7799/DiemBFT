@@ -1,7 +1,7 @@
 import json
 from logger_util import LOGGER
 from collections import defaultdict
-
+import time
 
 class NetworkPlayground(process):
 
@@ -24,6 +24,14 @@ class NetworkPlayground(process):
         self.validators =validators 
         self.state = defaultdict(dict)
         self.completed = False
+        if "delay_round_msg" in twin_config:
+            self.delay_round = twin_config["delay_round_msg"]
+        else:
+            self.delay_round={}
+        print("self.delay_round ",self.delay_round,type(self.delay_round))
+        print("self.delay_round ",self.delay_round,type(self.delay_round))
+
+        # round_number: type_of_msg_to_delay
 
         print("Validators count {} {}".format(len(validators), number_of_nodes))
 
@@ -47,7 +55,7 @@ class NetworkPlayground(process):
 
 
     def receive(msg=('Timeout', msg), from_=p):
-        LOGGER.log_event("Playground: Received  from {} for round {}".format(self.validators.index(p),msg["current_round"]), "Timeout", "msg", p)
+        LOGGER.log_event("Playground: Received  from {} for round {}".format( msg["from"],msg["current_round"]), "Timeout", "msg", p)
         print("Playground: Received  from {} {}".format(self.validators.index(p),p))
         if self.completed:
             print("Timeout ")
@@ -66,6 +74,11 @@ class NetworkPlayground(process):
 
         }
 
+        if len(self.delay_round) and str(msg["current_round"]) in self.delay_round and "Timeout" in self.delay_round[str(msg["current_round"])]:
+            LOGGER.log_event("Playground: sleep before sending Timeout request from {} to  all for round {}".format(msg["from"],msg["current_round"]), "Timeout", msg["payload"],p)
+            time.sleep(15)
+
+
         process_request(request)
         
         # else:
@@ -75,7 +88,7 @@ class NetworkPlayground(process):
 
 
     def receive(msg=('Proposal', msg), from_=p):
-        LOGGER.log_event("Playground: Received  from {} for round {} ".format(self.validators.index(p),msg["current_round"]), "Proposal", "msg", p)
+        LOGGER.log_event("Playground: Received  from {} for round {} ".format( msg["from"],msg["current_round"]), "Proposal", "msg", p)
         print("Playground: Received  from {} {}".format(self.validators.index(p),p))
         if self.completed:
             print("Proposal")
@@ -92,16 +105,17 @@ class NetworkPlayground(process):
             "payload": msg["payload"],
             "current_round":msg["current_round"],
             "is_broadcast": True
-
-
-
         }
+
+        if len(self.delay_round) and str(msg["current_round"]) in self.delay_round and "Proposal" in self.delay_round[str(msg["current_round"])]:
+            LOGGER.log_event("Playground: sleep before sending Proposal request from  {} to all for round {}".format(msg["from"],msg["current_round"]), "Proposal", msg["payload"],p)
+            time.sleep(15)
         process_request(request)
         # print("current_round=========== ",current_round)
 
     def receive(msg=('Vote', msg), from_=p):
-        LOGGER.log_event("Playground: Received  from {} for round {} ".format(self.validators.index(p),msg["current_round"]), "Vote", "msg", p)
-        print("Playground: Received  from {} {}".format(self.validators.index(p),p))
+        LOGGER.log_event("Playground: Received  from {} for round {} ".format(msg["from"],msg["current_round"]), "Vote", "msg", p)
+        print("Playground: Received  from {} {}".format(msg["from"],p))
         if self.completed:
             print("Vote ")
             return
@@ -120,6 +134,12 @@ class NetworkPlayground(process):
             "is_broadcast": False
 
         }
+        # print("Vote" in self.delay_round[str(msg["current_round"])], str(msg["current_round"]) in self.delay_round)
+        if len(self.delay_round) and (str(msg["current_round"]) in self.delay_round) and ("Vote" in self.delay_round[str(msg["current_round"])]):
+            LOGGER.log_event("Playground: sleep before sending Vote request from  {} to {}  for round {}".format(msg["from"],self.validators.index(msg["to"]),msg["current_round"]), "Proposal", msg["payload"],p)
+            time.sleep(15)
+
+
         process_request(request)
         
         # else:
@@ -162,13 +182,12 @@ class NetworkPlayground(process):
                 if same_partition(current_round,network_partition,sender_id, node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from  {} to {} for round {}".format(sender_id,node_id,current_round), request_type, payload, node)
                     print("Playground: process_request Round: {}  Send request {} to {}  {}".format(current_round,sender_id,node_id, request_type))
-
+ 
                     send((request_type, (payload,sender_id,current_round)), to=node)
 
                 if twin_id < len(self.validators) and same_partition(current_round,network_partition,twin_id,node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from Twin  {} to {} for round {}".format(twin_id,node_id,current_round), request_type, payload, node)
                     print("Playground: process_request Round: {} Send request twin : {} to {}   {} ".format(current_round,twin_id,node_id, request_type))
-                    
                     send((request_type, (payload,twin_id,current_round)), to=node)
               
                 
@@ -193,7 +212,6 @@ class NetworkPlayground(process):
             if receiverID+self.number_of_nodes < len(self.validators) and same_partition(current_round,network_partition,sender_id,receiverID+self.number_of_nodes):
                 LOGGER.log_event("Playground: process_request Send request {} to {} for round {}".format(sender_id,receiverID+self.number_of_nodes,round), request_type, payload, _to)
                 print("Playground: process_request Round: {}  Send request {} to twin : {}  {}".format(current_round,sender_id,receiverID+self.number_of_nodes , request_type))
-
                 send((request_type, (payload,sender_id,current_round)), to=self.validators[receiverID+self.number_of_nodes])
             
         
