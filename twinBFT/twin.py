@@ -285,28 +285,38 @@ def generateScenarios():
         drop_dict = {}
         delay_dict = {}
         for i in range (1, R+1):
-            drop_dict[i]=[{"VoteMsg":[]}, {"Proposal":[]},  {"Timeout":[]}]
-        for r in range (1, R-2):
-            for n in range(0, total_nodes):
-                if randint(0, 4) == 1:
-                    drop_dict[r][0]["VoteMsg"].append(n)
-                if randint(0, 4) == 1:
-                    drop_dict[r][1]["Proposal"].append(n)
-                if randint(0, 4) == 1:
-                    drop_dict[r][2]["Timeout"].append(n)
-        drop_dict={"Drop":drop_dict}
+            drop_dict[i]={}
         for i in range (1, R+1):
-            delay_dict[i]=[{"VoteMsg":[]}, {"Proposal":[]},  {"Timeout":[]}]
+            drop_dict[i]["Vote"]=[]
+            drop_dict[i]["Proposal"]=[]
+            drop_dict[i]["Timeout"]=[]
         
-        for r in range (1, R-2):
-            for n in range(0, total_nodes):
-                if randint(0, 4) == 1:
-                    delay_dict[r][0]["VoteMsg"].append(n)
-                if randint(0, 4) == 1:
-                    delay_dict[r][1]["Proposal"].append(n)
-                if randint(0, 4) == 1:
-                    delay_dict[r][2]["Timeout"].append(n)
-        delay_dict={"Delay":delay_dict}
+        # for r in range (1, R-2):
+        #     for n in range(0, total_nodes):
+        #         if randint(0, 4) == 1:
+        #             drop_dict[r]["Vote"].append(n)
+        #         if randint(0, 4) == 1:
+        #             drop_dict[r]["Proposal"].append(n)
+        #         if randint(0, 4) == 1:
+        #             drop_dict[r]["Timeout"].append(n)
+        drop_dict={"drop_round_msg":drop_dict}
+        # print(drop_dict)
+        for i in range (1, R+1):
+            delay_dict[i]={}
+        for i in range (1, R+1):
+            delay_dict[i]["Vote"]=[]
+            delay_dict[i]["Proposal"]=[]
+            delay_dict[i]["Timeout"]=[]
+        
+        # for r in range (1, R-2):
+        #     for n in range(0, total_nodes):
+        #         if randint(0, 4) == 1:
+        #             delay_dict[r]["Vote"].append(n)
+        #         if randint(0, 4) == 1:
+        #             delay_dict[r]["Proposal"].append(n)
+        #         if randint(0, 4) == 1:
+        #             delay_dict[r]["Timeout"].append(n)
+        delay_dict={"delay_round_msg":delay_dict}
         dict_json_object_str = json.dumps(drop_dict)
         # print(type(scenario_json_object_str))
         dict_json_object = json.loads(dict_json_object_str)

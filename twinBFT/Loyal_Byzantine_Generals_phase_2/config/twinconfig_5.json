@@ -4,15 +4,28 @@
         "number_of_nodes": 4,
         "number_of_twins": 1,
         "round_leaders": {
+            "0" : 1,
             "1" : 1,
             "2" : 1,
             "3" : 1,
             "4" : 1,
-            "5" : 1,
-            "6" : 3,
-            "7" : 2
+            "5" : 3,
+            "6" : 2
         },
         "round_partitions": {
+            "0" : [
+                [
+                    [
+                        0,
+                        1,
+                        2
+                    ],
+                    [
+                        3,
+                        4
+                    ]
+                ]
+            ],
             "1" : [
                 [
                     [
@@ -52,20 +65,7 @@
                     ]
                 ]
             ],
-            "4" : [
-                [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
-                ]
-            ],
-            "5" :  [
+            "4" :  [
                 [
                     [
                         4,
@@ -78,7 +78,7 @@
                     ]
                 ]
             ],
-            "6" : [
+            "5" : [
                 [
                     [
                         0,
@@ -92,111 +92,227 @@
                 ]
             ]
         },
-        "Drop":{
-            "1":[
-                {
-                   "VoteMsg":[
-                      
-                   ]
-                },
-                {
-                   "Proposal":[
-                      
-                   ]
-                },
-                {
-                   "Timeout":[
-                      
-                   ]
-                }
-             ],
-             "2":[
-                {
-                   "VoteMsg":[
-                      
-                   ]
-                },
-                {
-                   "Proposal":[
-                      
-                   ]
-                },
-                {
-                   "Timeout":[
-                      0,
-                      2
-                   ]
-                }
-             ],
-             "3":[
-                {
-                   "VoteMsg":[
-                      
-                   ]
-                },
-                {
-                   "Proposal":[
-                      1
-                   ]
-                },
-                {
-                   "Timeout":[
-                      
-                   ]
-                }
-             ],
-             "4":[
-                {
-                   "VoteMsg":[
-                      
-                   ]
-                },
-                {
-                   "Proposal":[
-                      
-                   ]
-                },
-                {
-                   "Timeout":[
-                      
-                   ]
-                }
-             ],
-             "5":[
-                {
-                   "VoteMsg":[
-                      2
-                   ]
-                },
-                {
-                   "Proposal":[
-                      
-                   ]
-                },
-                {
-                   "Timeout":[
-                      
-                   ]
-                }
-             ],
-             "6":[
-                {
-                   "VoteMsg":[
-                      0
-                   ]
-                },
-                {
-                   "Proposal":[
-                      1
-                   ]
-                },
-                {
-                   "Timeout":[
-                      2
-                   ]
-                }
-             ]
-        }
+        "drop_round_msg":{
+            "1":{
+               "Vote":[
+
+               ],
+               "Proposal":[
+               ],
+               "Timeout":[
+               ]
+            },
+            "2":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "3":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "4":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "5":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "6":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "7":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "8":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "9":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "10":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            }
+         },
+         "delay_round_msg":{
+            "1":{
+               "Vote":[
+
+               ],
+               "Proposal":[
+
+               ],
+               "Timeout":[
+               ]
+            },
+            "2":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "3":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "4":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "5":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "6":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "7":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "8":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "9":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            },
+            "10":{
+               "Vote":[
+                  
+               ],
+               "Proposal":[
+                  
+               ],
+               "Timeout":[
+                  
+               ]
+            }
+         }
     }
 ]
 

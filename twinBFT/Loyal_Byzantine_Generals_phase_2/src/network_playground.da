@@ -7,7 +7,6 @@ class NetworkPlayground(process):
 
 
     def setup(twin_config:dict,validators,number_of_nodes:int,public_keys_validators,public_keys_clients):
-
         config_id=0
         LOGGER.process_id = "NetworkPlayGround"
         LOGGER.filename = '../logs/config' + str(config_id) + '/' \
@@ -80,14 +79,14 @@ class NetworkPlayground(process):
 
         }
 
-        if len(self.delay_round) and str(msg["current_round"]) in self.delay_round and "Timeout" in self.delay_round[str(msg["current_round"])]:
-            LOGGER.log_event("Playground: sleep before sending Timeout request from {} to  all for round {}".format(msg["from"],msg["current_round"]), "Timeout", msg["payload"],p)
-            time.sleep(15)
+        if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
+            print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            time.sleep(5)
 
-        
-        if len(self.drop_round) and str(msg["current_round"]) in self.drop_round and "Timeout" in self.drop_round[str(msg["current_round"])]:
-            LOGGER.log_event("Playground: drop message Timeout request sent from {} to  all for round {}".format(msg["from"],msg["current_round"]), "Timeout", msg["payload"],p)
-
+        if msg["from"] in self.drop_round[str(msg["current_round"])][request["type"]]:
+            print("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
             return
 
 
@@ -119,11 +118,14 @@ class NetworkPlayground(process):
             "is_broadcast": True
         }
 
-        if len(self.delay_round) and str(msg["current_round"]) in self.delay_round and "Proposal" in self.delay_round[str(msg["current_round"])]:
-            LOGGER.log_event("Playground: sleep before sending Proposal request from  {} to all for round {}".format(msg["from"],msg["current_round"]), "Proposal", msg["payload"],p)
-            time.sleep(15)
-        if len(self.drop_round) and str(msg["current_round"]) in self.drop_round and "Proposal" in self.drop_round[str(msg["current_round"])]:
-            LOGGER.log_event("Playground: drop message Proposal request sent from  {} to all for round {}".format(msg["from"],msg["current_round"]), "Proposal", msg["payload"],p)
+        if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
+            print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            time.sleep(5)
+
+        if msg["from"] in self.drop_round[str(msg["current_round"])][request["type"]]:
+            print("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
             return
 
         process_request(request)
@@ -150,13 +152,14 @@ class NetworkPlayground(process):
             "is_broadcast": False
 
         }
-        # print("Vote" in self.delay_round[str(msg["current_round"])], str(msg["current_round"]) in self.delay_round)
-        if len(self.delay_round) and (str(msg["current_round"]) in self.delay_round) and ("Vote" in self.delay_round[str(msg["current_round"])]):
-            LOGGER.log_event("Playground: sleep before sending Vote request from  {} to {}  for round {}".format(msg["from"],self.validators.index(msg["to"]),msg["current_round"]), "Proposal", msg["payload"],p)
-            time.sleep(15)
+        if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
+            print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            time.sleep(5)
 
-        if len(self.drop_round) and (str(msg["current_round"]) in self.drop_round) and ("Vote" in self.drop_round[str(msg["current_round"])]):
-            LOGGER.log_event("Playground: drop message Vote request sent from  {} to {}  for round {}".format(msg["from"],self.validators.index(msg["to"]),msg["current_round"]), "Proposal", msg["payload"],p)
+        if msg["from"] in self.drop_round[str(msg["current_round"])][request["type"]]:
+            print("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
             return
 
         process_request(request)
@@ -186,6 +189,7 @@ class NetworkPlayground(process):
 
         LOGGER.log("=====current_round {} message_type {} from {} to {}".format(current_round,request_type,_from,_to))
         network_partition =  self.partitions[current_round-1]
+        # network_partition =  self.partitions[current_round]
 
         LOGGER.log(request,payload)
 

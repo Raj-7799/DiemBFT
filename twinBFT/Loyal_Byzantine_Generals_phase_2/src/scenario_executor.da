@@ -22,7 +22,6 @@ class ScenarioExecutor(process):
         self.twin_config=config['twin_config']
         self.round_leaders =self.twin_config['round_leaders'] 
         config['round_leaders']=self.round_leaders
-        print("ScenarioExecutor ")
         del config['twin_config']
         self.exit=False
 
@@ -32,7 +31,7 @@ class ScenarioExecutor(process):
         public_keys_validators = {}
         private_keys_clients = {}
         public_keys_clients = {}
-
+        
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
@@ -43,23 +42,21 @@ class ScenarioExecutor(process):
 
 
 
-
         ntwins = int(twin_config["number_of_twins"])
 
         self.twins =  new(Validator,num=ntwins)
 
 
         self.network_playground =  new(NetworkPlayground,num=1)
-        config['network_playground']=network_playground
+        config['network_playground']=self.network_playground
 
-        
         all_nodes=list()
         for i,v in enumerate(validators):
             private_key, public_key = Cryptography.generate_key()
             private_keys_validators[v] = private_key
             public_keys_validators[v] = public_key
             all_nodes.append(v)
-
+        
         twin_node_cache = {}
         for i, v in enumerate(twins,start=len(validators)):
             private_keys_validators[v]=private_keys_validators[validators[i-len(validators)]]
@@ -67,7 +64,6 @@ class ScenarioExecutor(process):
             twin_node_cache[i]=v
             # all_nodes[i]=v
             all_nodes.append(v)
-
         print(private_keys_validators)
 
         for c in clients:
@@ -75,11 +71,12 @@ class ScenarioExecutor(process):
             private_keys_clients[c] = private_key
             public_keys_clients[c] = public_key
 
-
+        
         # all_nodes = list(validators)+list(twins)
         for i, v in enumerate(all_nodes):
             setup({v}, (config, config_id, i, all_nodes, list(clients),
                         private_keys_validators[v], public_keys_validators, public_keys_clients))
+       
         print("all_nodes  ",all_nodes)
         
         # for i, v in enumerate(twins,start=len(validators)):
@@ -95,13 +92,13 @@ class ScenarioExecutor(process):
                         private_keys_clients[c], public_keys_validators))
 
         
-
         setup(network_playground, (twin_config,all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
-
+        
         start(network_playground)
         start(validators)
         start(twins)
         start(clients)
+        
         # await(each(c in clients, has=received(('Done',), from_=c)) or (received(('DonePlayground',), from_=network_playground)))
         print("Awaiting for Playground to exit")
         await(some(received(('DonePlayground',))))
@@ -152,12 +149,18 @@ def read_config(file):
     """
     config =  open(file)
     
-    twin_config =  json.load(config)
+    twin_configs =  json.load(config)
     # num_of_nodes = twin_config["number_of_nodes"]
     # num_of_twins =  twin_config["number_of_twins"]
     # print(num_of_nodes)
     # print(num_of_twins)
-    return twin_config
+    for twin_config in twin_configs:
+        # print("read-config")
+        # print("===type ",type(twin_config),twin_config)
+        twin_config["round_leaders"] = list(twin_config["round_leaders"].values())
+        twin_config["round_partitions"] = list(twin_config["round_partitions"].values())
+    # print(twin_config["round_leaders"].values())
+    return twin_configs
 
 
 def main():
@@ -172,7 +175,7 @@ def main():
     #file = "../config/twinconfig_all_good.json"
     #file = "../config/twinconfig.json"
 
-    file = "../config/twinconfig_4.json"
+    file = "../config/twinconfig_5.json"
 
     twin_configs = read_config(file)
     # print("===type ",type(twin_configs),twin_configs)
@@ -195,16 +198,16 @@ def main():
                 seed=637713655
             )        
         }
-        p = new(ScenarioExecutor)
-        setup(p, (config, 0))
-        start(p)
+        # p = new(ScenarioExecutor)
+        # setup(p, (config, 0))
+        # start(p)
         config_id = 0
     # for config in configs:
     #     # if not is_config_valid(config):
     #     #     output("The provided config", config,
     #     #         "is not valid. Skipping this config.")
     #     #     continue
-    #     p = new(ScenarioExecutor)
-    #     setup(p, (config, config_id))
-    #     start(p)
+        p = new(ScenarioExecutor)
+        setup(p, (config, config_id))
+        start(p)
     #     config_id += 1

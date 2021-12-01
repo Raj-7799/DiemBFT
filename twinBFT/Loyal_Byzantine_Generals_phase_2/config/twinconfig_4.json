@@ -12,16 +12,6 @@
             3,
             2
         ],
-        "delay_round_msg": {
-            "6": [
-                "Vote"
-            ]
-        },
-        "drop_round_msg": {
-            "4": [
-                "Proposal"
-            ]
-        },
         "round_partitions": [
             [
                 [
@@ -101,7 +91,17 @@
                     ]
                 ]
             ]
-        ]
+        ],
+        "delay_round_msg": {
+            "6": [
+                "Vote"
+            ]
+        },
+        "drop_round_msg": {
+            "4": [
+                "Proposal"
+            ]
+        }
     }
 ]
 
