@@ -9,12 +9,17 @@
             1,
             1,
             1,
-            2,
-            3
+            3,
+            2
         ],
         "delay_round_msg": {
-            "4": [
+            "6": [
                 "Vote"
+            ]
+        },
+        "drop_round_msg": {
+            "4": [
+                "Proposal"
             ]
         },
         "round_partitions": [
@@ -95,7 +100,7 @@
                         4
                     ]
                 ]
-            ],
+            ]
         ]
     }
 ]

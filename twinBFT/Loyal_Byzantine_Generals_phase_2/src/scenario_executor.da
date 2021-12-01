@@ -172,7 +172,7 @@ def main():
     #file = "../config/twinconfig_all_good.json"
     #file = "../config/twinconfig.json"
 
-    file = "../config/twinconfig_3.json"
+    file = "../config/twinconfig_4.json"
 
     twin_configs = read_config(file)
     # print("===type ",type(twin_configs),twin_configs)

@@ -28,6 +28,12 @@ class NetworkPlayground(process):
             self.delay_round = twin_config["delay_round_msg"]
         else:
             self.delay_round={}
+
+        if "drop_round_msg" in twin_config:
+            self.drop_round = twin_config["drop_round_msg"]
+        else:
+            self.drop_round={}
+        
         print("self.delay_round ",self.delay_round,type(self.delay_round))
         print("self.delay_round ",self.delay_round,type(self.delay_round))
 
@@ -78,6 +84,12 @@ class NetworkPlayground(process):
             LOGGER.log_event("Playground: sleep before sending Timeout request from {} to  all for round {}".format(msg["from"],msg["current_round"]), "Timeout", msg["payload"],p)
             time.sleep(15)
 
+        
+        if len(self.drop_round) and str(msg["current_round"]) in self.drop_round and "Timeout" in self.drop_round[str(msg["current_round"])]:
+            LOGGER.log_event("Playground: drop message Timeout request sent from {} to  all for round {}".format(msg["from"],msg["current_round"]), "Timeout", msg["payload"],p)
+
+            return
+
 
         process_request(request)
         
@@ -110,6 +122,10 @@ class NetworkPlayground(process):
         if len(self.delay_round) and str(msg["current_round"]) in self.delay_round and "Proposal" in self.delay_round[str(msg["current_round"])]:
             LOGGER.log_event("Playground: sleep before sending Proposal request from  {} to all for round {}".format(msg["from"],msg["current_round"]), "Proposal", msg["payload"],p)
             time.sleep(15)
+        if len(self.drop_round) and str(msg["current_round"]) in self.drop_round and "Proposal" in self.drop_round[str(msg["current_round"])]:
+            LOGGER.log_event("Playground: drop message Proposal request sent from  {} to all for round {}".format(msg["from"],msg["current_round"]), "Proposal", msg["payload"],p)
+            return
+
         process_request(request)
         # print("current_round=========== ",current_round)
 
@@ -139,6 +155,9 @@ class NetworkPlayground(process):
             LOGGER.log_event("Playground: sleep before sending Vote request from  {} to {}  for round {}".format(msg["from"],self.validators.index(msg["to"]),msg["current_round"]), "Proposal", msg["payload"],p)
             time.sleep(15)
 
+        if len(self.drop_round) and (str(msg["current_round"]) in self.drop_round) and ("Vote" in self.drop_round[str(msg["current_round"])]):
+            LOGGER.log_event("Playground: drop message Vote request sent from  {} to {}  for round {}".format(msg["from"],self.validators.index(msg["to"]),msg["current_round"]), "Proposal", msg["payload"],p)
+            return
 
         process_request(request)
         
