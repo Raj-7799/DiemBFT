@@ -32,9 +32,9 @@ class LeaderElection:
             change for twins, injectin round leaders
             
         '''
-        LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round, self.round_leaders[round - 1],self.replicas[self.round_leaders[round - 1]],), round)
 
         if round - 1 < len(self.round_leaders):
+            LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round, self.round_leaders[round - 1],self.replicas[self.round_leaders[round - 1]],), round)
             return self.replicas[self.round_leaders[round - 1]]
 
         '''if <round, leader> ∈ reputation leaders then'''
