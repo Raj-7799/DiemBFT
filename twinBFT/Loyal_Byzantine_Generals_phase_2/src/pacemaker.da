@@ -73,7 +73,7 @@ class Pacemaker:
     '''Procedure local timeout round()'''
 
     def local_timeout_round(self):
-        LOGGER.log('Pacemaker: local_timeout_round', [])
+        LOGGER.log('Pacemaker: local_timeout_round at round {}'.format(self.current_round), [])
         '''timeout info ← Safety.make timeout(current round, Block-Tree.high qc, last round tc)'''
         timeout_info = self.safety.make_timeout(
             self.current_round, self.blocktree.high_qc, self.last_round_tc)
@@ -84,7 +84,6 @@ class Pacemaker:
                 timeout_info, self.last_round_tc, self.blocktree.high_commit_qc)
             LOGGER.log("Timeout Msg parameters", timeout_info,
                        self.last_round_tc, self.blocktree.high_commit_qc)
-            self.start_timeout_timer(timeout_msg)
             # Broadcast the timeout message
             self.send_timeout_msg(timeout_msg)
 
