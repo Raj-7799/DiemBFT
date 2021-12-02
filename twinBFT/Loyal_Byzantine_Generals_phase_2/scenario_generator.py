@@ -293,7 +293,11 @@ def generateScenarios():
 
 
 generateScenarios()
-for item in array_of_scenarios:
-    print(item)
+
+for i in range(0, S):
+    filename = "config/twin_" + str(i) + ".json"
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(array_of_scenarios[i], f, ensure_ascii=False, indent=2)
+    print(array_of_scenarios[i])
     print("\n")
 

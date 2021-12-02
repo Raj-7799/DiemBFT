@@ -147,20 +147,14 @@ def read_config(file):
     """
         Reading Config file 
     """
-    config =  open(file)
-    
-    twin_configs =  json.load(config)
-    # num_of_nodes = twin_config["number_of_nodes"]
-    # num_of_twins =  twin_config["number_of_twins"]
-    # print(num_of_nodes)
-    # print(num_of_twins)
-    for twin_config in twin_configs:
-        # print("read-config")
-        # print("===type ",type(twin_config),twin_config)
+    # config =  open(file)
+    with open(file, 'r') as json_file:
+        twin_config = json.load(json_file)
+        # print(twin_config)
         twin_config["round_leaders"] = list(twin_config["round_leaders"].values())
         twin_config["round_partitions"] = list(twin_config["round_partitions"].values())
-    # print(twin_config["round_leaders"].values())
-    return twin_configs
+        # print(twin_config["round_leaders"].values())
+        return twin_config
 
 
 def main():
@@ -170,16 +164,19 @@ def main():
 
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
-
     #file = "../config/twinconfig.json"
     #file = "../config/twinconfig_all_good.json"
     #file = "../config/twinconfig.json"
-
-    file = "../config/twinconfig_5.json"
-
-    twin_configs = read_config(file)
-    # print("===type ",type(twin_configs),twin_configs)
-    for twin_config in twin_configs:
+    if len(sys.argv) < 2:
+        print("Please insert a config file")
+    files=sys.argv[1:]
+    # print(files)
+    config_id = 0
+    for file in files:
+        file = "../config/" + file
+        print("Running config file: " + str(file))
+        # twin_configs = json.load(file)
+        twin_config = read_config(file)
         print(twin_config)
         number_of_nodes =  int(twin_config["number_of_nodes"])
         config = {
@@ -198,16 +195,7 @@ def main():
                 seed=637713655
             )        
         }
-        # p = new(ScenarioExecutor)
-        # setup(p, (config, 0))
-        # start(p)
-        config_id = 0
-    # for config in configs:
-    #     # if not is_config_valid(config):
-    #     #     output("The provided config", config,
-    #     #         "is not valid. Skipping this config.")
-    #     #     continue
         p = new(ScenarioExecutor)
         setup(p, (config, config_id))
         start(p)
-    #     config_id += 1
+        config_id += 1
