@@ -192,4 +192,5 @@ Module ScenarioGenerator{
     
     return final_assignments
   }
+  
 }
