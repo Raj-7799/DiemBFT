@@ -9,6 +9,7 @@ from object_types import FailType, Failure, FailureConfig, MsgType
 
 from client import Client
 from config import configs
+from logger_util import LOGGER
 from cryptography import Cryptography
 from validator import Validator, ValidatorFI
 from network_playground import NetworkPlayground
@@ -16,6 +17,9 @@ from network_playground import NetworkPlayground
 class ScenarioExecutor(process):
         
     def setup(config, config_id):
+        self.config_id=config_id
+
+        LOGGER.log_action("Initial configuration", config)
         self.nvalidators = int(config['nvalidators'])
         self.nclients = int(config['nclients'])
         self.nfaulty = int(config['nfaulty'])
@@ -27,15 +31,13 @@ class ScenarioExecutor(process):
 
     def run():
 
+
         private_keys_validators = {}
         public_keys_validators = {}
         private_keys_clients = {}
         public_keys_clients = {}
-        
-        os.makedirs('../logs/config' + str(config_id))
-        os.makedirs('../ledgers/config' + str(config_id))
 
-        # self.validators = list(new(Validator, num=nvalidators))
+
         self.validators = list(new(ValidatorFI, num=nvalidators))
         
         clients = new(Client, num=nclients)
@@ -47,7 +49,7 @@ class ScenarioExecutor(process):
         self.twins =  new(Validator,num=ntwins)
 
 
-        self.network_playground =  new(NetworkPlayground,num=1)
+        self.network_playground =  new(NetworkPlayground, num=1)
         config['network_playground']=self.network_playground
 
         all_nodes=list()
@@ -62,9 +64,8 @@ class ScenarioExecutor(process):
             private_keys_validators[v]=private_keys_validators[validators[i-len(validators)]]
             public_keys_validators[v]=public_keys_validators[validators[i-len(validators)]]
             twin_node_cache[i]=v
-            # all_nodes[i]=v
             all_nodes.append(v)
-        print(private_keys_validators)
+        LOGGER.log(private_keys_validators)
 
         for c in clients:
             private_key, public_key = Cryptography.generate_key()
@@ -77,67 +78,42 @@ class ScenarioExecutor(process):
             setup({v}, (config, config_id, i, all_nodes, list(clients),
                         private_keys_validators[v], public_keys_validators, public_keys_clients))
        
-        print("all_nodes  ",all_nodes)
-        
-        # for i, v in enumerate(twins,start=len(validators)):
-        #     print("enumberate : ",i,v)
-        #     print("validators[i-len(validators)] ",validators[i-len(validators)])
-        #     setup({v}, (config, config_id, i, all_nodes, list(clients),
-        #                 private_keys_validators[v], public_keys_validators, public_keys_clients))
-
-
 
         for i, c in enumerate(clients):
             setup({c}, (config, config_id, i, all_nodes,
                         private_keys_clients[c], public_keys_validators))
 
         
-        setup(network_playground, (twin_config,all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
+        setup(network_playground, (twin_config, config_id, all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
         
         start(network_playground)
         start(validators)
         start(twins)
         start(clients)
         
-        # await(each(c in clients, has=received(('Done',), from_=c)) or (received(('DonePlayground',), from_=network_playground)))
-        print("Awaiting for Playground to exit")
+        LOGGER.log("Awaiting for Playground to exit")
         await(some(received(('DonePlayground',))))
-        # In case where client doesnt' send Done signal, and rounds in scenario are over
-        # await(each(c in clients, has=received(('Done',), from_=c)) or received(('Done',), from_=network_playground))
-        output("All clients done, informing all network playground.", config_id)
-        # send(('Done',), to=network_playground)
-        # await(received(('Done',), from_=network_playground))
-        output("Network Playground closed, informing all validators.", config_id)  
+        LOGGER.log("All clients done, informing all network playground.", config_id)
+        LOGGER.log("Network Playground closed, informing all validators.", config_id)
 
-        print("Closing validator ")
+        LOGGER.log("Closing validator ")
 
         send(('Done',), to=validators)
-        print("CLosed validator ")
+        LOGGER.log("CLosed validator ")
         send(('Done',), to=twins)
-        print("CLosed twin ")
-        # send(('Done',), to=clients)
-        output("All nodes exited ", config_id)
-
-    # def receive(msg=('DonePlayground',), from_=p):
-    #     print("DonePlayground")
-    #     self.exit=True
-    #     print("DonePlayground ",some(received(('DonePlayground',))),p)
-    #     print("Closing validator ")
-    #     send(('Done',), to=validators)
-    #     print("CLosed validator ")
-    #     send(('Done',), to=twins)
-    #     print("CLosed twin ")
+        LOGGER.logrint("CLosed twin ")
+        LOGGER.log("All nodes exited ", config_id)
 
 
 
 
     def is_config_valid(config):
         if int(config['nvalidators']) < (3 * int(config['nfaulty']) + 1):
-            print(
+            LOGGER.log(
                 "Number of validators should be more than thrice of number of faulty validators.")
             return False
         if (int(config['nfaulty']) > int(config['exclude_size'])) or (int(config['exclude_size']) > 2 * int(config['nfaulty'])):
-            print(
+            LOGGER.log(
                 "Exlude size should be between nfaulty and 2*nfaulty")
             return False
         return True
@@ -150,10 +126,8 @@ def read_config(file):
     # config =  open(file)
     with open(file, 'r') as json_file:
         twin_config = json.load(json_file)
-        # print(twin_config)
         twin_config["round_leaders"] = list(twin_config["round_leaders"].values())
         twin_config["round_partitions"] = list(twin_config["round_partitions"].values())
-        # print(twin_config["round_leaders"].values())
         return twin_config
 
 
@@ -164,17 +138,20 @@ def main():
 
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
-    #file = "../config/twinconfig.json"
-    #file = "../config/twinconfig_all_good.json"
-    #file = "../config/twinconfig.json"
     if len(sys.argv) < 2:
-        print("Please insert a config file")
+        output("Please insert a config file")
     files=sys.argv[1:]
-    # print(files)
     config_id = 0
     for file in files:
         file = "../config/" + file
-        print("Running config file: " + str(file))
+        os.makedirs('../logs/config' + str(config_id))
+        os.makedirs('../ledgers/config' + str(config_id))
+
+        LOGGER.process_id = "ScenarioExecutor_" + str(config_id)
+        LOGGER.filename = '../logs/config' + str(config_id) + '/' \
+            + LOGGER.process_id + ".log"
+        LOGGER.log("Running config file: " + str(file))
+
         # twin_configs = json.load(file)
         twin_config = read_config(file)
         print(twin_config)
