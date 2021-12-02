@@ -47,7 +47,8 @@ class Client(process):
             send_request(request)
 
         # Wait until we have received valid (f+1) responses for all its requests
-        await(len(received_sufficient_responses) == nops)
+        # await(len(received_sufficient_responses) == nops)
+        await(received(('Done',), from_=parent()))
 
         send(('Done',), to=parent())
         LOGGER.log_event("Sent", "Done", None, parent())
