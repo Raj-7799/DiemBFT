@@ -1,6 +1,7 @@
 import random
 import threading
 import time
+from collections import defaultdict
 
 from block_tree import BlockTree
 from cryptography import Cryptography
@@ -48,6 +49,8 @@ class Validator (process):
         self.mempool = MemPool(validator_id, self.request_cache)
         self.leader_election = LeaderElection(config['round_leaders'],
             validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'])
+        
+        self.timeout_counter = defaultdict(int)
 
         Cryptography.private_key = self.private_key
         Cryptography.replicas = self.replicas
@@ -74,7 +77,12 @@ class Validator (process):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
         # send(('Timeout', timeout_msg), to=self.replicas)
         current_round = timeout_msg.tmo_info.round
-        send(('Timeout', ({"from":self.validator_id, "to": self.replicas, "payload":timeout_msg, "current_round":current_round })), to=self.network_playground)
+        if self.timeout_counter[current_round] < 5:
+            send(('Timeout', ({"from":self.validator_id, "to": self.replicas, "payload":timeout_msg, "current_round":current_round })), to=self.network_playground)
+        else:
+            LOGGER.log('Pausing timeout messages')
+        
+        self.timeout_counter[current_round] += 1
         LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.replicas)
 
     '''Procedure start event processing(M)'''
@@ -331,7 +339,7 @@ class Validator (process):
                 '''process certificate qc(qc)
                 process new round event(⊥)'''
                 self.pacemaker.advance_round_tc(tc)
-                
+                self.proposal_cache[self.pacemaker.current_round] = tc
                 process_new_round_event(tc)
         else:
             LOGGER.log_action("Verified TimeoutMsg signature", False)
@@ -363,12 +371,21 @@ class Validator (process):
         for r  in range(round,self.pacemaker.current_round + 1):
             if r+1 <= self.pacemaker.current_round and r+1 in self.proposal_cache.keys():
                 proposal_msg = self.proposal_cache[r+1]
-                LOGGER.log_event("round in qc {} Replying to SyncRequest ".format(r),"Proposal", proposal_msg,p)
-                send(('Proposal', proposal_msg), to=p)
+                if isinstance(proposal_msg, tuple):
+                    LOGGER.log_event("round in qc {} Replying to SyncRequest ".format(r),"Proposal", proposal_msg,p)
+                    send(('Proposal', proposal_msg), to=p)
+                else:
+                    LOGGER.log_event("round in qc {} Replying to SyncRequest with TC".format(r),"Proposal", proposal_msg,p)
+                    send(('SyncTC', proposal_msg), to=p)
             else:
                 LOGGER.log_event("round in qc {} Not Replying to SyncRequest ".format(r),"Proposal", "",p)
                 break
 
+    def receive(msg=('SyncTC', tc)):
+        LOGGER.log_event("Received SyncTC Request at round {}".format(self.pacemaker.current_round),"SyncTC", "", tc)
+        self.pacemaker.advance_round_tc(tc)
+        process_new_round_event(tc)
+    
     def receive(msg=('Request', signed_req), from_=client):
         req = Cryptography.get_verified_message(
             signed_req, public_keys_clients[client])
