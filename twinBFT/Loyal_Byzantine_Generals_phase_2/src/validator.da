@@ -48,7 +48,7 @@ class Validator (process):
             validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
         self.mempool = MemPool(validator_id, self.request_cache)
         self.leader_election = LeaderElection(config['round_leaders'],
-            validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'])
+            validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'], config['nfaulty'])
         
         self.timeout_counter = defaultdict(int)
 
@@ -327,6 +327,10 @@ class Validator (process):
                 LOGGER.log("SyncRequest trigged on recieving Timeout with round {} and current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
                 check_for_sync(timeout_msg.tmo_info.round,self.replicas[sender])
                 return
+        elif self.pacemaker.current_round > timeout_msg.tmo_info.round:
+            LOGGER.log("Higher timeout round encountered syncing the node timeout msg round {} current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
+            process_sync_request(timeout_msg.high_commit_qc, self.replicas[sender])
+            return
         
         signature_verified = Cryptography.get_verified_message(
             timeout_msg.tmo_info.author_signature, public_keys_validators[self.replicas[sender]])
@@ -359,12 +363,8 @@ class Validator (process):
         # extract round info, (qc.vote_info.round) compare with pacemaker round (ideally use high commit qc)
         # send sync based on compare (send to sender, high_commit_qc) , 
         # reciever to send proposal to the lagging node
-    def send_sync():
-        send(('SyncRequest',self.blocktree.high_commit_qc), to=replicas)
-    
-    
+
     def check_for_sync(round,p):
-        
         if(self.blocktree.high_commit_qc is None or round > self.blocktree.high_commit_qc.vote_info.round ):
             # send sync message 
             # self.lag =  round- self.blocktree.high_commit_qc.vote_info.round
@@ -372,15 +372,18 @@ class Validator (process):
             send(('SyncRequest',self.blocktree.high_commit_qc), to=p)
 
 
-    def receive(msg=('SyncRequest', qc), from_=p):
+    def process_sync_request(qc, p):
         if qc is None: 
+            LOGGER.log("Received High Commit QC as none when processing sync request setting round to 0")
             round=0
         else:
+            LOGGER.log("Received High Commit QC with round {} when processing sync request".format(qc.vote_info.round))
             round = qc.vote_info.round
         
         LOGGER.log("Sync Request proposal cache {}".format(self.proposal_cache))
+        
         for r  in range(round,self.pacemaker.current_round + 1):
-            if r+1 <= self.pacemaker.current_round and r+1 in self.proposal_cache.keys():
+            if r+1 <= self.pacemaker.current_round and r+1 in self.proposal_cache:
                 proposal_msg = self.proposal_cache[r+1]
                 if isinstance(proposal_msg, tuple):
                     LOGGER.log_event("round in qc {} Replying to SyncRequest ".format(r),"Proposal", proposal_msg,p)
@@ -391,6 +394,9 @@ class Validator (process):
             else:
                 LOGGER.log_event("round in qc {} Not Replying to SyncRequest ".format(r),"Proposal", "",p)
                 break
+
+    def receive(msg=('SyncRequest', qc), from_=p):
+        process_sync_request(qc, p)
 
     def receive(msg=('SyncTC', tc)):
         LOGGER.log_event("Received SyncTC Request at round {}".format(self.pacemaker.current_round),"SyncTC", "", tc)
