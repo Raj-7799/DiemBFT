@@ -22,12 +22,10 @@ class ScenarioExecutor(process):
         self.twin_config=config['twin_config']
         self.round_leaders =self.twin_config['round_leaders'] 
         config['round_leaders']=self.round_leaders
-        print("ScenarioExecutor ")
         del config['twin_config']
         self.exit=False
 
     def run():
-
         private_keys_validators = {}
         public_keys_validators = {}
         private_keys_clients = {}
@@ -36,7 +34,6 @@ class ScenarioExecutor(process):
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
-        # self.validators = list(new(Validator, num=nvalidators))
         self.validators = list(new(ValidatorFI, num=nvalidators))
         
         clients = new(Client, num=nclients)
@@ -80,15 +77,6 @@ class ScenarioExecutor(process):
         for i, v in enumerate(all_nodes):
             setup({v}, (config, config_id, i, all_nodes, list(clients),
                         private_keys_validators[v], public_keys_validators, public_keys_clients))
-        print("all_nodes  ",all_nodes)
-        
-        # for i, v in enumerate(twins,start=len(validators)):
-        #     print("enumberate : ",i,v)
-        #     print("validators[i-len(validators)] ",validators[i-len(validators)])
-        #     setup({v}, (config, config_id, i, all_nodes, list(clients),
-        #                 private_keys_validators[v], public_keys_validators, public_keys_clients))
-
-
 
         for i, c in enumerate(clients):
             setup({c}, (config, config_id, i, all_nodes,
@@ -121,19 +109,6 @@ class ScenarioExecutor(process):
         # send(('Done',), to=clients)
         output("All nodes exited ", config_id)
 
-    # def receive(msg=('DonePlayground',), from_=p):
-    #     print("DonePlayground")
-    #     self.exit=True
-    #     print("DonePlayground ",some(received(('DonePlayground',))),p)
-    #     print("Closing validator ")
-    #     send(('Done',), to=validators)
-    #     print("CLosed validator ")
-    #     send(('Done',), to=twins)
-    #     print("CLosed twin ")
-
-
-
-
     def is_config_valid(config):
         if int(config['nvalidators']) < (3 * int(config['nfaulty']) + 1):
             print(
@@ -153,10 +128,6 @@ def read_config(file):
     config =  open(file)
     
     twin_config =  json.load(config)
-    # num_of_nodes = twin_config["number_of_nodes"]
-    # num_of_twins =  twin_config["number_of_twins"]
-    # print(num_of_nodes)
-    # print(num_of_twins)
     return twin_config
 
 
@@ -168,11 +139,7 @@ def main():
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
 
-    #file = "../config/twinconfig.json"
-    #file = "../config/twinconfig_all_good.json"
-    #file = "../config/twinconfig.json"
-
-    file = "../config/twinconfig_2.json"
+    file = "../config/twinconfig_sync copy.json"
 
     twin_configs = read_config(file)
     print("===type ",type(twin_configs),twin_configs)
@@ -199,6 +166,7 @@ def main():
         setup(p, (config, 0))
         start(p)
         config_id = 0
+    
     # for config in configs:
     #     # if not is_config_valid(config):
     #     #     output("The provided config", config,
