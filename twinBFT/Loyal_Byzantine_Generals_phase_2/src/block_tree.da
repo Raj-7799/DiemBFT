@@ -96,13 +96,13 @@ class BlockTree:
         vote_idx = Cryptography.hash(vote_msg.ledger_commit_info)
 
         '''pending votes[vote idx] ← pending votes[vote idx] ∪ v.signature'''
-        if vote_idx in self.pending_votes:
+        if vote_idx in self.pending_votes and vote_msg.signature not in self.pending_votes[vote_idx]:
             self.pending_votes[vote_idx].append(vote_msg.signature)
             self.pending_signers[vote_idx].append(vote_msg.sender)
         else:
             self.pending_votes[vote_idx] = [vote_msg.signature]
             self.pending_signers[vote_idx] = [vote_msg.sender]
-
+        
         '''if |pending votes[vote idx]| = 2f + 1 then'''
         if len(self.pending_votes[vote_idx]) == 2*self.f + 1:
             '''qc ←QC h
@@ -177,7 +177,7 @@ class BlockTree:
         LOGGER.log('BlockTree: process_qc ends', qc)
 
 
-class BuggyBlockTree(BlockTree):
+class BuggyBlockTree2f(BlockTree):
     def process_vote(self, vote_msg):
         LOGGER.log('BlockTree: process_vote', vote_msg,self.validator_id)
         '''process qc(v.high commit qc)'''
