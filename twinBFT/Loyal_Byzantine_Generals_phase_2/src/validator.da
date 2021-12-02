@@ -345,7 +345,7 @@ class Validator (process):
                 LOGGER.log("SyncRequest trigged on recieving Timeout with round {} and current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
                 check_for_sync(timeout_msg.tmo_info.round,self.replicas[sender])
                 return
-        elif self.pacemaker.current_round > timeout_msg.tmo_info.round:
+        elif self.pacemaker.current_round > timeout_msg.tmo_info.round and self.replicas[sender]!=self.replicas[self.validator_id]:
             LOGGER.log("Higher timeout round encountered syncing the node timeout msg round {} current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
             process_sync_request(timeout_msg.high_commit_qc, self.replicas[sender])
             return

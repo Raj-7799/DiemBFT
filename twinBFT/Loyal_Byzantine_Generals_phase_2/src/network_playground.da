@@ -180,6 +180,7 @@ class NetworkPlayground(process):
         if int(current_round) > self.max_current_round:
             if not safety_check():
                 self.completed = True
+            
             self.max_current_round = current_round
         
         if not liveness_check(int(current_round)):

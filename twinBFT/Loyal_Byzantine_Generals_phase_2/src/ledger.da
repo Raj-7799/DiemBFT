@@ -97,7 +97,6 @@ class Ledger:
                 else:
                     LOGGER.log('Ledger: commit committing a txn', txn)
                     fp.write(txn['command']+ ' - ' + str(block_id) + '\n')
-            
             self.recently_committed_block_ids.append(block_id)
             LOGGER.log('Committed blocks to ledger',
                                self.recently_committed_block_ids)
