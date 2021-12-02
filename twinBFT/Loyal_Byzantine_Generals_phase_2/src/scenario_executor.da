@@ -9,7 +9,6 @@ from object_types import FailType, Failure, FailureConfig, MsgType
 
 from client import Client
 from config import configs
-from logger_util import LOGGER
 from cryptography import Cryptography
 from validator import Validator, ValidatorFI
 from network_playground import NetworkPlayground
@@ -17,9 +16,6 @@ from network_playground import NetworkPlayground
 class ScenarioExecutor(process):
         
     def setup(config, config_id):
-        self.config_id=config_id
-
-        LOGGER.log_action("Initial configuration", config)
         self.nvalidators = int(config['nvalidators'])
         self.nclients = int(config['nclients'])
         self.nfaulty = int(config['nfaulty'])
@@ -30,12 +26,13 @@ class ScenarioExecutor(process):
         self.exit=False
 
     def run():
-
-
         private_keys_validators = {}
         public_keys_validators = {}
         private_keys_clients = {}
         public_keys_clients = {}
+        
+        os.makedirs('../logs/config' + str(config_id))
+        os.makedirs('../ledgers/config' + str(config_id))
 
         self.validators = list(new(ValidatorFI, num=nvalidators))
         
@@ -48,7 +45,7 @@ class ScenarioExecutor(process):
         self.twins =  new(Validator,num=ntwins)
 
 
-        self.network_playground =  new(NetworkPlayground, num=1)
+        self.network_playground =  new(NetworkPlayground,num=1)
         config['network_playground']=self.network_playground
 
         all_nodes=list()
@@ -63,8 +60,9 @@ class ScenarioExecutor(process):
             private_keys_validators[v]=private_keys_validators[validators[i-len(validators)]]
             public_keys_validators[v]=public_keys_validators[validators[i-len(validators)]]
             twin_node_cache[i]=v
+            # all_nodes[i]=v
             all_nodes.append(v)
-        LOGGER.log(private_keys_validators)
+        print(private_keys_validators)
 
         for c in clients:
             private_key, public_key = Cryptography.generate_key()
@@ -76,44 +74,37 @@ class ScenarioExecutor(process):
         for i, v in enumerate(all_nodes):
             setup({v}, (config, config_id, i, all_nodes, list(clients),
                         private_keys_validators[v], public_keys_validators, public_keys_clients))
-       
 
         for i, c in enumerate(clients):
             setup({c}, (config, config_id, i, all_nodes,
                         private_keys_clients[c], public_keys_validators))
 
         
-        setup(network_playground, (twin_config, config_id, all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
+        setup(network_playground, (twin_config,all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
         
         start(network_playground)
         start(validators)
         start(twins)
         start(clients)
         
-        LOGGER.log("Awaiting for Playground to exit")
+        print("Awaiting for Playground to exit")
         await(some(received(('DonePlayground',))))
-        LOGGER.log("All clients done, informing all network playground.", config_id)
-        LOGGER.log("Network Playground closed, informing all validators.", config_id)
-
-        LOGGER.log("Closing validator ")
 
         send(('Done',), to=validators)
-        LOGGER.log("CLosed validator ")
+        print("CLosed validator ")
         send(('Done',), to=twins)
-        LOGGER.log("CLosed twin ")
+        print("CLosed twin")
         send(('Done',), to=clients)
-        LOGGER.log("CLosed client ")
+        print("Closed clients")
         output("All nodes exited ", config_id)
-        LOGGER.log("All nodes exited ", config_id)
-
 
     def is_config_valid(config):
         if int(config['nvalidators']) < (3 * int(config['nfaulty']) + 1):
-            LOGGER.log(
+            print(
                 "Number of validators should be more than thrice of number of faulty validators.")
             return False
         if (int(config['nfaulty']) > int(config['exclude_size'])) or (int(config['exclude_size']) > 2 * int(config['nfaulty'])):
-            LOGGER.log(
+            print(
                 "Exlude size should be between nfaulty and 2*nfaulty")
             return False
         return True
@@ -123,12 +114,15 @@ def read_config(file):
     """
         Reading Config file 
     """
-    # config =  open(file)
-    with open(file, 'r') as json_file:
-        twin_config = json.load(json_file)
+    config =  open(file)
+    
+    twin_configs =  json.load(config)
+
+    for twin_config in twin_configs:
         twin_config["round_leaders"] = list(twin_config["round_leaders"].values())
         twin_config["round_partitions"] = list(twin_config["round_partitions"].values())
-        return twin_config
+
+    return twin_configs
 
 
 def main():
@@ -138,22 +132,12 @@ def main():
 
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
-    if len(sys.argv) < 2:
-        output("Please insert a config file")
-    files=sys.argv[1:]
-    config_id = 0
-    for file in files:
-        file = "../config/" + file
-        os.makedirs('../logs/config' + str(config_id))
-        os.makedirs('../ledgers/config' + str(config_id))
 
-        LOGGER.process_id = "ScenarioExecutor_" + str(config_id)
-        LOGGER.filename = '../logs/config' + str(config_id) + '/' \
-            + LOGGER.process_id + ".log"
-        LOGGER.log("Running config file: " + str(file))
+    file = "../config/twinconfig_leader.json"
 
-        # twin_configs = json.load(file)
-        twin_config = read_config(file)
+    twin_configs = read_config(file)
+
+    for twin_config in twin_configs:
         print(twin_config)
         number_of_nodes =  int(twin_config["number_of_nodes"])
         config = {
@@ -172,7 +156,17 @@ def main():
                 seed=637713655
             )        
         }
+        # p = new(ScenarioExecutor)
+        # setup(p, (config, 0))
+        # start(p)
+        config_id = 0
+    
+    # for config in configs:
+    #     # if not is_config_valid(config):
+    #     #     output("The provided config", config,
+    #     #         "is not valid. Skipping this config.")
+    #     #     continue
         p = new(ScenarioExecutor)
         setup(p, (config, config_id))
         start(p)
-        config_id += 1
+    #     config_id += 1
