@@ -211,6 +211,8 @@ class NetworkPlayground(process):
                     print("Playground: process_request Round: {}  Send request {} to {}  {}".format(current_round,sender_id,node_id, request_type))
  
                     send((request_type, (payload,sender_id,current_round)), to=node)
+                else:
+                    LOGGER.log_event("Playground: process_request broadcast Not Sending request from  {} to {} for round {}".format(sender_id,node_id,current_round), request_type, payload, node)
               
         else:
             print("Receiver ID ",_to,len(self.validators),self.validators)
