@@ -13,8 +13,8 @@ class NetworkPlayground(process):
             + LOGGER.process_id + ".log"
 
         LOGGER.log_action("Initial configuration", twin_config)
-        self.max_current_round = 0 #to check safety
-        self.liveness_TTL = 5
+        self.max_current_round = 0 #to check safety and liveness
+        self.liveness_TTL = 100
         self.current_liveness_TTL = self.liveness_TTL
         self.liveness_round = 0
         self.leaders =  twin_config["round_leaders"]
@@ -223,13 +223,13 @@ class NetworkPlayground(process):
         
         current_round = request["current_round"]
 
-        if current_round > self.max_current_round:
+        if int(current_round) > self.max_current_round:
             if not safety_check():
                 self.completed = True
             self.max_current_round = current_round
-        # if not liveness_check(int(current_round)):
-        #     LOGGER.log("Liveness of system violated")
-        #     self.completed = True
+        if not liveness_check(int(current_round)):
+            LOGGER.log("Liveness of system violated")
+            self.completed = True
         if not self.completed and current_round == len(self.partitions):#+1:
             self.completed = True
 
