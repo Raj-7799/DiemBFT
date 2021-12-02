@@ -133,10 +133,10 @@ def main():
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
 
-    file = "../config/twinconfig_sync.json"
+    file = "../config/twinconfig_leader.json"
 
     twin_configs = read_config(file)
-    # print("===type ",type(twin_configs),twin_configs)
+
     for twin_config in twin_configs:
         print(twin_config)
         number_of_nodes =  int(twin_config["number_of_nodes"])
