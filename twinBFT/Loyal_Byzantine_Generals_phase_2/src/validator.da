@@ -171,10 +171,14 @@ class Validator (process):
             )
             print("Proposal sending ",self.network_playground)
             LOGGER.log("Broadcasting proposal message and setting to cache with block round {}".format(block.round))
-            self.proposal_cache[block.round] = proposal_msg
-            # send(('Proposal', proposal_msg), to=self.replicas)
+
             current_round=proposal_msg.block.round
             send(('Proposal', ({"from":self.validator_id,"to":self.replicas,"payload":proposal_msg, "current_round":current_round})), to=self.network_playground)
+            
+            # if proposal_msg.block.qc:
+            #     self.proposal_cache[proposal_msg.block.qc.vote_info.round] = (proposal_msg,self.validator_id, current_round)
+            # else:
+            self.proposal_cache[proposal_msg.block.round]= (proposal_msg,self.validator_id, current_round)
 
             LOGGER.log_event("Sent", "Proposal",
                              proposal_msg, self.replicas)
@@ -238,6 +242,9 @@ class Validator (process):
 
             '''Block-Tree.execute and insert(P) // Adds a new speculative state to the Ledger'''
             self.blocktree.execute_and_insert(proposal_msg.block)
+            # if proposal_msg.block.qc:
+            #     self.proposal_cache[proposal_msg.block.qc.vote_info.round]=cache_msg
+            # else:
             self.proposal_cache[proposal_msg.block.round]=cache_msg
 
             '''vote msg ← Safety.make vote(P.block, P.last round tc)'''
@@ -343,7 +350,7 @@ class Validator (process):
                 '''process certificate qc(qc)
                 process new round event(⊥)'''
                 self.pacemaker.advance_round_tc(tc)
-                self.proposal_cache[self.pacemaker.current_round] = tc
+                self.proposal_cache[tc.round] = tc
                 process_new_round_event(tc)
         else:
             LOGGER.log_action("Verified TimeoutMsg signature", False)
