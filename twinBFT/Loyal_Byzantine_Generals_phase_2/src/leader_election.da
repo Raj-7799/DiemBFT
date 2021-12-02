@@ -4,7 +4,7 @@ from logger_util import LOGGER
 
 class LeaderElection:
 
-    def __init__(self,round_leaders, validator_id, replicas, ledger, pacemaker, window_size, exclude_size):
+    def __init__(self,round_leaders, validator_id, replicas, ledger, pacemaker, window_size, exclude_size, f):
         # LOGGER.replicas = replicas
         # LOGGER.process_id = "Leader_" + str(validator_id)
         
@@ -25,7 +25,7 @@ class LeaderElection:
         self.reputation_leaders = dict()
 
         self.round_leaders=round_leaders
-        self.max_node=max(self.round_leaders)
+        self.max_node=3 * f + 1
 
     '''Function get leader(round)'''
     def get_leader(self, round):
@@ -37,7 +37,9 @@ class LeaderElection:
         if round - 1 < len(self.round_leaders):
             LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round, self.round_leaders[round - 1],self.replicas[self.round_leaders[round - 1]],), round)
             leader = self.round_leaders[round - 1]
-            if leader + self.max_node + 1 == self.validator_id:
+            LOGGER.log('LeaderElection: get_leader {} twin {} {}'.format(leader, leader + self.max_node + 1, self.validator_id))
+            if leader + self.max_node == self.validator_id:
+                LOGGER.log('LeaderElection: get_leader choosing twin validator as leader should also be {}'.format(leader + self.max_node + 1))
                 return self.validator
             
             return self.replicas[leader]
