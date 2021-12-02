@@ -25,6 +25,7 @@ class LeaderElection:
         self.reputation_leaders = dict()
 
         self.round_leaders=round_leaders
+        self.max_node=max(self.round_leaders)
 
     '''Function get leader(round)'''
     def get_leader(self, round):
@@ -35,7 +36,11 @@ class LeaderElection:
 
         if round - 1 < len(self.round_leaders):
             LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round, self.round_leaders[round - 1],self.replicas[self.round_leaders[round - 1]],), round)
-            return self.replicas[self.round_leaders[round - 1]]
+            leader = self.round_leaders[round - 1]
+            if leader + self.max_node + 1 == self.validator_id:
+                return self.validator
+            
+            return self.replicas[leader]
 
         '''if <round, leader> ∈ reputation leaders then'''
         if round in self.reputation_leaders:
