@@ -128,10 +128,6 @@ class NetworkPlayground(process):
 
         process_request(request)
         
-        # else:
-        #     pass
-        # print("current_round=========== ",current_round)
-
     def liveness_check(current_round):
         if current_round > self.liveness_round:
             self.liveness_round = current_round
@@ -225,10 +221,11 @@ class NetworkPlayground(process):
             twin_id = sender_id +self.number_of_nodes
             
             # message originating from some now of node which has a twin node
-            if receiverID+self.number_of_nodes < len(self.validators) and same_partition(current_round,network_partition,sender_id,receiverID+self.number_of_nodes):
-                LOGGER.log_event("Playground: process_request Send request from {} to {} for round {}".format(sender_id,receiverID+self.number_of_nodes,round), request_type, payload, _to)
+            
+            # if receiverID+self.number_of_nodes < len(self.validators) and same_partition(current_round,network_partition,sender_id,receiverID+self.number_of_nodes):
+            #     LOGGER.log_event("Playground: process_request Send request from {} to {} for round {}".format(sender_id,receiverID+self.number_of_nodes,round), request_type, payload, _to)
 
-                send((request_type, (payload,sender_id,current_round)), to=self.validators[receiverID + self.number_of_nodes])
+            #     send((request_type, (payload,sender_id,current_round)), to=self.validators[receiverID + self.number_of_nodes])
             
         
         state[sender_id][current_round]=+1
@@ -243,20 +240,8 @@ class NetworkPlayground(process):
             state[sender][_round]=1
             partition_id=0
 
-        
         for partition in current_partitions[partition_id]:
-            #LOGGER.log_event("Playground: process_request receiver {} sender {} ".format(receiver,sender) ,_round, partition,sender)
             if sender in partition and receiver in partition:
                 return True              
         return False
         
-
-        
-
-
-
-
-
-
-
-

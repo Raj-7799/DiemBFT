@@ -175,3 +175,41 @@ class BlockTree:
         '''high qc ← maxround{qc, high qc}'''
         self.high_qc = get_qc_with_max_round(qc, self.high_qc)
         LOGGER.log('BlockTree: process_qc ends', qc)
+
+
+class BuggyBlockTree(BlockTree):
+    def process_vote(self, vote_msg):
+        LOGGER.log('BlockTree: process_vote', vote_msg,self.validator_id)
+        '''process qc(v.high commit qc)'''
+        self.process_qc(vote_msg.high_commit_qc)
+        '''vote idx ← hash(v.ledger commit info)'''
+        vote_idx = Cryptography.hash(vote_msg.ledger_commit_info)
+
+        '''pending votes[vote idx] ← pending votes[vote idx] ∪ v.signature'''
+        if vote_idx in self.pending_votes:
+            self.pending_votes[vote_idx].append(vote_msg.signature)
+            self.pending_signers[vote_idx].append(vote_msg.sender)
+        else:
+            self.pending_votes[vote_idx] = [vote_msg.signature]
+            self.pending_signers[vote_idx] = [vote_msg.sender]
+
+        '''if |pending votes[vote idx]| = 2f + 1 then'''
+        if len(self.pending_votes[vote_idx]) == 2*self.f:
+            '''qc ←QC h
+                vote info ← v.vote info,
+                state id ← v.state id,
+                votes ← pending votes[vote idx] i
+            return qc'''
+            qc = QC(
+                vote_info=vote_msg.vote_info,
+                ledger_commit_info=vote_msg.ledger_commit_info,
+                signatures=self.pending_votes[vote_idx],
+                author=self.validator_id,
+                signers=self.pending_signers[vote_idx]
+            )
+            LOGGER.log('BlockTree: process_vote: returns', qc)
+            return qc
+
+        LOGGER.log('BlockTree: process_vote: returns', None, len(self.pending_votes[vote_idx]))
+        '''return ⊥'''
+        return None

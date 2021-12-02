@@ -25,7 +25,7 @@ class LeaderElection:
         self.reputation_leaders = dict()
 
         self.round_leaders=round_leaders
-        self.max_node=3 * f + 1
+        self.max_node= int(3 * f + 1)
 
     '''Function get leader(round)'''
     def get_leader(self, round):
@@ -37,10 +37,6 @@ class LeaderElection:
         if round - 1 < len(self.round_leaders):
             LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round, self.round_leaders[round - 1],self.replicas[self.round_leaders[round - 1]],), round)
             leader = self.round_leaders[round - 1]
-            LOGGER.log('LeaderElection: get_leader {} twin {} {}'.format(leader, leader + self.max_node + 1, self.validator_id))
-            if leader + self.max_node == self.validator_id:
-                LOGGER.log('LeaderElection: get_leader choosing twin validator as leader should also be {}'.format(leader + self.max_node + 1))
-                return self.validator
             
             return self.replicas[leader]
 
@@ -56,6 +52,18 @@ class LeaderElection:
         LOGGER.log("Leader election is Done successfully", None)
         '''return validators[floor(round//2) mod |validators|] // Round-robin leader (two rounds per leader)'''
         return self.replicas[((round)//2) % len(self.replicas)]
+    
+    def get_twin_leader(self, round):
+        if round - 1 < len(self.round_leaders):
+            leader = self.round_leaders[round - 1]
+
+            if leader + self.max_node < len(self.replicas):
+                LOGGER.log('LeaderElection: get_leader {} twin {} {}'.format(leader, leader + self.max_node, self.validator_id))
+                return self.replicas[leader + self.max_node]
+            else:
+                return None
+        
+        return None
 
     '''Procedure update leaders(qc)'''
     def update_leaders(self, qc):

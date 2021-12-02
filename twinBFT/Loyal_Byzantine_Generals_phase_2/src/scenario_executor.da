@@ -34,16 +34,12 @@ class ScenarioExecutor(process):
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
-        self.validators = list(new(ValidatorFI, num=nvalidators))
+        self.validators = list(new(Validator, num=nvalidators))
         
         clients = new(Client, num=nclients)
-
-
-
         ntwins = int(twin_config["number_of_twins"])
 
         self.twins =  new(Validator,num=ntwins)
-
 
         self.network_playground =  new(NetworkPlayground,num=1)
         config['network_playground']=self.network_playground

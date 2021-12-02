@@ -130,10 +130,11 @@ class Validator (process):
         LOGGER.log('Validator: process_new_round_event', last_tc)
 
         '''if u = LeaderElection.get leader(Pacemaker.current round) then'''
-        if self.replicas[validator_id] == self.leader_election.get_leader(self.pacemaker.current_round):
+        leader = self.leader_election.get_leader(self.pacemaker.current_round)
+        twin_leader = self.leader_election.get_twin_leader(self.pacemaker.current_round)
 
+        if self.replicas[validator_id] == leader or self.replicas[validator_id] == twin_leader:
 
-            print(self.replicas[validator_id],self.leader_election.get_leader(self.pacemaker.current_round))
             # Check if there are any transactions in the MemPool
             if self.mempool.peek_pool() == 0:
                 print(self.mempool.pending_txns)
@@ -231,10 +232,20 @@ class Validator (process):
             round = self.pacemaker.current_round
             '''leader ← LeaderElection.get leader(current round)'''
             leader = self.leader_election.get_leader(round)
+            twin_leader = self.leader_election.get_twin_leader(round)
+
+            LOGGER.log("Proposal leader", leader)
+            LOGGER.log("Proposal twin leader", twin_leader)
+            final_leader = None
+            if replicas[proposal_msg.sender] == leader:
+                final_leader = leader
+            elif replicas[proposal_msg.sender] == twin_leader:
+                final_leader = twin_leader
+            
             '''if P.block.round 6= round ∨ P.sender 6= leader ∨ P.block.author 6= leader then
                     return'''
-            if proposal_msg.block.round != round or replicas[proposal_msg.sender] != leader or replicas[proposal_msg.block.author] != leader:
-                LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], leader)
+            if proposal_msg.block.round != round or replicas[proposal_msg.sender] != final_leader or replicas[proposal_msg.block.author] != final_leader:
+                LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], proposal_msg.block.author, final_leader)
                 return
 
             if len(proposal_msg.block.payload) == 0:
@@ -255,10 +266,17 @@ class Validator (process):
                     send vote msg to LeaderElection.get leader(current round + 1)'''
             if vote_msg is not None:
                 next_leader = self.leader_election.get_leader(round + 1)
-                current_round=max(vote_msg.vote_info.round,self.partition_round)
-                send(('Vote', ({"from":self.validator_id,"to": next_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+                next_twin_leader = self.leader_election.get_twin_leader(round + 1)
 
-                LOGGER.log_event("Sent", "Vote", vote_msg, next_leader)
+                current_round=max(vote_msg.vote_info.round,self.partition_round)
+                LOGGER.log_event("Sent", "Vote to next leader", vote_msg, next_leader)
+                send(('Vote', ({"from":self.validator_id,"to": next_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+                
+                if next_twin_leader:
+                    current_round=max(vote_msg.vote_info.round,self.partition_round)
+                    LOGGER.log_event("Sent", "Vote to next twin leader", vote_msg, next_leader)
+                    send(('Vote', ({"from":self.validator_id,"to": next_twin_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+
 
         else:
             LOGGER.log_action("Verified ProposalMsg signature", False)
