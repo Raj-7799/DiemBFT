@@ -76,7 +76,7 @@ class Ledger:
             if current_block_to_commit.id not in self.id_to_block:
                 break
             stack.append((current_block_to_commit.id,
-                          current_block_to_commit.payload))
+                          current_block_to_commit.payload, current_block_to_commit.round))
             recently_commited.add(current_block_to_commit.id)
 
             # Now check if the current block has a QC
@@ -87,7 +87,7 @@ class Ledger:
         fp = open('../ledgers/config' + str(self.config_id) +
                   "/" + self.filename, 'a+')
         while(stack):
-            block_id, payload = stack.pop()
+            block_id, payload, round = stack.pop()
             self.commited[block_id] = payload
             for txn in payload:
                 if txn['req_id'] in self.request_cache:

@@ -194,7 +194,7 @@ class Validator (process):
 
         msg,sender,self.partition_round= proposal_msg
         proposal_msg=msg
-        LOGGER.log_event("Received from {} {}".format(sender,self.partition_round), "Proposal", proposal_msg, p)
+        LOGGER.log_event("Received Proposal from {} {} with payload {}".format(sender,self.partition_round, proposal_msg.block.payload), "Proposal", proposal_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
             proposal_msg.signature, public_keys_validators[self.replicas[sender]])
@@ -404,7 +404,7 @@ class Validator (process):
             if r+1 <= self.pacemaker.current_round and r+1 in self.proposal_cache:
                 proposal_msg = self.proposal_cache[r+1]
                 if isinstance(proposal_msg, tuple):
-                    LOGGER.log_event("round in qc {} Replying to SyncRequest ".format(r),"Proposal", proposal_msg,p)
+                    LOGGER.log_event("round in qc {} Replying to SyncRequest ".format(r),"Proposal", proposal_msg[0].block.payload, p)
                     send(('Proposal', proposal_msg), to=p)
                 else:
                     LOGGER.log_event("round in qc {} Replying to SyncRequest with TC".format(r),"Proposal", proposal_msg,p)
@@ -419,7 +419,6 @@ class Validator (process):
     def receive(msg=('SyncTC', tc)):
         LOGGER.log_event("Received SyncTC Request at round {}".format(self.pacemaker.current_round),"SyncTC", "", tc)
         self.pacemaker.advance_round_tc(tc)
-        process_new_round_event(tc)
     
     def receive(msg=('Request', signed_req), from_=client):
         req = Cryptography.get_verified_message(

@@ -41,6 +41,7 @@ class MemPool:
         return send_txns
 
     def validate_and_remove_transactions(self, txns):
+        return True
         LOGGER.log('MemPool: validate_and_remove_transactions', txns)
         to_remove = []
         for txn in txns:
