@@ -1,15 +1,20 @@
 import random
+from random import randint
 from collections import defaultdict
+import json
 
 R = 10 # total number of rounds
 M = 3 # max partitions per round
 F = 1 # number of twins
+S = 5 #number of scenarios
 probability_of_overlap = 0.5 # probability of overlapping partition
 probability_partition_has_overlap = 0.5 # probability that a network partition contains a overlap
 
 
 total_nodes = 3 * F + 1
 Partitions = []
+
+
 
 def assign_leaders(type = "random", assignments = {}):
 
@@ -165,7 +170,7 @@ def populate_conensus_partition(network_partition, leader, twin_nodes):
     nodes_shuffled = set(random.sample(nodes, total_nodes + F))
 
     if len(network_partition) == 1:
-        return nodes
+        return [nodes]
     
     majority_partition = network_partition[0]
     # place the leader in majority partition
@@ -252,10 +257,79 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
 # print(Partitions)
 # Partitions = prune_duplicate_partition(Partitions)
 # print(Partitions)
-leader_assignments = assign_leaders()
-print(leader_assignments)
-twin_nodes = set(["1"])
-final_assignments = round_assignment(leader_assignments, twin_nodes)
-for key, value in final_assignments.items():
-    print(key, ":", value)
+array_of_scenarios = []
+def generateScenarios():
+    for i in range(0, S):
+        json_object_str = json.dumps({"num_of_nodes": total_nodes})
+        # print(type(json_object_str))
+        json_object = json.loads(json_object_str)
+        # print(type(json_object))
+        json_object.update({"num_of_twins": F})
+        # json_object.update({"scenarios": []})
+        leader_assignments = assign_leaders()
+        twin_nodes = set(["1"])
+        final_assignments = round_assignment(leader_assignments, twin_nodes)
+        # for key, value in final_assignments.items():
+        #     print(key, ":", value)
+        # json_object = json.loads(final_assignments) 
+        scenario_json_object_str = json.dumps({"round_leaders" : leader_assignments})
+        # print(type(scenario_json_object_str))
+        scenario_json_object = json.loads(scenario_json_object_str)
+        scenario_json_object.update({"round_partitions" : final_assignments})
+        # scenario_json_object_str = json.dumps({"round_partitions" : final_assignments})
+        # print(type(scenario_json_object))
+        # json_object = json.loads(scenario_json_object_str)
+        # json_object["scenarios"].append(scenario_json_object)
+        json_object.update(scenario_json_object)
+
+        drop_dict = {}
+        delay_dict = {}
+        for i in range (1, R+1):
+            drop_dict[i]={}
+        for i in range (1, R+1):
+            drop_dict[i]["Vote"]=[]
+            drop_dict[i]["Proposal"]=[]
+            drop_dict[i]["Timeout"]=[]
+        
+        # for r in range (1, R-2):
+        #     for n in range(0, total_nodes):
+        #         if randint(0, 4) == 1:
+        #             drop_dict[r]["Vote"].append(n)
+        #         if randint(0, 4) == 1:
+        #             drop_dict[r]["Proposal"].append(n)
+        #         if randint(0, 4) == 1:
+        #             drop_dict[r]["Timeout"].append(n)
+        drop_dict={"drop_round_msg":drop_dict}
+        # print(drop_dict)
+        for i in range (1, R+1):
+            delay_dict[i]={}
+        for i in range (1, R+1):
+            delay_dict[i]["Vote"]=[]
+            delay_dict[i]["Proposal"]=[]
+            delay_dict[i]["Timeout"]=[]
+        
+        # for r in range (1, R-2):
+        #     for n in range(0, total_nodes):
+        #         if randint(0, 4) == 1:
+        #             delay_dict[r]["Vote"].append(n)
+        #         if randint(0, 4) == 1:
+        #             delay_dict[r]["Proposal"].append(n)
+        #         if randint(0, 4) == 1:
+        #             delay_dict[r]["Timeout"].append(n)
+        delay_dict={"delay_round_msg":delay_dict}
+        dict_json_object_str = json.dumps(drop_dict)
+        # print(type(scenario_json_object_str))
+        dict_json_object = json.loads(dict_json_object_str)
+        dict_json_object.update(delay_dict)
+
+        json_object.update(dict_json_object)
+        # json_object["scenarios"].append(dict_json_object)
+        # json_object["scenarios"].append(delay_dict)
+        array_of_scenarios.append(json_object)
+
+
+generateScenarios()
+for item in array_of_scenarios:
+    print(item)
+    print("\n")
 

@@ -29,7 +29,12 @@ class BlockTree:
     # This function inserts the given block into the Ledger's speculate tree and also into pending block tree as well
 
     def execute_and_insert(self, block):
-        LOGGER.log('BlockTree: execute_and_insert block_id {} block_msg {} at validator {} '.format(block.id,block.payload,self.validator_id))
+        LOGGER.log('BlockTree: execute_and_insert', block)
+        
+        if not Cryptography.hash_validation_block(block):
+            LOGGER.log('[HashValidation]BlockTree: Block Validation failed')
+            return
+        
         self.id_block[block.id] = block
         if block.qc is None:
             '''Ledger.speculate(b.qc.block id, b.id, b.payload)'''

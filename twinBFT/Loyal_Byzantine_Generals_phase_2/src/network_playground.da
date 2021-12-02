@@ -1,20 +1,22 @@
 import json
 from logger_util import LOGGER
 from collections import defaultdict
-
+import time
 
 class NetworkPlayground(process):
 
 
     def setup(twin_config:dict,validators,number_of_nodes:int,public_keys_validators,public_keys_clients):
-
-        config_id=0
+        self.config_id=0
         LOGGER.process_id = "NetworkPlayGround"
-        LOGGER.filename = '../logs/config' + str(config_id) + '/' \
+        LOGGER.filename = '../logs/config' + str(self.config_id) + '/' \
             + LOGGER.process_id + ".log"
 
         LOGGER.log_action("Initial configuration", twin_config)
-
+        self.max_current_round = 0 #to check safety and liveness
+        self.liveness_TTL = 100
+        self.current_liveness_TTL = self.liveness_TTL
+        self.liveness_round = 0
         self.leaders =  twin_config["round_leaders"]
         self.partitions =  twin_config["round_partitions"]
         self.public_keys_validators= public_keys_validators
@@ -24,13 +26,26 @@ class NetworkPlayground(process):
         self.validators =validators 
         self.state = defaultdict(dict)
         self.completed = False
+        if "delay_round_msg" in twin_config:
+            self.delay_round = twin_config["delay_round_msg"]
+        else:
+            self.delay_round={}
 
-        print("Validators count {} {}".format(len(validators), number_of_nodes))
+        if "drop_round_msg" in twin_config:
+            self.drop_round = twin_config["drop_round_msg"]
+        else:
+            self.drop_round={}
+        
+        print("self.delay_round ",self.delay_round,type(self.delay_round))
+        print("self.delay_round ",self.delay_round,type(self.delay_round))
 
 
     def run():
         output("Creating NetworkPlayGround  ",self.completed)
+        # self.completed = True
         await(self.completed == True)
+        safety_check()
+
         output("Informing parent about Exiting  NetworkPlayGround  ",parent())
         output("Exiting  NetworkPlayGround 1 ",parent())
         # in case parent process is not sending done but rounds in partition are over,
@@ -50,12 +65,23 @@ class NetworkPlayground(process):
             "is_broadcast": True
         }
 
+        if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
+            print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            time.sleep(5)
+
+        if msg["from"] in self.drop_round[str(msg["current_round"])][request["type"]]:
+            print("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            return
+
+
         process_request(request)
 
 
 
     def receive(msg=('Proposal', msg), from_=p):
-        LOGGER.log_event("Playground: Received  from {} for round {} ".format(self.validators.index(p),msg["current_round"]), "Proposal", "msg", p)
+        LOGGER.log_event("Playground: Received  from {} for round {} ".format( msg["from"],msg["current_round"]), "Proposal", "msg", p)
         print("Playground: Received  from {} {}".format(self.validators.index(p),p))
 
         request  = {
@@ -66,6 +92,16 @@ class NetworkPlayground(process):
             "current_round":msg["current_round"],
             "is_broadcast": True
         }
+
+        if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
+            print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            time.sleep(5)
+
+        if msg["from"] in self.drop_round[str(msg["current_round"])][request["type"]]:
+            print("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            return
 
         process_request(request)
 
@@ -80,8 +116,58 @@ class NetworkPlayground(process):
             "current_round":msg["current_round"],
             "is_broadcast": False
         }
-        
+        if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
+            print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            time.sleep(5)
+
+        if msg["from"] in self.drop_round[str(msg["current_round"])][request["type"]]:
+            print("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            LOGGER.log("Dropping {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
+            return
+
         process_request(request)
+        
+        # else:
+        #     pass
+        # print("current_round=========== ",current_round)
+
+    def liveness_check(current_round):
+        if current_round > self.liveness_round:
+            self.liveness_round = current_round
+            self.current_liveness_TTL = self.liveness_TTL
+            return True
+        if(self.current_liveness_TTL <= 0):
+            return False
+
+        self.current_liveness_TTL-=1
+        return True
+
+    def safety_check():
+        ledger_dict = {}
+        maxlines = 0
+        #extract data from ledger
+        for n in range(0, self.number_of_nodes):
+            level = 0
+            filename = "validator_" + str(n) + ".ledger"
+            # '''self.config_id'''
+            fp = open('../ledgers/config' + str(self.config_id) +
+                  "/" + filename, 'r')
+            Lines = fp.readlines()
+            maxlines = max(maxlines, len(Lines))
+            ledger_dict[n] = Lines
+
+        LOGGER.log_action("Ledger state", ledger_dict)
+        for l in range(0, maxlines):
+            blocks = set()
+            for n in range(0, self.number_of_nodes):
+                if l < len(ledger_dict[n]):
+                    blocks.add(ledger_dict[n][l])
+            if len(blocks) > 1:
+                LOGGER.log("Safety Check violated")
+                return False
+
+        return True
 
     def process_request(request):
         
@@ -95,7 +181,16 @@ class NetworkPlayground(process):
         
         current_round = request["current_round"]
 
-        if current_round == len(self.partitions) + 1:
+        if int(current_round) > self.max_current_round:
+            if not safety_check():
+                self.completed = True
+            self.max_current_round = current_round
+        
+        if not liveness_check(int(current_round)):
+            LOGGER.log("Liveness of system violated")
+            self.completed = True
+        
+        if not self.completed and current_round == len(self.partitions) + 1:
             self.completed = True
             LOGGER.log_event("Playground: process_request completed = {}  {} {} ".format(current_round,self.completed,self.state), request_type, "payload",_from)
             return
@@ -114,7 +209,7 @@ class NetworkPlayground(process):
                 if same_partition(current_round,network_partition,sender_id, node_id):
                     LOGGER.log_event("Playground: process_request broadcast Send request from  {} to {} for round {}".format(sender_id,node_id,current_round), request_type, payload, node)
                     print("Playground: process_request Round: {}  Send request {} to {}  {}".format(current_round,sender_id,node_id, request_type))
-
+ 
                     send((request_type, (payload,sender_id,current_round)), to=node)
               
         else:

@@ -8,6 +8,25 @@ class Cryptography:
     def hash(*data):
         return nacl.hash.sha256(pickle.dumps(data), encoder=nacl.encoding.HexEncoder)
 
+    def hash_validation_block(block):
+        qc = block.qc
+        if qc is None:
+            id = Cryptography.hash(block.author, block.round,
+                                   block.payload)
+        else:
+            id = Cryptography.hash(block.author, block.round,
+                                   block.payload, qc.vote_info.id, qc.signatures)
+        if id == block.id :
+            return True
+        else:
+            return False
+
+    def hash_validation_votemsg(vote_msg):
+        if Cryptography.hash(vote_msg.vote_info) == vote_msg.ledger_commit_info.vote_info_hash:
+            return True
+        else:
+            return False
+
     #Create Pair of private and public key for clients and validators
     def generate_key():
         signing_key = nacl.signing.SigningKey.generate()

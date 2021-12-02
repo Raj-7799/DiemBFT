@@ -137,6 +137,8 @@ class Pacemaker:
                 signatures ← {t.signature | t ∈ pending timeouts[tmo info.round]}i)'''
             tc = TC(tmo_info.round, tmo_high_qc_rounds,
                     self.tmo_signatures[tmo_info.round], self.tmo_senders[tmo_info.round], self.validator_id)
+            LOGGER.log('Pacemaker: process_remote_timeout TC generated for   tmo_info.round {} tc {}'.format(tmo_info.round,tc))
+
             return tc
         LOGGER.log('Pacemaker: process_remote_timeout: returns', None)
         '''return ⊥'''

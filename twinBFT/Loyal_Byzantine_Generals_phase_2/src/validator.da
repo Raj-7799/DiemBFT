@@ -279,6 +279,10 @@ class Validator (process):
                 check_for_sync(vote_msg.vote_info.round, p)
             return
         
+        if not Cryptography.hash_validation_votemsg(vote_msg):
+            LOGGER.log_action("VoteMsg hash validation failed", False)
+            return
+
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
 
