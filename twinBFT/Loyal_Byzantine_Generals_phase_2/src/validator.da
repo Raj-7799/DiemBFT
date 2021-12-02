@@ -263,6 +263,10 @@ class Validator (process):
         signature_verified = Cryptography.get_verified_message(
             vote_msg.signature, public_keys_validators[self.replicas[sender]])
 
+        if not Cryptography.hash_validation_votemsg(vote_msg):
+            LOGGER.log_action("VoteMsg hash validation failed", False)
+            return
+
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
 

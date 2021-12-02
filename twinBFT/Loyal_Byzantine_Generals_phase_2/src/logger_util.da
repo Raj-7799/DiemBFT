@@ -56,7 +56,7 @@ class LOGGER:
         )
         f.close()
 
-    def log(funcname, *params):
+    def log(funcname, *params): #pass
         timestamp = datetime.datetime.now()
         f = open(LOGGER.filename, 'a+')
         p_list = []
