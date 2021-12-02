@@ -101,7 +101,7 @@ class ScenarioExecutor(process):
         send(('Done',), to=validators)
         LOGGER.log("CLosed validator ")
         send(('Done',), to=twins)
-        LOGGER.logrint("CLosed twin ")
+        LOGGER.log("CLosed twin ")
         LOGGER.log("All nodes exited ", config_id)
 
 

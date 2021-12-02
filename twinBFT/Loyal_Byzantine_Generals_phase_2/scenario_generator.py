@@ -26,9 +26,6 @@ def assign_leaders(type = "random", assignments = {}):
     assignments is a dictionary which can be used to deterministically to assign leaders at each round
     '''
 
-    # if not (len(assignments) <= R and max(assignments) <= R):
-    #     print("Leader assignments should not exceed round numbers")
-    #     return None
 
     pending_assignments = []
     final_assignments = {}
@@ -209,29 +206,17 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
     
     # generate all network partition scenarios from sum of total nodes and its twins
     partition_scenarios, major_partitions = get_partition_scenarios(total_nodes, F)
-    # print("----------------")
-    # print(partition_scenarios)
-    # print("----------------")
-    # print(major_partitions)
-    # print("----------------")
-    # print(leader_assignments)
-    # print("----------------")
 
     final_assignments = {}
 
     for i in range(1, R + 5):
         final_assignments[i] = []
-    for i in range(1, R + 1):
-        # partitions can be populated randomly expect for last partition 
+    for i in range(1, R + 1): 
         if i in parition_assignments:
             final_assignments[i] = parition_assignments[i]
             continue
         
         for j in range(partition_per_round[i] - 1):
-            # final_assignments[i].append(populate_partition(
-            #     random.choice(partition_scenarios),
-            #     leader_assignments[i]
-            #     ))
             final_assignments[i].append(random.choice(partition_scenarios))
         
         # ensuring that the last partition trigger will have super majority
@@ -270,19 +255,37 @@ def generateScenarios():
 
         drop_dict = {}
         delay_dict = {}
+
         for i in range (1, R+1):
             drop_dict[i]={}
         for i in range (1, R+1):
             drop_dict[i]["Vote"]=[]
             drop_dict[i]["Proposal"]=[]
             drop_dict[i]["Timeout"]=[]
+        for r in range (1, R):
+            for n in range(0, total_nodes):
+                if randint(0, 4) == 1:
+                    drop_dict[r]["Vote"].append(n)
+                if randint(0, 4) == 1:
+                    drop_dict[r]["Proposal"].append(n)
+                if randint(0, 4) == 1:
+                    drop_dict[r]["Timeout"].append(n)
         drop_dict={"drop_round_msg":drop_dict}
+
         for i in range (1, R+1):
             delay_dict[i]={}
         for i in range (1, R+1):
             delay_dict[i]["Vote"]=[]
             delay_dict[i]["Proposal"]=[]
             delay_dict[i]["Timeout"]=[]
+        for r in range (1, R):
+            for n in range(0, total_nodes):
+                if randint(0, 4) == 1:
+                    delay_dict[r]["Vote"].append(n)
+                if randint(0, 4) == 1:
+                    delay_dict[r]["Proposal"].append(n)
+                if randint(0, 4) == 1:
+                    delay_dict[r]["Timeout"].append(n)
         delay_dict={"delay_round_msg":delay_dict}
         dict_json_object_str = json.dumps(drop_dict)
         dict_json_object = json.loads(dict_json_object_str)

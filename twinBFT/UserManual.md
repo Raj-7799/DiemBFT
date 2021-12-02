@@ -18,4 +18,7 @@ pip install tabulate
 ```
 ## 2. Running twinBFT 
 ### Command to run the scenario executor code from the source folder
-- ```  python -m da --message-buffer-size=65536 scenario_executor.da &> out.log  ```
+- ```  python -m da --message-buffer-size=65536 scenario_executor.da <config_file> &> out.log  ```
+
+Here list of config files are entered that contains individual scenarios
+eg:: ```python -m da --message-buffer-size=65536 scenario_executor.da twin_5.json twin_6.json ```

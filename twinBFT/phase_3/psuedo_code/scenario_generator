@@ -192,4 +192,46 @@ Module ScenarioGenerator{
     
     return final_assignments
   }
+
+  Function drop_delay(
+    total_nodes
+  ) {
+    //drop_sict contains information for Message drops
+    drop_dict = {}
+    //delay dictionary contains information of delay messages
+    delay_dict = {}
+
+    for i in range (1, R+1):
+        drop_dict[i]["Vote"]=[]
+        drop_dict[i]["Proposal"]=[]
+        drop_dict[i]["Timeout"]=[]
+    
+    //Randomly populate the Drop Information for each round for each message type
+    for r in range (1, R):
+        for n in range(0, total_nodes):
+            if randint(0, 4) == 1:
+                drop_dict[r]["Vote"].append(n)
+            if randint(0, 4) == 1:
+                drop_dict[r]["Proposal"].append(n)
+            if randint(0, 4) == 1:
+                drop_dict[r]["Timeout"].append(n)
+    drop_dict={"drop_round_msg":drop_dict}
+
+    //Randomly populate the Drop Information for each round for each message type
+    for i in range (1, R+1):
+        delay_dict[i]["Vote"]=[]
+        delay_dict[i]["Proposal"]=[]
+        delay_dict[i]["Timeout"]=[]
+    for r in range (1, R):
+        for n in range(0, total_nodes):
+            if randint(0, 4) == 1:
+                delay_dict[r]["Vote"].append(n)
+            if randint(0, 4) == 1:
+                delay_dict[r]["Proposal"].append(n)
+            if randint(0, 4) == 1:
+                delay_dict[r]["Timeout"].append(n)
+    delay_dict={"delay_round_msg":delay_dict}
+
+    return drop_dict, delay_dict
+  }
 }
