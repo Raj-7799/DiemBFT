@@ -27,6 +27,7 @@ class Pacemaker:
         self.safety = safety
         self.replicas = replicas
         self.send_timeout_msg = send_timeout_msg
+        self.dict_of_timeout_timers = {}
 
     '''Function get round timer(r)'''
 
@@ -40,6 +41,21 @@ class Pacemaker:
         LOGGER.log('Pacemaker: stop_timer', round)
         if self.timer is not None:
             self.timer.cancel()
+    
+    def start_timeout_timer(self, timeout_msg):
+        if timeout_msg and timeout_msg.tmo_info:
+            LOGGER.log("[on_timeout_timer] Started timeout timer")
+            self.dict_of_timeout_timers[timeout_msg.tmo_info.round] = threading.Timer(self.delta, self.on_timeout_timer, [timeout_msg])
+            self.dict_of_timeout_timers[timeout_msg.tmo_info.round].start()
+    
+    def stop_timeout_timer(self, tmo_info):
+        if tmo_info and tmo_info.round in self.dict_of_timeout_timers:
+            LOGGER.log("[on_timeout_timer] Cancelled timeout timer")
+            self.dict_of_timeout_timers[tmo_info.round].cancel()
+    
+    def on_timeout_timer(self, timeout_msg):
+        LOGGER.log("[on_timeout_timer] Timeout Timer expired, broadcasting again")
+        self.send_timeout_msg(timeout_msg)
 
     '''Procedure start timer(new round)'''
 
@@ -68,6 +84,7 @@ class Pacemaker:
                 timeout_info, self.last_round_tc, self.blocktree.high_commit_qc)
             LOGGER.log("Timeout Msg parameters", timeout_info,
                        self.last_round_tc, self.blocktree.high_commit_qc)
+            self.start_timeout_timer(timeout_msg)
             # Broadcast the timeout message
             self.send_timeout_msg(timeout_msg)
 
@@ -85,6 +102,7 @@ class Pacemaker:
 
         '''if tmo info.sender 6∈ pending timeouts[tmo info.round].senders then
             pending timeouts[tmo info.round] ← pending timeouts[tmo info.round] ∪ {tmo info}'''
+        self.stop_timeout_timer(tmo.tmo_info)
         if tmo_info.round not in self.pending_timeouts:
             self.pending_timeouts[tmo_info.round] = []
             self.tmo_senders[tmo_info.round] = []
