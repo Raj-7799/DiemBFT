@@ -1,0 +1,204 @@
+Timestamp: 2021-12-03 08:05:39.226926 | ProcessId: validator_4 | Action: Initial configuration | Object: {'nvalidators': 4, 'nclients': 1, 'nfaulty': 1.0, 'sleeptime': 1, 'clienttimeout': 10, 'nclientops': 10, 'delta': 2, 'window_size': 3, 'exclude_size': 0, 'duplicate_votes': False, 'failure_config': FailureConfig(failures=[], seed=637713655), 'round_leaders': [0, 0, 0, 0], 'network_playground': {<NetworkPlayground:f0009>}} |
+2021-12-03 08:05:39.360296 validator_4 Pacemaker: start_timer [1]
+2021-12-03 08:05:39.386894 validator_4 Pacemaker: stop_timer [1]
+2021-12-03 08:05:39.421805 validator_4 Pacemaker: get_round_timer [1]
+2021-12-03 08:05:39.442524 validator_4 <Validator:f0008> []
+Timestamp: 2021-12-03 08:05:39.546871 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 08:05:39.562126 validator_4 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}]
+2021-12-03 08:05:39.583261 validator_4 Validator: process_new_round_event [None]
+2021-12-03 08:05:39.603228 validator_4 LeaderElection: get_leader  round 1 leader number 0 leader process <Validator:f0004> [1]
+2021-12-03 08:05:39.620571 validator_4 LeaderElection: get_leader 0 twin 4 4 []
+2021-12-03 08:05:39.632581 validator_4 MemPool: peek_pool [None]
+2021-12-03 08:05:39.639327 validator_4 MemPool: peek_pool: returns [1, dict_keys(['0_0'])]
+2021-12-03 08:05:39.652389 validator_4 MemPool: get_transactions [None]
+2021-12-03 08:05:39.671881 validator_4 MemPool: get_transactions: returns [[{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}]]
+2021-12-03 08:05:39.679393 validator_4 BlockTree: generate_block  [[{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}], 1, 4]
+2021-12-03 08:05:39.708942 validator_4 BlockTree: generate_block: returns [{'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}], 'qc': None, 'id': b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e', 'author_signature': b'jG\x8a\xba\x9b8K\n\x9e\x99.\xe7\xeb\x97.\xa2\xe3\x89p\xed\x0c\x82Ll\x02\xb4Y\x89\x04~>\xa9\xd4g\xba\xb47\xbe\xe2\xd1`\xdb\xb3\xdb\x1d\x86\xba!\xafjr\xc9\xc8\x9d-Pg\xac\xf62Uj\x13\x00\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\x07\x00\xaf\xe7\xa9\x9dAO\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMV\x92M\xe4^\x86q\x0btq\x0c\x81q\rua.'}]
+Timestamp: 2021-12-03 08:05:39.748383 | ProcessId: validator_4 | Action: Created a new block | Object: {'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': [7206281623646013011984391, 1, {}, '', '', '127.0.0.1', [37462, 24292]]}], 'qc': None, 'id': [50, 55, 49, 56, 54, 57, 52, 52, 56, 97, 54, 98, 56, 97, 101, 48, 102, 54, 98, 57, 48, 56, 53, 49, 55, 101, 54, 100, 55, 52, 54, 53, 50, 97, 55, 97, 99, 99, 98, 102, 49, 97, 99, 51, 51, 50, 51, 49, 53, 99, 54, 56, 98, 57, 51, 49, 51, 98, 99, 55, 49, 57, 50, 101], 'author_signature': {}} |
+2021-12-03 08:05:39.759920 validator_4 Broadcasting proposal message and setting to cache with block round 1 []
+Timestamp: 2021-12-03 08:05:39.794540 | ProcessId: validator_4 | Event: Sent | MsgType: Proposal | To: ALL validators | Msg: {'block': {'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': [7206281623646013011984391, 1, {}, '', '', '127.0.0.1', [37462, 24292]]}], 'qc': None, 'id': [50, 55, 49, 56, 54, 57, 52, 52, 56, 97, 54, 98, 56, 97, 101, 48, 102, 54, 98, 57, 48, 56, 53, 49, 55, 101, 54, 100, 55, 52, 54, 53, 50, 97, 55, 97, 99, 99, 98, 102, 49, 97, 99, 51, 51, 50, 51, 49, 53, 99, 54, 56, 98, 57, 51, 49, 51, 98, 99, 55, 49, 57, 50, 101], 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None, 'sender': 4, 'signature': {}}
+2021-12-03 08:05:39.796850 validator_4 Validator: process_new_round_event ends [None]
+Timestamp: 2021-12-03 08:05:39.833629 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 08:05:39.841591 validator_4 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:39.866423 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 08:05:39.871335 validator_4 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:39.898999 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 08:05:39.903768 validator_4 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:39.929746 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 08:05:39.935482 validator_4 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:39.953780 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 08:05:39.960239 validator_4 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:39.976565 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 08:05:39.979505 validator_4 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:39.992836 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 08:05:39.995282 validator_4 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:40.014083 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 08:05:40.016823 validator_4 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:40.033816 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 08:05:40.037749 validator_4 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:40.052724 | ProcessId: validator_4 | Event: Received | MsgType: Proposal | From: parent_process | Msg: (<object_types.ProposalMsg object at 0x401d838f28>, 4, 1)
+Timestamp: 2021-12-03 08:05:40.065782 | ProcessId: validator_4 | Event: Received Proposal from 4 1 with payload [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}] | MsgType: Proposal | To: parent_process | Msg: {'block': {'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': [7206281623646013011984391, 1, {}, '', '', '127.0.0.1', [37462, 24292]]}], 'qc': None, 'id': [50, 55, 49, 56, 54, 57, 52, 52, 56, 97, 54, 98, 56, 97, 101, 48, 102, 54, 98, 57, 48, 56, 53, 49, 55, 101, 54, 100, 55, 52, 54, 53, 50, 97, 55, 97, 99, 99, 98, 102, 49, 97, 99, 51, 51, 50, 51, 49, 53, 99, 54, 56, 98, 57, 51, 49, 51, 98, 99, 55, 49, 57, 50, 101], 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None, 'sender': 4, 'signature': {}}
+Timestamp: 2021-12-03 08:05:40.078292 | ProcessId: validator_4 | Action: Verified ProposalMsg signature | Object: True |
+2021-12-03 08:05:40.089505 validator_4 Pacemaker: advance_round_tc [None]
+2021-12-03 08:05:40.094341 validator_4 Pacemaker: advance_round_tc: returns [False]
+2021-12-03 08:05:40.108358 validator_4 LeaderElection: get_leader  round 1 leader number 0 leader process <Validator:f0004> [1]
+2021-12-03 08:05:40.116479 validator_4 LeaderElection: get_leader 0 twin 4 4 []
+2021-12-03 08:05:40.124320 validator_4 Proposal leader [<Validator:f0004>]
+2021-12-03 08:05:40.134239 validator_4 Proposal twin leader [<Validator:f0008>]
+2021-12-03 08:05:40.146465 validator_4 BlockTree: execute_and_insert [{'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}], 'qc': None, 'id': b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e', 'author_signature': b'jG\x8a\xba\x9b8K\n\x9e\x99.\xe7\xeb\x97.\xa2\xe3\x89p\xed\x0c\x82Ll\x02\xb4Y\x89\x04~>\xa9\xd4g\xba\xb47\xbe\xe2\xd1`\xdb\xb3\xdb\x1d\x86\xba!\xafjr\xc9\xc8\x9d-Pg\xac\xf62Uj\x13\x00\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\x07\x00\xaf\xe7\xa9\x9dAO\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMV\x92M\xe4^\x86q\x0btq\x0c\x81q\rua.'}]
+2021-12-03 08:05:40.155562 validator_4 Ledger: speculate [None, b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e', ['0-0']]
+2021-12-03 08:05:40.168126 validator_4 Ledger: get_state_id [None, b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e', ['0-0']]
+2021-12-03 08:05:40.174893 validator_4 Ledger: get_state_id: returns [b'003d4fd045804d375520f4e5329f68760fd1e6bd3830915cdf4f968193fbb301']
+2021-12-03 08:05:40.180590 validator_4 BlockTree: execute_and_insert ends [{'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}], 'qc': None, 'id': b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e', 'author_signature': b'jG\x8a\xba\x9b8K\n\x9e\x99.\xe7\xeb\x97.\xa2\xe3\x89p\xed\x0c\x82Ll\x02\xb4Y\x89\x04~>\xa9\xd4g\xba\xb47\xbe\xe2\xd1`\xdb\xb3\xdb\x1d\x86\xba!\xafjr\xc9\xc8\x9d-Pg\xac\xf62Uj\x13\x00\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\x07\x00\xaf\xe7\xa9\x9dAO\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMV\x92M\xe4^\x86q\x0btq\x0c\x81q\rua.'}]
+2021-12-03 08:05:40.191444 validator_4 Safety: make_vote [{'author': 4, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}], 'qc': None, 'id': b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e', 'author_signature': b'jG\x8a\xba\x9b8K\n\x9e\x99.\xe7\xeb\x97.\xa2\xe3\x89p\xed\x0c\x82Ll\x02\xb4Y\x89\x04~>\xa9\xd4g\xba\xb47\xbe\xe2\xd1`\xdb\xb3\xdb\x1d\x86\xba!\xafjr\xc9\xc8\x9d-Pg\xac\xf62Uj\x13\x00\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\x07\x00\xaf\xe7\xa9\x9dAO\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMV\x92M\xe4^\x86q\x0btq\x0c\x81q\rua.'}, None]
+2021-12-03 08:05:40.198626 validator_4 Safety: __safe_to_vote [1, 0, None]
+2021-12-03 08:05:40.205715 validator_4 Safety: __consecutive [1, 0]
+2021-12-03 08:05:40.214453 validator_4 Safety: __consecutive returns [True]
+2021-12-03 08:05:40.225714 validator_4 Safety: __safe_to_vote returns2 [True]
+2021-12-03 08:05:40.235379 validator_4 Safety: __consecutive [1, 0]
+2021-12-03 08:05:40.246607 validator_4 Safety: __consecutive returns [True]
+2021-12-03 08:05:40.253901 validator_4 Safety: __update_highest_qc_round [0]
+2021-12-03 08:05:40.260607 validator_4 Safety: __update_highest_qc_round returns [0]
+2021-12-03 08:05:40.265335 validator_4 Safety: __increase_highest_vote_round [1]
+2021-12-03 08:05:40.272478 validator_4 Safety: __increase_highest_vote_round returns [1]
+2021-12-03 08:05:40.295715 validator_4 Ledger: pending_state [b'271869448a6b8ae0f6b908517e6d74652a7accbf1ac332315c68b9313bc7192e']
+2021-12-03 08:05:40.308169 validator_4 Ledger: pending_state: returns [b'003d4fd045804d375520f4e5329f68760fd1e6bd3830915cdf4f968193fbb301']
+2021-12-03 08:05:40.316823 validator_4 Safety: __commit_state_id_candidate [1, 0, '0']
+2021-12-03 08:05:40.322357 validator_4 Safety: __consecutive [1, 0]
+2021-12-03 08:05:40.348551 validator_4 Safety: __consecutive returns [True]
+2021-12-03 08:05:40.366278 validator_4 Ledger: pending_state ['0']
+2021-12-03 08:05:40.382288 validator_4 Ledger: pending_state: returns [None]
+2021-12-03 08:05:40.388275 validator_4 Safety: __commit_state_id_candidate returns1 [None]
+2021-12-03 08:05:40.399803 validator_4 Ledger: pending_state ['0']
+2021-12-03 08:05:40.413322 validator_4 Ledger: pending_state: returns [None]
+2021-12-03 08:05:40.425064 validator_4 Safety: make_vote: returns [{'vote_info': <object_types.VoteInfo object at 0x401d838470>, 'ledger_commit_info': <object_types.LedgerCommitInfo object at 0x401d838da0>, 'high_commit_qc': None, 'sender': 4, 'signature': b'dD\x94q\xcb7q\xba\xf4\xad\x0b\x1cT\xe6}@w\x00eCP\xeer\xc1\x9dx{#\xa9\xe0\xe4\xe7\x03R\x94\xd4\x9cx\xb7V\xcf/l\xfc\x17\x1bep\xcd\xf1>\xe8\x8fT\xccu\xea\x04V\x04\xef\xc8\xbe\x01\x80\x03cobject_types\nLedgerCommitInfo\nq\x00)\x81q\x01}q\x02(X\x0f\x00\x00\x00commit_state_idq\x03NX\x0e\x00\x00\x00vote_info_hashq\x04C@549f69c9ee4e68983402829b858c6a82379ce05ab369adb21150da206d44eeeeq\x05ub.'}]
+2021-12-03 08:05:40.439433 validator_4 LeaderElection: get_leader  round 2 leader number 0 leader process <Validator:f0004> [2]
+2021-12-03 08:05:40.447262 validator_4 LeaderElection: get_leader 0 twin 4 4 []
+Timestamp: 2021-12-03 08:05:40.468325 | ProcessId: validator_4 | Event: Sent | MsgType: Vote to next leader | To: validator_0 | Msg: {'vote_info': {'id': [50, 55, 49, 56, 54, 57, 52, 52, 56, 97, 54, 98, 56, 97, 101, 48, 102, 54, 98, 57, 48, 56, 53, 49, 55, 101, 54, 100, 55, 52, 54, 53, 50, 97, 55, 97, 99, 99, 98, 102, 49, 97, 99, 51, 51, 50, 51, 49, 53, 99, 54, 56, 98, 57, 51, 49, 51, 98, 99, 55, 49, 57, 50, 101], 'round': 1, 'parent_id': '0', 'parent_round': 0, 'exec_state_id': [48, 48, 51, 100, 52, 102, 100, 48, 52, 53, 56, 48, 52, 100, 51, 55, 53, 53, 50, 48, 102, 52, 101, 53, 51, 50, 57, 102, 54, 56, 55, 54, 48, 102, 100, 49, 101, 54, 98, 100, 51, 56, 51, 48, 57, 49, 53, 99, 100, 102, 52, 102, 57, 54, 56, 49, 57, 51, 102, 98, 98, 51, 48, 49]}, 'ledger_commit_info': {'commit_state_id': None, 'vote_info_hash': [53, 52, 57, 102, 54, 57, 99, 57, 101, 101, 52, 101, 54, 56, 57, 56, 51, 52, 48, 50, 56, 50, 57, 98, 56, 53, 56, 99, 54, 97, 56, 50, 51, 55, 57, 99, 101, 48, 53, 97, 98, 51, 54, 57, 97, 100, 98, 50, 49, 49, 53, 48, 100, 97, 50, 48, 54, 100, 52, 52, 101, 101, 101, 101]}, 'high_commit_qc': None, 'sender': 4, 'signature': {}}
+Timestamp: 2021-12-03 08:05:40.481718 | ProcessId: validator_4 | Event: Sent | MsgType: Vote to next twin leader | To: validator_0 | Msg: {'vote_info': {'id': [50, 55, 49, 56, 54, 57, 52, 52, 56, 97, 54, 98, 56, 97, 101, 48, 102, 54, 98, 57, 48, 56, 53, 49, 55, 101, 54, 100, 55, 52, 54, 53, 50, 97, 55, 97, 99, 99, 98, 102, 49, 97, 99, 51, 51, 50, 51, 49, 53, 99, 54, 56, 98, 57, 51, 49, 51, 98, 99, 55, 49, 57, 50, 101], 'round': 1, 'parent_id': '0', 'parent_round': 0, 'exec_state_id': [48, 48, 51, 100, 52, 102, 100, 48, 52, 53, 56, 48, 52, 100, 51, 55, 53, 53, 50, 48, 102, 52, 101, 53, 51, 50, 57, 102, 54, 56, 55, 54, 48, 102, 100, 49, 101, 54, 98, 100, 51, 56, 51, 48, 57, 49, 53, 99, 100, 102, 52, 102, 57, 54, 56, 49, 57, 51, 102, 98, 98, 51, 48, 49]}, 'ledger_commit_info': {'commit_state_id': None, 'vote_info_hash': [53, 52, 57, 102, 54, 57, 99, 57, 101, 101, 52, 101, 54, 56, 57, 56, 51, 52, 48, 50, 56, 50, 57, 98, 56, 53, 56, 99, 54, 97, 56, 50, 51, 55, 57, 99, 101, 48, 53, 97, 98, 51, 54, 57, 97, 100, 98, 50, 49, 49, 53, 48, 100, 97, 50, 48, 54, 100, 52, 52, 101, 101, 101, 101]}, 'high_commit_qc': None, 'sender': 4, 'signature': {}}
+Timestamp: 2021-12-03 08:05:40.571518 | ProcessId: validator_4 | Event: Received | MsgType: Vote | From: parent_process | Msg: (<object_types.VoteMsg object at 0x401d838ef0>, 4, 1)
+Timestamp: 2021-12-03 08:05:40.579076 | ProcessId: validator_4 | Event: Received from 4  | MsgType: Vote | To: parent_process | Msg: {'vote_info': {'id': [50, 55, 49, 56, 54, 57, 52, 52, 56, 97, 54, 98, 56, 97, 101, 48, 102, 54, 98, 57, 48, 56, 53, 49, 55, 101, 54, 100, 55, 52, 54, 53, 50, 97, 55, 97, 99, 99, 98, 102, 49, 97, 99, 51, 51, 50, 51, 49, 53, 99, 54, 56, 98, 57, 51, 49, 51, 98, 99, 55, 49, 57, 50, 101], 'round': 1, 'parent_id': '0', 'parent_round': 0, 'exec_state_id': [48, 48, 51, 100, 52, 102, 100, 48, 52, 53, 56, 48, 52, 100, 51, 55, 53, 53, 50, 48, 102, 52, 101, 53, 51, 50, 57, 102, 54, 56, 55, 54, 48, 102, 100, 49, 101, 54, 98, 100, 51, 56, 51, 48, 57, 49, 53, 99, 100, 102, 52, 102, 57, 54, 56, 49, 57, 51, 102, 98, 98, 51, 48, 49]}, 'ledger_commit_info': {'commit_state_id': None, 'vote_info_hash': [53, 52, 57, 102, 54, 57, 99, 57, 101, 101, 52, 101, 54, 56, 57, 56, 51, 52, 48, 50, 56, 50, 57, 98, 56, 53, 56, 99, 54, 97, 56, 50, 51, 55, 57, 99, 101, 48, 53, 97, 98, 51, 54, 57, 97, 100, 98, 50, 49, 49, 53, 48, 100, 97, 50, 48, 54, 100, 52, 52, 101, 101, 101, 101]}, 'high_commit_qc': None, 'sender': 4, 'signature': {}}
+Timestamp: 2021-12-03 08:05:40.590335 | ProcessId: validator_4 | Action: Verified VoteMsg signature | Object: True |
+2021-12-03 08:05:40.593621 validator_4 BlockTree: process_vote [{'vote_info': <object_types.VoteInfo object at 0x401d84b128>, 'ledger_commit_info': <object_types.LedgerCommitInfo object at 0x401d84b0f0>, 'high_commit_qc': None, 'sender': 4, 'signature': b'dD\x94q\xcb7q\xba\xf4\xad\x0b\x1cT\xe6}@w\x00eCP\xeer\xc1\x9dx{#\xa9\xe0\xe4\xe7\x03R\x94\xd4\x9cx\xb7V\xcf/l\xfc\x17\x1bep\xcd\xf1>\xe8\x8fT\xccu\xea\x04V\x04\xef\xc8\xbe\x01\x80\x03cobject_types\nLedgerCommitInfo\nq\x00)\x81q\x01}q\x02(X\x0f\x00\x00\x00commit_state_idq\x03NX\x0e\x00\x00\x00vote_info_hashq\x04C@549f69c9ee4e68983402829b858c6a82379ce05ab369adb21150da206d44eeeeq\x05ub.'}, 4]
+2021-12-03 08:05:40.601838 validator_4 BlockTree: process_qc [None, 4]
+2021-12-03 08:05:40.610182 validator_4 BlockTree: process_qc ends [None]
+2021-12-03 08:05:40.620648 validator_4 BlockTree: process_vote: returns [None, 1]
+2021-12-03 08:05:40.627689 validator_4 Received VoteMsg ends g [None]
+2021-12-03 08:05:47.449628 validator_4 Pacemaker: local_timeout_round at round 1 [[]]
+2021-12-03 08:05:47.478496 validator_4 Safety: make_timeout [1, None, None]
+2021-12-03 08:05:47.502563 validator_4 Safety: __safe_to_timeout [1, 0, None]
+2021-12-03 08:05:47.510506 validator_4 Safety: __consecutive [1, 0]
+2021-12-03 08:05:47.517183 validator_4 Safety: __consecutive returns [True]
+2021-12-03 08:05:47.526898 validator_4 Safety: __safe_to_timeout returns2 [True]
+2021-12-03 08:05:47.539591 validator_4 Safety: __consecutive [1, 0]
+2021-12-03 08:05:47.546021 validator_4 Safety: __consecutive returns [True]
+2021-12-03 08:05:47.551420 validator_4 Safety: __increase_highest_vote_round [1]
+2021-12-03 08:05:47.560206 validator_4 Safety: __increase_highest_vote_round returns [1]
+2021-12-03 08:05:47.568002 validator_4 Safety: make_timeout: returns1 [{'round': 1, 'high_qc': None, 'author': 4, 'author_signature': b'\x97\xc5\x87\xedJ\x134\x8f[\xc6\xf8&\x80\x16\xf2\xa8\xb5\x19\xfdh>\xf6\x8cBB%C\x86\x8b\xce:\xea\x07\xecP\xa5E\xc4\x87\xc9\xd5\xa59\x07BM\x10\x10\x80k\x9c$\xea\x9b\x88\xdb1\x87\xc7\x93I\x11l\x00\x80\x03X\x06\x00\x00\x001,Noneq\x00.'}]
+Timestamp: 2021-12-03 08:05:47.582336 | ProcessId: validator_4 | Action: Local Timeout occurred | Object: {'round': 1, 'high_qc': None, 'author': 4, 'author_signature': {}} |
+2021-12-03 08:05:47.584611 validator_4 Timeout Msg parameters [{'round': 1, 'high_qc': None, 'author': 4, 'author_signature': b'\x97\xc5\x87\xedJ\x134\x8f[\xc6\xf8&\x80\x16\xf2\xa8\xb5\x19\xfdh>\xf6\x8cBB%C\x86\x8b\xce:\xea\x07\xecP\xa5E\xc4\x87\xc9\xd5\xa59\x07BM\x10\x10\x80k\x9c$\xea\x9b\x88\xdb1\x87\xc7\x93I\x11l\x00\x80\x03X\x06\x00\x00\x001,Noneq\x00.'}, None, None]
+2021-12-03 08:05:47.591270 validator_4 Validator: send_timeout_message [{'tmo_info': <object_types.TimeoutInfo object at 0x401d838ef0>, 'last_round_tc': None, 'high_commit_qc': None}]
+Timestamp: 2021-12-03 08:05:47.619675 | ProcessId: validator_4 | Event: Sent | MsgType: Timeout | To: ALL validators | Msg: {'tmo_info': {'round': 1, 'high_qc': None, 'author': 4, 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None}
+Timestamp: 2021-12-03 08:05:47.820757 | ProcessId: validator_4 | Event: Received | MsgType: Timeout | From: parent_process | Msg: (<object_types.TimeoutMsg object at 0x401d838eb8>, 4, 1)
+Timestamp: 2021-12-03 08:05:47.828208 | ProcessId: validator_4 | Event: Received from 4 | MsgType: Timeout | To: parent_process | Msg: {'tmo_info': {'round': 1, 'high_qc': None, 'author': 4, 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None}
+Timestamp: 2021-12-03 08:05:47.834818 | ProcessId: validator_4 | Action: Verified TimeoutMsg signature | Object: True |
+2021-12-03 08:05:47.837309 validator_4 Validator: process_certificate_qc [None]
+2021-12-03 08:05:47.850367 validator_4 BlockTree: process_qc [None, 4]
+2021-12-03 08:05:47.857259 validator_4 BlockTree: process_qc ends [None]
+2021-12-03 08:05:47.862188 validator_4 Validator: process_certificate_qc recent_committed_block [0]
+2021-12-03 08:05:47.866640 validator_4 LeaderElection: update_leaders [None]
+2021-12-03 08:05:47.875606 validator_4 Pacemaker: advance_round_qc [None]
+2021-12-03 08:05:47.885477 validator_4 Pacemaker: advance_round_qc: returns [True]
+2021-12-03 08:05:47.892628 validator_4 Validator: process_certificate_qc ended [None]
+2021-12-03 08:05:47.901897 validator_4 Validator: process_certificate_qc [None]
+2021-12-03 08:05:47.908177 validator_4 BlockTree: process_qc [None, 4]
+2021-12-03 08:05:47.914708 validator_4 BlockTree: process_qc ends [None]
+2021-12-03 08:05:47.919659 validator_4 Validator: process_certificate_qc recent_committed_block [0]
+2021-12-03 08:05:47.925895 validator_4 LeaderElection: update_leaders [None]
+2021-12-03 08:05:47.933515 validator_4 Pacemaker: advance_round_qc [None]
+2021-12-03 08:05:47.939678 validator_4 Pacemaker: advance_round_qc: returns [True]
+2021-12-03 08:05:47.950313 validator_4 Validator: process_certificate_qc ended [None]
+2021-12-03 08:05:47.956103 validator_4 Pacemaker: advance_round_tc [None]
+2021-12-03 08:05:47.961458 validator_4 Pacemaker: advance_round_tc: returns [False]
+2021-12-03 08:05:47.969235 validator_4 Pacemaker: process_remote_timeout [{'tmo_info': <object_types.TimeoutInfo object at 0x401d84b208>, 'last_round_tc': None, 'high_commit_qc': None}]
+2021-12-03 08:05:47.976931 validator_4 Pacemaker: process_remote_timeout: returns [None]
+Timestamp: 2021-12-03 08:05:49.548853 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 08:05:49.552676 validator_4 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.617579 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 08:05:49.623769 validator_4 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.663631 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 08:05:49.667295 validator_4 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.719222 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 08:05:49.723133 validator_4 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.770743 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 08:05:49.774032 validator_4 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.822298 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 08:05:49.824236 validator_4 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.854670 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 08:05:49.857860 validator_4 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.897527 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 08:05:49.903742 validator_4 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.944371 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 08:05:49.947505 validator_4 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:49.970408 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 08:05:49.974485 validator_4 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.659234 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 08:05:59.664561 validator_4 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.683038 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 08:05:59.687516 validator_4 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.705397 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 08:05:59.709528 validator_4 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.741048 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 08:05:59.743428 validator_4 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.789120 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 08:05:59.790511 validator_4 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.837881 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 08:05:59.840194 validator_4 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.876462 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 08:05:59.878365 validator_4 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.919031 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 08:05:59.920965 validator_4 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.964732 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 08:05:59.968405 validator_4 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:05:59.992639 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 08:05:59.994125 validator_4 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.726052 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 08:06:09.732094 validator_4 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.774124 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 08:06:09.779579 validator_4 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.807339 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 08:06:09.817152 validator_4 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.834451 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 08:06:09.839563 validator_4 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.870508 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 08:06:09.876016 validator_4 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.910203 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 08:06:09.913833 validator_4 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.941496 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 08:06:09.946151 validator_4 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.964123 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 08:06:09.967381 validator_4 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:09.995677 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 08:06:10.000656 validator_4 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:10.023876 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 08:06:10.027795 validator_4 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:19.922605 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 08:06:19.936562 validator_4 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:19.971126 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 08:06:19.981551 validator_4 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.014988 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 08:06:20.020119 validator_4 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.053864 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 08:06:20.058753 validator_4 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.094147 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 08:06:20.116990 validator_4 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.150538 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 08:06:20.154422 validator_4 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.186749 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 08:06:20.189585 validator_4 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.209184 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 08:06:20.217698 validator_4 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.243112 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 08:06:20.246415 validator_4 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:f0007>}]
+Timestamp: 2021-12-03 08:06:20.263966 | ProcessId: validator_4 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 08:06:20.267418 validator_4 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:f0007>}]
