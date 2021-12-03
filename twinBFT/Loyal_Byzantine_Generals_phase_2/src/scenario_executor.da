@@ -8,7 +8,6 @@ sys.path.append('../config')
 from object_types import FailType, Failure, FailureConfig, MsgType
 
 from client import Client
-from config import configs
 from logger_util import LOGGER
 from cryptography import Cryptography
 from validator import Validator, ValidatorFI
@@ -136,9 +135,12 @@ def main():
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
     if len(sys.argv) < 2:
-        output("Please insert a config file")
-    files=sys.argv[1:]
+        files = os.listdir('../config/')
+    else:
+        files=sys.argv[1:]
+    
     config_id = 0
+
     for file in files:
         file = "../config/" + file
         os.makedirs('../logs/config' + str(config_id))
