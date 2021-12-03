@@ -166,7 +166,7 @@ def main():
             'delta': 2,
             'window_size': 3,
             'exclude_size': 0,
-            'duplicate_votes': True,
+            'duplicate_votes': False,
             #"quorum_size" : 2*(int(number_of_nodes-1)/3),
             'failure_config': FailureConfig(
                 failures=[],
@@ -174,26 +174,6 @@ def main():
             )        
         }
 
-
-
-        # config_1={
-        #     'nvalidators': 4,
-        #     'nfaulty': 1,
-        #     'nclients': 3,
-        #     'nclientops': 6,
-        #     'sleeptime': 1,
-        #     'clienttimeout': 10,
-        #     'delta': 5,
-        #     'window_size': 5,
-        #     'exclude_size': 1,
-        #     'failure_config': FailureConfig(
-        #         failures=[
-        #             Failure(src='_', dest='_', msg_type=MsgType.All,
-        #                     round='all', prob=1, fail_type=FailType.SetAttr, val=2, attr='quorum_size')
-        #         ],
-        #         seed=637713655
-        #     )
-        # }
         p = new(ScenarioExecutor)
         setup(p, (config, config_id))
         start(p)

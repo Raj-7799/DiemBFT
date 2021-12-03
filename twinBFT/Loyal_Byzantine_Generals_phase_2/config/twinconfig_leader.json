@@ -1,318 +1,197 @@
-
-
-    {
-        "number_of_nodes": 4,
-        "number_of_twins": 1,
-        "round_leaders": {
-            "0" : 0,
-            "1" : 0,
-            "2" : 0,
-            "3" : 0,
-            "4" : 0,
-            "5" : 0,
-            "6" : 0
-        },
-        "round_partitions": {
-            "0" : [
+{
+    "number_of_nodes": 4,
+    "number_of_twins": 1,
+    "round_leaders": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0
+    },
+    "round_partitions": {
+        "0": [
+            [
                 [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
-                ]
-            ],
-            "1" : [
+                    0,
+                    1,
+                    2
+                ],
                 [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
-                ]
-            ],
-            "2" : [
-                [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
-                ]
-            ],
-            "3" : [
-                [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
-                ]
-            ],
-            "4" :  [
-                [
-                    [
-                        4,
-                        3,
-                        1
-                    ],
-                    [
-                        0,
-                        2
-                    ]
-                ]
-            ],
-            "5" : [
-                [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
+                    3,
+                    4
                 ]
             ]
+        ],
+        "1": [
+            [
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    3,
+                    4
+                ]
+            ]
+        ],
+        "2": [
+            [
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    3,
+                    4
+                ]
+            ]
+        ],
+        "3": [
+            [
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    3,
+                    4
+                ]
+            ]
+        ],
+        "4": [
+            [
+                [
+                    4,
+                    3,
+                    1
+                ],
+                [
+                    0,
+                    2
+                ]
+            ]
+        ],
+        "5": [
+            [
+                [
+                    0,
+                    1,
+                    2
+                ],
+                [
+                    3,
+                    4
+                ]
+            ]
+        ]
+    },
+    "drop_round_msg": {
+        "1": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
         },
-        "drop_round_msg":{
-            "1":{
-               "Vote":[
-
-               ],
-               "Proposal":[
-               ],
-               "Timeout":[
-               ]
-            },
-            "2":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "3":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "4":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "5":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "6":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "7":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "8":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "9":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "10":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            }
-         },
-         "delay_round_msg":{
-            "1":{
-               "Vote":[
-
-               ],
-               "Proposal":[
-
-               ],
-               "Timeout":[
-               ]
-            },
-            "2":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "3":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "4":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "5":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "6":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "7":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "8":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "9":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "10":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            }
-         }
+        "2": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "3": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "4": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "5": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "6": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "7": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "8": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "9": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "10": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        }
+    },
+    "delay_round_msg": {
+        "1": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "2": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "3": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "4": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "5": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "6": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "7": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "8": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "9": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        },
+        "10": {
+            "Vote": [],
+            "Proposal": [],
+            "Timeout": []
+        }
     }
-
-
+}
