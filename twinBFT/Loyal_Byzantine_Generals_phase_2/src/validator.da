@@ -277,12 +277,18 @@ class Validator (process):
 
                 current_round=max(vote_msg.vote_info.round,self.partition_round)
                 LOGGER.log_event("Sent", "Vote to next leader", vote_msg, next_leader)
+
                 send(('Vote', ({"from":self.validator_id,"to": next_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
-                
+                if(self.duplicate_votes):
+                    send(('Vote', ({"from":self.validator_id,"to": next_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+
+
                 if next_twin_leader:
                     current_round=max(vote_msg.vote_info.round,self.partition_round)
                     LOGGER.log_event("Sent", "Vote to next twin leader", vote_msg, next_leader)
                     send(('Vote', ({"from":self.validator_id,"to": next_twin_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+                    if(self.duplicate_votes):
+                        send(('Vote', ({"from":self.validator_id,"to": next_twin_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
 
 
         else:
