@@ -37,7 +37,8 @@ class Validator (process):
         self.should_start_new_round = True
 
         self.proposal_cache = dict()
-        self.quorum_size = 2 * self.config['nfaulty'] + 1
+        self.quorum_size = config['quorum_size'] if 'quorum_size' in config else 2 * self.config['nfaulty'] +1
+
         self.ledger = Ledger(
             config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
         self.blocktree = BlockTree(

@@ -106,6 +106,7 @@ class BlockTree:
         
         '''if |pending votes[vote idx]| = 2f + 1 then'''
         if len(self.pending_votes[vote_idx]) == self.quorum_size:
+            
             '''qc ←QC h
                 vote info ← v.vote info,
                 state id ← v.state id,
@@ -118,7 +119,7 @@ class BlockTree:
                 author=self.validator_id,
                 signers=self.pending_signers[vote_idx]
             )
-            LOGGER.log('BlockTree: process_vote: returns', qc)
+            LOGGER.log('BlockTree: process_vote: returns quorum_size {}'.format(self.quorum_size), qc)
             return qc
 
         LOGGER.log('BlockTree: process_vote: returns', None, len(self.pending_votes[vote_idx]))
