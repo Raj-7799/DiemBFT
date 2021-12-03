@@ -37,11 +37,11 @@ class Validator (process):
         self.should_start_new_round = True
 
         self.proposal_cache = dict()
-
+        self.quorum_size = 2 * self.config['nfaulty'] + 1
         self.ledger = Ledger(
             config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
         self.blocktree = BlockTree(
-            validator_id, replicas, self.ledger, config['nfaulty'], self.id_block)
+            validator_id, replicas, self.ledger, config['nfaulty'], self.quorum_size,self.id_block)
         self.safety = Safety(validator_id, replicas,
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
@@ -69,6 +69,9 @@ class Validator (process):
             self.pacemaker.current_round = value
         elif attr == 'highest_vote_round':
             self.safety.set_highest_vote_round(value)
+        elif attr == 'quorum_size':
+            self.quorum_size = val
+            self.blocktree.quorum_size=val
         else:
             output('error: Validator.setattr: unsupported attribute')
 
@@ -476,6 +479,7 @@ class ValidatorFI (process, Validator):
                 return None
             else:
                 return failure_config
+        
         return None
 
     def send_msg_delayed(message, to, val):
@@ -507,6 +511,7 @@ class ValidatorFI (process, Validator):
 
                 elif failure_config.fail_type == FailType.SetAttr:
                     LOGGER.log('ValidatorFI.send', 'config changed')
+
                     super().setattr(failure_config.attr, failure_config.val)
 
                 else:

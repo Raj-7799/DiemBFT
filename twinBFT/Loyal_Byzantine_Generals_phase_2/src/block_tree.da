@@ -5,7 +5,7 @@ from utils import get_qc_with_max_round
 
 
 class BlockTree:
-    def __init__(self, validator_id, replicas, ledger, nfaulty, id_block):
+    def __init__(self, validator_id, replicas, ledger, nfaulty,quorum_size, id_block):
         '''
         pending block tree; // tree of blocks pending commitment
         pending votes; // collected votes per block indexed by their LedgerInfo hash
@@ -23,6 +23,7 @@ class BlockTree:
         self.validator_id = validator_id
         self.ledger = ledger
         self.f = nfaulty
+        self.quorum_size = quorum_size
         self.id_block = id_block
 
     '''Procedure execute and insert(b)'''
@@ -104,7 +105,7 @@ class BlockTree:
             self.pending_signers[vote_idx] = [vote_msg.sender]
         
         '''if |pending votes[vote idx]| = 2f + 1 then'''
-        if len(self.pending_votes[vote_idx]) == 2*self.f + 1:
+        if len(self.pending_votes[vote_idx]) == self.quorum_size:
             '''qc ←QC h
                 vote info ← v.vote info,
                 state id ← v.state id,
@@ -178,6 +179,7 @@ class BlockTree:
 
 
 class BuggyBlockTree2f(BlockTree):
+
     def process_vote(self, vote_msg):
         LOGGER.log('BlockTree: process_vote', vote_msg,self.validator_id)
         '''process qc(v.high commit qc)'''
