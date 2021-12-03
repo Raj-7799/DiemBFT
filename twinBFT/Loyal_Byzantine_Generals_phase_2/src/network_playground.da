@@ -2,6 +2,7 @@ import json
 from logger_util import LOGGER
 from collections import defaultdict
 import time
+import threading
 
 class NetworkPlayground(process):
 
@@ -17,6 +18,7 @@ class NetworkPlayground(process):
         self.liveness_TTL = 100
         self.current_liveness_TTL = self.liveness_TTL
         self.liveness_round = 0
+        self.livenessTimer = 30 #half minute
         self.leaders =  twin_config["round_leaders"]
         self.partitions =  twin_config["round_partitions"]
         self.public_keys_validators= public_keys_validators
@@ -26,6 +28,7 @@ class NetworkPlayground(process):
         self.validators =validators 
         self.state = defaultdict(dict)
         self.completed = False
+        self.dict_of_timer = {}
         if "delay_round_msg" in twin_config:
             self.delay_round = twin_config["delay_round_msg"]
         else:
@@ -40,10 +43,13 @@ class NetworkPlayground(process):
         print("self.delay_round ",self.delay_round,type(self.delay_round))
 
 
+
     def run():
         output("Creating NetworkPlayGround  ",self.completed)
+        _start_timer(int(self.max_current_round))
         # self.completed = True
         await(self.completed == True)
+        _stop_timer(int(self.max_current_round))
         safety_check()
 
         output("Informing parent about Exiting  NetworkPlayGround  ",parent())
@@ -143,6 +149,23 @@ class NetworkPlayground(process):
             return
 
         process_request(request)
+
+    def _on_timeout():
+        LOGGER.log("Liveness of the system violated")
+        self.completed = True
+
+    def _start_timer(roundNo):
+        print("[_start_timer] Starting timer for round {} max_time  {} timestamp {}".format( roundNo, self.livenessTimer, time.time()))
+        self.dict_of_timer[roundNo] = threading.Timer(self.livenessTimer, _on_timeout)
+        self.dict_of_timer[roundNo].start()
+
+    def _stop_timer(roundNo):
+        if roundNo in self.dict_of_timer:
+            print("[_stop_timer] Stopping timer for roundNo {} timestamp {} ".format( roundNo, time.time()))
+            self.dict_of_timer[roundNo].cancel()
+            # del self.dict_of_timer[roundNo]
+    
+
         
     def liveness_check(current_round):
         if current_round > self.liveness_round:
@@ -193,10 +216,14 @@ class NetworkPlayground(process):
         current_round = request["current_round"]
 
         if int(current_round) > self.max_current_round:
+            for roundNo in self.dict_of_timer:
+                _stop_timer(roundNo)
             if not safety_check():
                 self.completed = True
             
             self.max_current_round = current_round
+            
+            _start_timer(self.max_current_round)
         
         if not liveness_check(int(current_round)):
             LOGGER.log("Liveness of system violated")
