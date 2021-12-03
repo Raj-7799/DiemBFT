@@ -217,19 +217,8 @@ class NetworkPlayground(process):
             if same_partition(current_round,network_partition,sender_id,receiverID):
                 LOGGER.log_event("Playground: process_request Send request from {} to {} for round {} ".format(sender_id, receiverID, current_round), request_type, payload, _to)
                 send((request_type, (payload,sender_id,current_round)), to=_to)
-
-            
-            twin_id = sender_id +self.number_of_nodes
-            
-            # message originating from some now of node which has a twin node
-            
-            # if receiverID+self.number_of_nodes < len(self.validators) and same_partition(current_round,network_partition,sender_id,receiverID+self.number_of_nodes):
-            #     LOGGER.log_event("Playground: process_request Send request from {} to {} for round {}".format(sender_id,receiverID+self.number_of_nodes,round), request_type, payload, _to)
-
-            #     send((request_type, (payload,sender_id,current_round)), to=self.validators[receiverID + self.number_of_nodes])
-            
         
-        state[sender_id][current_round]=+1
+        state[sender_id][current_round]+=1
 
     def same_partition(_round,round_network_partition,sender,receiver):
 
