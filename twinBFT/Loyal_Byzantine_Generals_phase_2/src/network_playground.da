@@ -6,9 +6,9 @@ import time
 class NetworkPlayground(process):
 
 
-    def setup(twin_config:dict,validators,number_of_nodes:int,public_keys_validators,public_keys_clients):
-        self.config_id=0
-        LOGGER.process_id = "NetworkPlayGround"
+    def setup(twin_config:dict, config_id:int, validators,number_of_nodes:int, public_keys_validators, public_keys_clients):
+        self.config_id=config_id
+        LOGGER.process_id = "NetworkPlayGround_" + str(self.config_id)
         LOGGER.filename = '../logs/config' + str(self.config_id) + '/' \
             + LOGGER.process_id + ".log"
 
