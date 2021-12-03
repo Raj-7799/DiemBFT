@@ -51,6 +51,7 @@ class NetworkPlayground(process):
         await(self.completed == True)
         _stop_timer(int(self.max_current_round))
         safety_check()
+        liveness_check_end()
 
         output("Informing parent about Exiting  NetworkPlayGround  ",parent())
         output("Exiting  NetworkPlayGround 1 ",parent())
@@ -151,7 +152,7 @@ class NetworkPlayground(process):
         process_request(request)
 
     def _on_timeout():
-        LOGGER.log("Liveness of the system violated")
+        LOGGER.log("[Violation] Liveness of the system violated")
         self.completed = True
 
     def _start_timer(roundNo):
@@ -166,7 +167,28 @@ class NetworkPlayground(process):
             # del self.dict_of_timer[roundNo]
     
 
-        
+    def liveness_check_end():
+        ledger_dict = {}
+        maxlines = 0
+        #extract data from ledger
+        for n in range(0, self.number_of_nodes):
+            filename = "validator_" + str(n) + ".ledger"
+            fp = open('../ledgers/config' + str(self.config_id) +
+                  "/" + filename, 'r')
+            Lines = fp.readlines()
+            maxlines = max(maxlines, len(Lines))
+            ledger_dict[n] = Lines
+
+        LOGGER.log_action("Ledger state", ledger_dict)
+        blocks = []
+        for l in range(0, maxlines):
+            for n in range(0, self.number_of_nodes):
+                if l < len(ledger_dict[n]):
+                    blocks.append(ledger_dict[n][l])
+
+        if len(blocks) < 2*int(self.number_of_twins) + 1:
+            LOGGER.log("[Violation] Liveness of system violated due to empty commits: ")
+
     def liveness_check(current_round):
         if current_round > self.liveness_round:
             self.liveness_round = current_round
@@ -198,7 +220,7 @@ class NetworkPlayground(process):
                 if l < len(ledger_dict[n]):
                     blocks.add(ledger_dict[n][l])
             if len(blocks) > 1:
-                LOGGER.log("Safety Check violated")
+                LOGGER.log("[Violation] Safety Check violated")
                 return False
 
         return True
@@ -226,7 +248,7 @@ class NetworkPlayground(process):
             _start_timer(self.max_current_round)
         
         if not liveness_check(int(current_round)):
-            LOGGER.log("Liveness of system violated")
+            LOGGER.log("[Violation] Liveness of system violated")
             self.completed = True
         
         if not self.completed and current_round == len(self.partitions) + 1:

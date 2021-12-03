@@ -23,14 +23,14 @@ a system. The steps for Anaconda installation is provided in Manual.
 ## 3. Bugs and Limitations
 - 
 
-## 3. Main files
+## 4. Main files
 - **twinBFT/scenario_generator.py	 :** ScenarioGenerator code
 - **twinBFT/Loyal_Byzantine_Generals_phase_2/src/scenario_executor.da :** The Driver code that runs  spawns teh clients and validtors as per the configuration/scenario passed. \
 - **twinBFT/Loyal_Byzantine_Generals_phase_2/src/network_playground.da  :** The code of NetworkPlayground which acts as a NetoworkTunnel.
 - **twinBFT/Loyal_Byzantine_Generals_phase_2/src/leader_election.da :** This the file that overrides the leader election module in DiemBFT. The leader for each round is taken from the configuration file
 
 
-## 6. Code Size
+## 5. Code Size
 - Cloc report in codesize.txt
 - Total code lines is 4048
 - Non essential code (tests, helper methods etc) is 753
@@ -51,9 +51,9 @@ All 3 members contributed equally to the project. Below are some of the notable 
 * Raj Patel (114363611)
     - SyncUP
     - Client Deduplication
-    - PaceMaker
 * Prince Kumar Maurya (114354075)
     - ScenarioExecutor
+	- Network Playground
 * Vishal Singh (114708875)
     - HashValidation
     - ScenarioGenerator

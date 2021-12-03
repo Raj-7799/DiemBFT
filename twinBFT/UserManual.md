@@ -16,7 +16,12 @@ pip install pynacl
 pip install plyvel
 pip install tabulate
 ```
-## 2. Running twinBFT 
+
+
+
+## 4. Running twinBFT 
+###  Generating scenarios::
+- ``` python scenario_generator.py```
 ### Command to run the scenario executor code from the source folder
 - ```  python -m da --message-buffer-size=65536 scenario_executor.da <config_file> &> out.log  ```
 
