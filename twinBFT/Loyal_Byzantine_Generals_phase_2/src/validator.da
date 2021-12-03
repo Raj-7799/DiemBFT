@@ -77,7 +77,7 @@ class Validator (process):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
         # send(('Timeout', timeout_msg), to=self.replicas)
         current_round = timeout_msg.tmo_info.round
-        if self.timeout_counter[current_round] < 5:
+        if self.timeout_counter[current_round] < 10:
             send(('Timeout', ({"from":self.validator_id, "to": self.replicas, "payload":timeout_msg, "current_round":current_round })), to=self.network_playground)
         else:
             LOGGER.log('Pausing timeout messages')

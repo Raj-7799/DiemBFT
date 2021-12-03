@@ -129,7 +129,7 @@ def main():
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
 
-    file = "../config/twinconfig_sync copy 3.json"
+    file = "../config/twinconfig_sync.json"
 
     twin_configs = read_config(file)
 
