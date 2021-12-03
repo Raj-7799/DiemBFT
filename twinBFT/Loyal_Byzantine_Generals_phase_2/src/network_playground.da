@@ -65,6 +65,11 @@ class NetworkPlayground(process):
             "is_broadcast": True
         }
 
+        if msg["current_round"] == len(self.partitions) + 1:
+            self.completed = True
+            LOGGER.log("Playground: process_request completed = {}  Timeout {} ".format(msg["current_round"],self.completed,self.state))
+            return
+
         if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
             print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
             LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
@@ -93,6 +98,11 @@ class NetworkPlayground(process):
             "is_broadcast": True
         }
 
+        if msg["current_round"] == len(self.partitions) + 1:
+            self.completed = True
+            LOGGER.log("Playground: process_request completed = {} Proposal {} ".format(msg["current_round"],self.completed,self.state))
+            return
+
         if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
             print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
             LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
@@ -106,7 +116,7 @@ class NetworkPlayground(process):
         process_request(request)
 
     def receive(msg=('Vote', msg), from_=p):
-        LOGGER.log_event("Playground: Received  from {} for round {} ".format(self.validators.index(p),msg["current_round"]), "Vote", "msg", p)
+        LOGGER.log("Playground: Received  from {} for round {} ".format(self.validators.index(p),msg["current_round"]))
 
         request  = {
             "type": 'Vote',
@@ -116,6 +126,12 @@ class NetworkPlayground(process):
             "current_round":msg["current_round"],
             "is_broadcast": False
         }
+
+        if msg["current_round"] == len(self.partitions) + 1:
+            self.completed = True
+            LOGGER.log_event("Playground: process_request completed = {}  Vote {} ".format(msg["current_round"],self.completed,self.state), "payload",msg["from"])
+            return
+
         if msg["from"] in self.delay_round[str(msg["current_round"])][request["type"]]:
             print("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
             LOGGER.log("Delaying {} for round {} from validator {}".format(request["type"], msg["current_round"], msg["from"]))
@@ -146,7 +162,6 @@ class NetworkPlayground(process):
         for n in range(0, self.number_of_nodes):
             level = 0
             filename = "validator_" + str(n) + ".ledger"
-            # '''self.config_id'''
             fp = open('../ledgers/config' + str(self.config_id) +
                   "/" + filename, 'r')
             Lines = fp.readlines()

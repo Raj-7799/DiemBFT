@@ -3,9 +3,9 @@ from random import randint
 from collections import defaultdict
 import json
 
-R = 10 # total number of rounds
+R = 3 # total number of rounds
 M = 3 # max partitions per round
-F = 1 # number of twins
+F = 2 # number of twins
 S = 5 #number of scenarios
 probability_of_overlap = 0.5 # probability of overlapping partition
 probability_partition_has_overlap = 0.5 # probability that a network partition contains a overlap
@@ -226,13 +226,15 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
                 twin_nodes
             ))
     
+    liveness_partition = populate_conensus_partition(
+                random.choice(major_partitions),
+                F + 1, 
+                twin_nodes
+    )
+
     # adding four extra rounds with super majority to ensure liveness
     for i in range(1, 5):
-        final_assignments[R + i].append(populate_conensus_partition(
-                random.choice(major_partitions),
-                leader_assignments[i], 
-                twin_nodes
-        ))
+        final_assignments[R + i].append(liveness_partition)
     
     return final_assignments
 
@@ -240,14 +242,15 @@ def round_assignment(leader_assignments, twin_nodes, parition_assignments={}):
 array_of_scenarios = []
 def generateScenarios():
     for i in range(0, S):
-        json_object_str = json.dumps({"num_of_nodes": total_nodes})
+        json_object_str = json.dumps({"number_of_nodes": total_nodes})
         json_object = json.loads(json_object_str)
-        json_object.update({"num_of_twins": F})
+        json_object.update({"number_of_twins": F})
         leader_assignments = assign_leaders()
         twin_nodes = set(["1"])
         final_assignments = round_assignment(leader_assignments, twin_nodes)
         for i in range(R+1, R+5):
-            leader_assignments[i] = final_assignments[i][0][0][0]
+            leader_assignments[i] = F + 1
+        
         scenario_json_object_str = json.dumps({"round_leaders" : leader_assignments})
         scenario_json_object = json.loads(scenario_json_object_str)
         scenario_json_object.update({"round_partitions" : final_assignments})
@@ -256,9 +259,9 @@ def generateScenarios():
         drop_dict = {}
         delay_dict = {}
 
-        for i in range (1, R+1):
+        for i in range (1, R+5):
             drop_dict[i]={}
-        for i in range (1, R+1):
+        for i in range (1, R+5):
             drop_dict[i]["Vote"]=[]
             drop_dict[i]["Proposal"]=[]
             drop_dict[i]["Timeout"]=[]
@@ -268,13 +271,12 @@ def generateScenarios():
                     drop_dict[r]["Vote"].append(n)
                 if randint(0, 4) == 1:
                     drop_dict[r]["Proposal"].append(n)
-                if randint(0, 4) == 1:
-                    drop_dict[r]["Timeout"].append(n)
+
         drop_dict={"drop_round_msg":drop_dict}
 
-        for i in range (1, R+1):
+        for i in range (1, R+5):
             delay_dict[i]={}
-        for i in range (1, R+1):
+        for i in range (1, R+5):
             delay_dict[i]["Vote"]=[]
             delay_dict[i]["Proposal"]=[]
             delay_dict[i]["Timeout"]=[]
@@ -284,8 +286,7 @@ def generateScenarios():
                     delay_dict[r]["Vote"].append(n)
                 if randint(0, 4) == 1:
                     delay_dict[r]["Proposal"].append(n)
-                if randint(0, 4) == 1:
-                    delay_dict[r]["Timeout"].append(n)
+
         delay_dict={"delay_round_msg":delay_dict}
         dict_json_object_str = json.dumps(drop_dict)
         dict_json_object = json.loads(dict_json_object_str)
