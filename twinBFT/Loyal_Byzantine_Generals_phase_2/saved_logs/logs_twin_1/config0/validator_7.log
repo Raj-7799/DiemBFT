@@ -1,0 +1,135 @@
+Timestamp: 2021-12-03 03:05:11.755742 | ProcessId: validator_7 | Action: Initial configuration | Object: {'nvalidators': 7, 'nclients': 1, 'nfaulty': 2.0, 'sleeptime': 1, 'clienttimeout': 10, 'nclientops': 10, 'delta': 2, 'window_size': 3, 'exclude_size': 0, 'duplicate_votes': False, 'failure_config': FailureConfig(failures=[], seed=637713655), 'round_leaders': [0, 2, 3, 3, 3, 3, 3], 'network_playground': {<NetworkPlayground:dbc0d>}} |
+2021-12-03 03:05:11.762898 validator_7 Pacemaker: start_timer [1]
+2021-12-03 03:05:11.762938 validator_7 Pacemaker: stop_timer [1]
+2021-12-03 03:05:11.762960 validator_7 Pacemaker: get_round_timer [1]
+2021-12-03 03:05:11.763063 validator_7 <Validator:dbc0b> []
+Timestamp: 2021-12-03 03:05:11.765355 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 03:05:11.765412 validator_7 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}]
+2021-12-03 03:05:11.765457 validator_7 Validator: process_new_round_event [None]
+2021-12-03 03:05:11.765497 validator_7 LeaderElection: get_leader  round 1 leader number 0 leader process <Validator:dbc03> [1]
+2021-12-03 03:05:11.765529 validator_7 LeaderElection: get_leader 0 twin 7 7 []
+2021-12-03 03:05:11.765562 validator_7 MemPool: peek_pool [None]
+2021-12-03 03:05:11.765590 validator_7 MemPool: peek_pool: returns [1, dict_keys(['0_0'])]
+2021-12-03 03:05:11.765620 validator_7 MemPool: get_transactions [None]
+2021-12-03 03:05:11.765638 validator_7 MemPool: get_transactions: returns [[{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}]]
+2021-12-03 03:05:11.765662 validator_7 BlockTree: generate_block  [[{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}], 1, 7]
+2021-12-03 03:05:11.765813 validator_7 BlockTree: generate_block: returns [{'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}], 'qc': None, 'id': b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2', 'author_signature': b'\xcf|\x934\xe1\xc9<I`\xde\x98UN\n.\x94x8\x04,\x12\x1b\x04WU\xf7a\x17\x90\xfa6$~vc\xcf\x89\x88\xe1\\\x02\x17&0\xa5W\xc5\x0b\x00hr\xb9}\xc7\x1e\xc5\x7f\xbeN|\xea\xa9\xab\x05\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\n\xbc\x8d\xb7\xb3S\x96M\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMn/M\x1c\xd5\x86q\x0btq\x0c\x81q\rua.'}]
+Timestamp: 2021-12-03 03:05:11.766209 | ProcessId: validator_7 | Action: Created a new block | Object: {'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': [7206281503374876238265354, 1, {}, '', '', '127.0.0.1', [12142, 54556]]}], 'qc': None, 'id': [57, 49, 55, 97, 54, 97, 100, 99, 98, 56, 54, 102, 99, 54, 53, 101, 56, 54, 54, 97, 50, 50, 51, 57, 56, 97, 57, 99, 97, 48, 52, 100, 54, 48, 102, 57, 56, 101, 52, 102, 49, 51, 101, 50, 57, 99, 56, 54, 52, 102, 57, 49, 52, 51, 99, 101, 101, 51, 54, 98, 48, 50, 102, 50], 'author_signature': {}} |
+2021-12-03 03:05:11.766283 validator_7 Broadcasting proposal message and setting to cache with block round 1 []
+Timestamp: 2021-12-03 03:05:11.766592 | ProcessId: validator_7 | Event: Sent | MsgType: Proposal | To: ALL validators | Msg: {'block': {'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': [7206281503374876238265354, 1, {}, '', '', '127.0.0.1', [12142, 54556]]}], 'qc': None, 'id': [57, 49, 55, 97, 54, 97, 100, 99, 98, 56, 54, 102, 99, 54, 53, 101, 56, 54, 54, 97, 50, 50, 51, 57, 56, 97, 57, 99, 97, 48, 52, 100, 54, 48, 102, 57, 56, 101, 52, 102, 49, 51, 101, 50, 57, 99, 56, 54, 52, 102, 57, 49, 52, 51, 99, 101, 101, 51, 54, 98, 48, 50, 102, 50], 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None, 'sender': 7, 'signature': {}}
+2021-12-03 03:05:11.766645 validator_7 Validator: process_new_round_event ends [None]
+Timestamp: 2021-12-03 03:05:11.766880 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 03:05:11.766913 validator_7 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.767324 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 03:05:11.767350 validator_7 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.768371 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 03:05:11.768396 validator_7 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.768536 | ProcessId: validator_7 | Event: Received | MsgType: Proposal | From: parent_process | Msg: (<object_types.ProposalMsg object at 0x7f778c323390>, 7, 1)
+Timestamp: 2021-12-03 03:05:11.768596 | ProcessId: validator_7 | Event: Received Proposal from 7 1 with payload [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}] | MsgType: Proposal | To: parent_process | Msg: {'block': {'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': [7206281503374876238265354, 1, {}, '', '', '127.0.0.1', [12142, 54556]]}], 'qc': None, 'id': [57, 49, 55, 97, 54, 97, 100, 99, 98, 56, 54, 102, 99, 54, 53, 101, 56, 54, 54, 97, 50, 50, 51, 57, 56, 97, 57, 99, 97, 48, 52, 100, 54, 48, 102, 57, 56, 101, 52, 102, 49, 51, 101, 50, 57, 99, 56, 54, 52, 102, 57, 49, 52, 51, 99, 101, 101, 51, 54, 98, 48, 50, 102, 50], 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None, 'sender': 7, 'signature': {}}
+Timestamp: 2021-12-03 03:05:11.768697 | ProcessId: validator_7 | Action: Verified ProposalMsg signature | Object: True |
+2021-12-03 03:05:11.768716 validator_7 Pacemaker: advance_round_tc [None]
+2021-12-03 03:05:11.768733 validator_7 Pacemaker: advance_round_tc: returns [False]
+2021-12-03 03:05:11.768754 validator_7 LeaderElection: get_leader  round 1 leader number 0 leader process <Validator:dbc03> [1]
+2021-12-03 03:05:11.768772 validator_7 LeaderElection: get_leader 0 twin 7 7 []
+2021-12-03 03:05:11.768788 validator_7 Proposal leader [<Validator:dbc03>]
+2021-12-03 03:05:11.768805 validator_7 Proposal twin leader [<Validator:dbc0b>]
+2021-12-03 03:05:11.768824 validator_7 BlockTree: execute_and_insert [{'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}], 'qc': None, 'id': b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2', 'author_signature': b'\xcf|\x934\xe1\xc9<I`\xde\x98UN\n.\x94x8\x04,\x12\x1b\x04WU\xf7a\x17\x90\xfa6$~vc\xcf\x89\x88\xe1\\\x02\x17&0\xa5W\xc5\x0b\x00hr\xb9}\xc7\x1e\xc5\x7f\xbeN|\xea\xa9\xab\x05\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\n\xbc\x8d\xb7\xb3S\x96M\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMn/M\x1c\xd5\x86q\x0btq\x0c\x81q\rua.'}]
+2021-12-03 03:05:11.768876 validator_7 Ledger: speculate [None, b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2', ['0-0']]
+2021-12-03 03:05:11.768912 validator_7 Ledger: get_state_id [None, b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2', ['0-0']]
+2021-12-03 03:05:11.768951 validator_7 Ledger: get_state_id: returns [b'003d4fd045804d375520f4e5329f68760fd1e6bd3830915cdf4f968193fbb301']
+2021-12-03 03:05:11.768982 validator_7 BlockTree: execute_and_insert ends [{'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}], 'qc': None, 'id': b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2', 'author_signature': b'\xcf|\x934\xe1\xc9<I`\xde\x98UN\n.\x94x8\x04,\x12\x1b\x04WU\xf7a\x17\x90\xfa6$~vc\xcf\x89\x88\xe1\\\x02\x17&0\xa5W\xc5\x0b\x00hr\xb9}\xc7\x1e\xc5\x7f\xbeN|\xea\xa9\xab\x05\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\n\xbc\x8d\xb7\xb3S\x96M\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMn/M\x1c\xd5\x86q\x0btq\x0c\x81q\rua.'}]
+2021-12-03 03:05:11.769016 validator_7 Safety: make_vote [{'author': 7, 'round': 1, 'payload': [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}], 'qc': None, 'id': b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2', 'author_signature': b'\xcf|\x934\xe1\xc9<I`\xde\x98UN\n.\x94x8\x04,\x12\x1b\x04WU\xf7a\x17\x90\xfa6$~vc\xcf\x89\x88\xe1\\\x02\x17&0\xa5W\xc5\x0b\x00hr\xb9}\xc7\x1e\xc5\x7f\xbeN|\xea\xa9\xab\x05\x80\x03]q\x00}q\x01(X\x06\x00\x00\x00req_idq\x02X\x03\x00\x00\x000_0q\x03X\x07\x00\x00\x00commandq\x04X\x03\x00\x00\x000-0q\x05X\x06\x00\x00\x00clientq\x06cda.common\nProcessId\nq\x07(\x8a\x0b\n\xbc\x8d\xb7\xb3S\x96M\xfd\xf5\x05K\x01cclient\nClient\nq\x08X\x00\x00\x00\x00q\th\tX\t\x00\x00\x00127.0.0.1q\nMn/M\x1c\xd5\x86q\x0btq\x0c\x81q\rua.'}, None]
+2021-12-03 03:05:11.769305 validator_7 Safety: __safe_to_vote [1, 0, None]
+2021-12-03 03:05:11.769344 validator_7 Safety: __consecutive [1, 0]
+2021-12-03 03:05:11.769370 validator_7 Safety: __consecutive returns [True]
+2021-12-03 03:05:11.769387 validator_7 Safety: __safe_to_vote returns2 [True]
+2021-12-03 03:05:11.769403 validator_7 Safety: __consecutive [1, 0]
+2021-12-03 03:05:11.769419 validator_7 Safety: __consecutive returns [True]
+2021-12-03 03:05:11.769435 validator_7 Safety: __update_highest_qc_round [0]
+2021-12-03 03:05:11.769452 validator_7 Safety: __update_highest_qc_round returns [0]
+2021-12-03 03:05:11.769468 validator_7 Safety: __increase_highest_vote_round [1]
+2021-12-03 03:05:11.769484 validator_7 Safety: __increase_highest_vote_round returns [1]
+2021-12-03 03:05:11.769504 validator_7 Ledger: pending_state [b'917a6adcb86fc65e866a22398a9ca04d60f98e4f13e29c864f9143cee36b02f2']
+2021-12-03 03:05:11.769521 validator_7 Ledger: pending_state: returns [b'003d4fd045804d375520f4e5329f68760fd1e6bd3830915cdf4f968193fbb301']
+2021-12-03 03:05:11.769543 validator_7 Safety: __commit_state_id_candidate [1, 0, '0']
+2021-12-03 03:05:11.769561 validator_7 Safety: __consecutive [1, 0]
+2021-12-03 03:05:11.769576 validator_7 Safety: __consecutive returns [True]
+2021-12-03 03:05:11.769592 validator_7 Ledger: pending_state ['0']
+2021-12-03 03:05:11.769607 validator_7 Ledger: pending_state: returns [None]
+2021-12-03 03:05:11.769622 validator_7 Safety: __commit_state_id_candidate returns1 [None]
+2021-12-03 03:05:11.769637 validator_7 Ledger: pending_state ['0']
+2021-12-03 03:05:11.769652 validator_7 Ledger: pending_state: returns [None]
+2021-12-03 03:05:11.769725 validator_7 Safety: make_vote: returns [{'vote_info': <object_types.VoteInfo object at 0x7f778c357210>, 'ledger_commit_info': <object_types.LedgerCommitInfo object at 0x7f778c360910>, 'high_commit_qc': None, 'sender': 7, 'signature': b'\xe8v\xab\xa9\xfd_\x07p\xb7P\xb5\xb3\x86\xbaL\x18"\xc6\xf51!\xbc@\xd3\xb2\xda\xb5\x97\xfb\xd6\x85\xd1N\xab\xda\xab\x15@\xa3R\xf0\xff\xac\\\x8a\x87\xf8t\xb4\x15\xb9B\x9d\xbb\x13\xe9b\xe8zJ\xfa\x96\x0f\x0e\x80\x03cobject_types\nLedgerCommitInfo\nq\x00)\x81q\x01}q\x02(X\x0f\x00\x00\x00commit_state_idq\x03NX\x0e\x00\x00\x00vote_info_hashq\x04C@8b34d042d0fa4c6d6a0fb5539f1455ec6eaf2ac9981da77ef32cae8f386f2d5cq\x05ub.'}]
+2021-12-03 03:05:11.769757 validator_7 LeaderElection: get_leader  round 2 leader number 2 leader process <Validator:dbc08> [2]
+Timestamp: 2021-12-03 03:05:11.769826 | ProcessId: validator_7 | Event: Sent | MsgType: Vote to next leader | To: validator_2 | Msg: {'vote_info': {'id': [57, 49, 55, 97, 54, 97, 100, 99, 98, 56, 54, 102, 99, 54, 53, 101, 56, 54, 54, 97, 50, 50, 51, 57, 56, 97, 57, 99, 97, 48, 52, 100, 54, 48, 102, 57, 56, 101, 52, 102, 49, 51, 101, 50, 57, 99, 56, 54, 52, 102, 57, 49, 52, 51, 99, 101, 101, 51, 54, 98, 48, 50, 102, 50], 'round': 1, 'parent_id': '0', 'parent_round': 0, 'exec_state_id': [48, 48, 51, 100, 52, 102, 100, 48, 52, 53, 56, 48, 52, 100, 51, 55, 53, 53, 50, 48, 102, 52, 101, 53, 51, 50, 57, 102, 54, 56, 55, 54, 48, 102, 100, 49, 101, 54, 98, 100, 51, 56, 51, 48, 57, 49, 53, 99, 100, 102, 52, 102, 57, 54, 56, 49, 57, 51, 102, 98, 98, 51, 48, 49]}, 'ledger_commit_info': {'commit_state_id': None, 'vote_info_hash': [56, 98, 51, 52, 100, 48, 52, 50, 100, 48, 102, 97, 52, 99, 54, 100, 54, 97, 48, 102, 98, 53, 53, 51, 57, 102, 49, 52, 53, 53, 101, 99, 54, 101, 97, 102, 50, 97, 99, 57, 57, 56, 49, 100, 97, 55, 55, 101, 102, 51, 50, 99, 97, 101, 56, 102, 51, 56, 54, 102, 50, 100, 53, 99]}, 'high_commit_qc': None, 'sender': 7, 'signature': {}}
+Timestamp: 2021-12-03 03:05:11.770419 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 03:05:11.770445 validator_7 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.770610 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 03:05:11.770632 validator_7 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.771389 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 03:05:11.771414 validator_7 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.772457 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 03:05:11.772482 validator_7 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.773457 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 03:05:11.773481 validator_7 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:11.774543 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 03:05:11.774566 validator_7 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:dbc0a>}]
+2021-12-03 03:05:19.763250 validator_7 Pacemaker: local_timeout_round at round 1 [[]]
+2021-12-03 03:05:19.763581 validator_7 Safety: make_timeout [1, None, None]
+2021-12-03 03:05:19.763710 validator_7 Safety: __safe_to_timeout [1, 0, None]
+2021-12-03 03:05:19.763819 validator_7 Safety: __consecutive [1, 0]
+2021-12-03 03:05:19.763942 validator_7 Safety: __consecutive returns [True]
+2021-12-03 03:05:19.764018 validator_7 Safety: __safe_to_timeout returns2 [True]
+2021-12-03 03:05:19.764082 validator_7 Safety: __consecutive [1, 0]
+2021-12-03 03:05:19.764145 validator_7 Safety: __consecutive returns [True]
+2021-12-03 03:05:19.764211 validator_7 Safety: __increase_highest_vote_round [1]
+2021-12-03 03:05:19.764275 validator_7 Safety: __increase_highest_vote_round returns [1]
+2021-12-03 03:05:19.764573 validator_7 Safety: make_timeout: returns1 [{'round': 1, 'high_qc': None, 'author': 7, 'author_signature': b"\xf7/\x16\xb02\x8f\x95&\xfb2b\x9e+\xbc\xa0E\xc7u\xd4\x0ec\xea\xff\xaf\x8e\x84\xb4\xa9\xfd'\xb5\xd9\xe1\xe7fUm\xc6Y\x8e|@\xae-\xab{\xeb\xef\x9fO\xb0\xb3!\xf9\xdb^\xce\x99/}\xf9\x94O\x01\x80\x03X\x06\x00\x00\x001,Noneq\x00."}]
+Timestamp: 2021-12-03 03:05:19.764767 | ProcessId: validator_7 | Action: Local Timeout occurred | Object: {'round': 1, 'high_qc': None, 'author': 7, 'author_signature': {}} |
+2021-12-03 03:05:19.764874 validator_7 Timeout Msg parameters [{'round': 1, 'high_qc': None, 'author': 7, 'author_signature': b"\xf7/\x16\xb02\x8f\x95&\xfb2b\x9e+\xbc\xa0E\xc7u\xd4\x0ec\xea\xff\xaf\x8e\x84\xb4\xa9\xfd'\xb5\xd9\xe1\xe7fUm\xc6Y\x8e|@\xae-\xab{\xeb\xef\x9fO\xb0\xb3!\xf9\xdb^\xce\x99/}\xf9\x94O\x01\x80\x03X\x06\x00\x00\x001,Noneq\x00."}, None, None]
+2021-12-03 03:05:19.764972 validator_7 Validator: send_timeout_message [{'tmo_info': <object_types.TimeoutInfo object at 0x7f778c30eb50>, 'last_round_tc': None, 'high_commit_qc': None}]
+Timestamp: 2021-12-03 03:05:19.766529 | ProcessId: validator_7 | Event: Sent | MsgType: Timeout | To: ALL validators | Msg: {'tmo_info': {'round': 1, 'high_qc': None, 'author': 7, 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None}
+Timestamp: 2021-12-03 03:05:19.774915 | ProcessId: validator_7 | Event: Received | MsgType: Timeout | From: parent_process | Msg: (<object_types.TimeoutMsg object at 0x7f778c3238d0>, 7, 1)
+Timestamp: 2021-12-03 03:05:19.774962 | ProcessId: validator_7 | Event: Received from 7 | MsgType: Timeout | To: parent_process | Msg: {'tmo_info': {'round': 1, 'high_qc': None, 'author': 7, 'author_signature': {}}, 'last_round_tc': None, 'high_commit_qc': None}
+Timestamp: 2021-12-03 03:05:19.775059 | ProcessId: validator_7 | Action: Verified TimeoutMsg signature | Object: True |
+2021-12-03 03:05:19.775077 validator_7 Validator: process_certificate_qc [None]
+2021-12-03 03:05:19.775097 validator_7 BlockTree: process_qc [None, 7]
+2021-12-03 03:05:19.775115 validator_7 BlockTree: process_qc ends [None]
+2021-12-03 03:05:19.775131 validator_7 Validator: process_certificate_qc recent_committed_block [0]
+2021-12-03 03:05:19.775148 validator_7 LeaderElection: update_leaders [None]
+2021-12-03 03:05:19.775165 validator_7 Pacemaker: advance_round_qc [None]
+2021-12-03 03:05:19.775180 validator_7 Pacemaker: advance_round_qc: returns [True]
+2021-12-03 03:05:19.775195 validator_7 Validator: process_certificate_qc ended [None]
+2021-12-03 03:05:19.775211 validator_7 Validator: process_certificate_qc [None]
+2021-12-03 03:05:19.775225 validator_7 BlockTree: process_qc [None, 7]
+2021-12-03 03:05:19.775241 validator_7 BlockTree: process_qc ends [None]
+2021-12-03 03:05:19.775256 validator_7 Validator: process_certificate_qc recent_committed_block [0]
+2021-12-03 03:05:19.775272 validator_7 LeaderElection: update_leaders [None]
+2021-12-03 03:05:19.775287 validator_7 Pacemaker: advance_round_qc [None]
+2021-12-03 03:05:19.775301 validator_7 Pacemaker: advance_round_qc: returns [True]
+2021-12-03 03:05:19.775317 validator_7 Validator: process_certificate_qc ended [None]
+2021-12-03 03:05:19.775332 validator_7 Pacemaker: advance_round_tc [None]
+2021-12-03 03:05:19.775347 validator_7 Pacemaker: advance_round_tc: returns [False]
+2021-12-03 03:05:19.775369 validator_7 Pacemaker: process_remote_timeout [{'tmo_info': <object_types.TimeoutInfo object at 0x7f778c323e90>, 'last_round_tc': None, 'high_commit_qc': None}]
+2021-12-03 03:05:19.775393 validator_7 Pacemaker: process_remote_timeout: returns [None]
+Timestamp: 2021-12-03 03:05:21.768972 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_0', 'command': '0-0'}
+2021-12-03 03:05:21.769022 validator_7 MemPool: add_transaction [{'req_id': '0_0', 'command': '0-0', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.772115 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_1', 'command': '0-1'}
+2021-12-03 03:05:21.772149 validator_7 MemPool: add_transaction [{'req_id': '0_1', 'command': '0-1', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.775252 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_2', 'command': '0-2'}
+2021-12-03 03:05:21.775281 validator_7 MemPool: add_transaction [{'req_id': '0_2', 'command': '0-2', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.777354 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_3', 'command': '0-3'}
+2021-12-03 03:05:21.777389 validator_7 MemPool: add_transaction [{'req_id': '0_3', 'command': '0-3', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.779479 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_4', 'command': '0-4'}
+2021-12-03 03:05:21.779511 validator_7 MemPool: add_transaction [{'req_id': '0_4', 'command': '0-4', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.780038 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_5', 'command': '0-5'}
+2021-12-03 03:05:21.780072 validator_7 MemPool: add_transaction [{'req_id': '0_5', 'command': '0-5', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.781048 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_6', 'command': '0-6'}
+2021-12-03 03:05:21.781076 validator_7 MemPool: add_transaction [{'req_id': '0_6', 'command': '0-6', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.781816 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_7', 'command': '0-7'}
+2021-12-03 03:05:21.781857 validator_7 MemPool: add_transaction [{'req_id': '0_7', 'command': '0-7', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.782273 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_8', 'command': '0-8'}
+2021-12-03 03:05:21.782303 validator_7 MemPool: add_transaction [{'req_id': '0_8', 'command': '0-8', 'client': <Client:dbc0a>}]
+Timestamp: 2021-12-03 03:05:21.782648 | ProcessId: validator_7 | Event: Received | MsgType: Request | From: client_0 | Msg: {'req_id': '0_9', 'command': '0-9'}
+2021-12-03 03:05:21.782675 validator_7 MemPool: add_transaction [{'req_id': '0_9', 'command': '0-9', 'client': <Client:dbc0a>}]
+2021-12-03 03:05:29.914698 validator_7 Pacemaker: stop_timer [1]

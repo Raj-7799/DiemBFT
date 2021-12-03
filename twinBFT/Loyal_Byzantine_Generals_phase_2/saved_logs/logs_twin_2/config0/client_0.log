@@ -1,0 +1,177 @@
+Timestamp: 2021-12-03 02:59:17.472003 | ProcessId: client_0 | Action: Initial configuration | Object: {'nvalidators': 7, 'nclients': 1, 'nfaulty': 2.0, 'sleeptime': 1, 'clienttimeout': 10, 'nclientops': 10, 'delta': 2, 'window_size': 3, 'exclude_size': 0, 'duplicate_votes': False, 'failure_config': FailureConfig(failures=[], seed=637713655), 'round_leaders': [4, 1, 2, 3, 3, 3, 3], 'network_playground': {<NetworkPlayground:2d00d>}} |
+Timestamp: 2021-12-03 02:59:17.478928 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_0', 'command': '0-0'}
+Timestamp: 2021-12-03 02:59:17.480247 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_1', 'command': '0-1'}
+Timestamp: 2021-12-03 02:59:17.481409 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 02:59:17.482509 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 02:59:17.483582 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 02:59:17.484653 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 02:59:17.485710 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 02:59:17.486833 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 02:59:17.487934 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 02:59:17.489005 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 02:59:27.479218 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_0', 'command': '0-0'} |
+Timestamp: 2021-12-03 02:59:27.480501 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_1', 'command': '0-1'} |
+Timestamp: 2021-12-03 02:59:27.481263 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_0', 'command': '0-0'}
+Timestamp: 2021-12-03 02:59:27.481640 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 02:59:27.482800 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 02:59:27.483431 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_1', 'command': '0-1'}
+Timestamp: 2021-12-03 02:59:27.483819 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 02:59:27.484918 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 02:59:27.485497 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 02:59:27.486083 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 02:59:27.487117 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 02:59:27.487905 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 02:59:27.488214 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 02:59:27.489237 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 02:59:27.490211 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 02:59:27.492128 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 02:59:27.493378 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 02:59:27.494255 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 02:59:27.494709 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 02:59:27.494933 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 02:59:37.481773 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_0', 'command': '0-0'} |
+Timestamp: 2021-12-03 02:59:37.484380 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_1', 'command': '0-1'} |
+Timestamp: 2021-12-03 02:59:37.486722 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 02:59:37.488116 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_0', 'command': '0-0'}
+Timestamp: 2021-12-03 02:59:37.488297 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 02:59:37.490329 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_1', 'command': '0-1'}
+Timestamp: 2021-12-03 02:59:37.490619 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 02:59:37.491115 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 02:59:37.492343 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 02:59:37.492491 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 02:59:37.493737 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 02:59:37.493897 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 02:59:37.494599 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 02:59:37.495151 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 02:59:37.495287 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 02:59:37.496328 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 02:59:37.499419 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 02:59:37.500716 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 02:59:37.501024 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 02:59:37.501150 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 02:59:38.565075 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_3 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.568786 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.569487 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.569521 | ProcessId: client_0 | Action: Received f + 1 valid responses | Object: 0_0 |
+Timestamp: 2021-12-03 02:59:38.570185 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_2 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.571536 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_4 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.572366 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_5 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.579674 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_3 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.583093 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.583414 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.583824 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_2 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.584552 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_4 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.585353 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_5 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.591917 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_3 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.595305 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.595664 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.595716 | ProcessId: client_0 | Action: Received f + 1 valid responses | Object: 0_1 |
+Timestamp: 2021-12-03 02:59:38.603609 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_6 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.605384 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_7 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.606998 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_6 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.607075 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_8 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.608304 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_7 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.609918 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_8 | Msg: {'req_id': '0_0', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.609987 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_6 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.611292 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_7 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:38.612798 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_8 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:46.594704 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_2 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:46.596571 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_4 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:46.598525 | ProcessId: client_0 | Event: Received | MsgType: Response | From: validator_5 | Msg: {'req_id': '0_1', 'resp_status': 'success'}
+Timestamp: 2021-12-03 02:59:47.491574 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 02:59:47.493331 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 02:59:47.494855 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 02:59:47.496962 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 02:59:47.499754 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 02:59:47.501118 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 02:59:47.501375 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 02:59:47.501488 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 02:59:47.502973 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 02:59:47.505470 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 02:59:47.506782 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 02:59:47.507126 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 02:59:47.508768 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 02:59:47.509446 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 02:59:47.509627 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 02:59:47.509757 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 02:59:54.650771 | ProcessId: client_0 | Event: Sent | MsgType: Done | To: parent_process | Msg: None
+Timestamp: 2021-12-03 02:59:57.503409 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 02:59:57.504562 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 02:59:57.505752 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 02:59:57.506879 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 02:59:57.507076 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 02:59:57.507639 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 02:59:57.509160 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 02:59:57.509733 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 02:59:57.510075 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 02:59:57.510301 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 02:59:57.511280 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 02:59:57.513040 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 02:59:57.515777 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 02:59:57.516355 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 02:59:57.516554 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 02:59:57.516672 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 03:00:07.504995 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 03:00:07.507497 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 03:00:07.511985 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 03:00:07.513430 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 03:00:07.513597 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 03:00:07.515095 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 03:00:07.516195 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 03:00:07.516463 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 03:00:07.516684 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 03:00:07.516837 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 03:00:07.516971 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 03:00:07.517733 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 03:00:07.521508 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 03:00:07.521902 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 03:00:07.522123 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 03:00:07.522254 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 03:00:17.514052 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 03:00:17.515227 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 03:00:17.515489 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 03:00:17.516534 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 03:00:17.516687 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 03:00:17.517821 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 03:00:17.517993 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 03:00:17.518923 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 03:00:17.521811 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 03:00:17.522248 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 03:00:17.522684 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 03:00:17.522877 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 03:00:17.525830 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 03:00:17.526994 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 03:00:17.527305 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 03:00:17.527464 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 03:00:27.515767 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 03:00:27.517635 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 03:00:27.518453 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 03:00:27.520109 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 03:00:27.524124 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 03:00:27.525560 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 03:00:27.525788 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 03:00:27.525945 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 03:00:27.526084 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 03:00:27.527167 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 03:00:27.527335 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 03:00:27.527714 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 03:00:27.527837 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 03:00:27.530468 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 03:00:27.531463 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 03:00:27.531603 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
+Timestamp: 2021-12-03 03:00:37.524537 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_2', 'command': '0-2'} |
+Timestamp: 2021-12-03 03:00:37.525767 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_2', 'command': '0-2'}
+Timestamp: 2021-12-03 03:00:37.525840 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_3', 'command': '0-3'} |
+Timestamp: 2021-12-03 03:00:37.526227 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_4', 'command': '0-4'} |
+Timestamp: 2021-12-03 03:00:37.526272 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_5', 'command': '0-5'} |
+Timestamp: 2021-12-03 03:00:37.527437 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_6', 'command': '0-6'} |
+Timestamp: 2021-12-03 03:00:37.530772 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_8', 'command': '0-8'} |
+Timestamp: 2021-12-03 03:00:37.531444 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_3', 'command': '0-3'}
+Timestamp: 2021-12-03 03:00:37.531712 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_9', 'command': '0-9'} |
+Timestamp: 2021-12-03 03:00:37.531965 | ProcessId: client_0 | Action: Retransmitting Request | Object: {'req_id': '0_7', 'command': '0-7'} |
+Timestamp: 2021-12-03 03:00:37.532528 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_4', 'command': '0-4'}
+Timestamp: 2021-12-03 03:00:37.532987 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_5', 'command': '0-5'}
+Timestamp: 2021-12-03 03:00:37.534096 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_6', 'command': '0-6'}
+Timestamp: 2021-12-03 03:00:37.536228 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_8', 'command': '0-8'}
+Timestamp: 2021-12-03 03:00:37.536650 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_9', 'command': '0-9'}
+Timestamp: 2021-12-03 03:00:37.536774 | ProcessId: client_0 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '0_7', 'command': '0-7'}
