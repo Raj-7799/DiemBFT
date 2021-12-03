@@ -104,6 +104,7 @@ class BlockTree:
             self.pending_signers[vote_idx] = [vote_msg.sender]
         
         '''if |pending votes[vote idx]| = 2f + 1 then'''
+        # if len(self.pending_votes[vote_idx]) == 2*self.f + 1:
         if len(self.pending_votes[vote_idx]) == 2*self.f + 1:
             '''qc ←QC h
                 vote info ← v.vote info,
