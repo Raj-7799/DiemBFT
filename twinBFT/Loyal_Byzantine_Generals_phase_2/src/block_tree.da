@@ -5,7 +5,7 @@ from utils import get_qc_with_max_round
 
 
 class BlockTree:
-    def __init__(self, validator_id, replicas, ledger, nfaulty,quorum_size, id_block):
+    def __init__(self, validator_id, replicas, ledger, nfaulty,quorum_size,duplicate_votes, id_block):
         '''
         pending block tree; // tree of blocks pending commitment
         pending votes; // collected votes per block indexed by their LedgerInfo hash
@@ -25,6 +25,7 @@ class BlockTree:
         self.f = nfaulty
         self.quorum_size = quorum_size
         self.id_block = id_block
+        self.duplicate_votes = duplicate_votes
 
     '''Procedure execute and insert(b)'''
     # This function inserts the given block into the Ledger's speculate tree and also into pending block tree as well
@@ -97,7 +98,7 @@ class BlockTree:
         vote_idx = Cryptography.hash(vote_msg.ledger_commit_info)
 
         '''pending votes[vote idx] ← pending votes[vote idx] ∪ v.signature'''
-        if vote_idx in self.pending_votes and vote_msg.signature not in self.pending_votes[vote_idx]:
+        if vote_idx in self.pending_votes and ( vote_msg.signature not in self.pending_votes[vote_idx] or self.duplicate_votes):
             self.pending_votes[vote_idx].append(vote_msg.signature)
             self.pending_signers[vote_idx].append(vote_msg.sender)
         else:

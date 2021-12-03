@@ -41,8 +41,11 @@ class Validator (process):
 
         self.ledger = Ledger(
             config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
+        
+        self.duplicate_votes =  False if "duplicate_votes" not in config else config["duplicate_votes"]
+
         self.blocktree = BlockTree(
-            validator_id, replicas, self.ledger, config['nfaulty'], self.quorum_size,self.id_block)
+            validator_id, replicas, self.ledger, config['nfaulty'], self.quorum_size,self.duplicate_votes,self.id_block)
         self.safety = Safety(validator_id, replicas,
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
