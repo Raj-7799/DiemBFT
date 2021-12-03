@@ -49,15 +49,22 @@ a system. The steps for Anaconda installation is provided in Manual.
 
 All 3 members contributed equally to the project. Below are some of the notable contributions by each team member
 * Raj Patel (114363611)
-    - SyncUP
-    - Client Deduplication
+    - Sync Up
+    - Leader Assignments
+    - Fixing duplicate block commits
+    - Ensuring liveness in scenario generation
+    - Relaying through Network Playground
+    - Overall integration and debugging
 * Prince Kumar Maurya (114354075)
     - ScenarioExecutor
 	- Network Playground
+    - Configuration and Validator Identity
+    - Overall integration and debugging
 * Vishal Singh (114708875)
     - HashValidation
     - ScenarioGenerator
-    - Readme and Manual
+    - Adding safety and liveness check
+    - Test Report, Readme and Manual
 
 ## 9. Other
 Guide to TAs 
