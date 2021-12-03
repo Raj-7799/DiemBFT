@@ -180,13 +180,13 @@ class NetworkPlayground(process):
             ledger_dict[n] = Lines
 
         LOGGER.log_action("Ledger state", ledger_dict)
-        blocks = set()
+        blocks = []
         for l in range(0, maxlines):
             for n in range(0, self.number_of_nodes):
                 if l < len(ledger_dict[n]):
-                    blocks.add(ledger_dict[n][l])
+                    blocks.append(ledger_dict[n][l])
 
-        if len(blocks) == 0:
+        if len(blocks) < 2*int(self.number_of_twins) + 1:
             LOGGER.log("[Violation] Liveness of system violated due to empty commits: ")
 
     def liveness_check(current_round):
