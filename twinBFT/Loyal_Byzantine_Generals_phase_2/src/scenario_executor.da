@@ -166,7 +166,7 @@ def main():
             'delta': 2,
             'window_size': 3,
             'exclude_size': 0,
-            "quorum_size" : 2*(int(number_of_nodes-1)/3),
+            # "quorum_size" : 2*(int(number_of_nodes-1)/3),
             'failure_config': FailureConfig(
                 failures=[],
                 seed=637713655
