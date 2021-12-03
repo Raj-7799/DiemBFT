@@ -1,422 +1,288 @@
-<<<<<<< HEAD:twinBFT/Loyal_Byzantine_Generals_phase_2/config/twin_safety_2f.json
-{
-   "number_of_nodes": 4,
-   "number_of_twins": 1,
-   "round_leaders": {
-      "0": 0,
-      "1": 0,
-      "2": 0,
-      "3": 0
-   },
-   "round_partitions": {
-      "0": [
-         [
-            [
-               0,
-               1,
-               2
-=======
 
     {
-        "number_of_nodes": 4,
-        "number_of_twins": 1,
-        "round_leaders": {
-            "0" : 0,
-            "1" : 0,
-            "2" : 0,
-            "3" : 0
-        },
-        "round_partitions": {
-            "0" : [
-                [
-                    [
-                        0,
-                        1,
-                        2
-                    ],
-                    [
-                        3,
-                        4
-                    ]
-                ]
->>>>>>> 504be6d3b28fa53faef587fd77e2bfab72a6d6ba:twinBFT/Loyal_Byzantine_Generals_phase_2/config/twinconfig_safety_2f.json
-            ],
-            [
-               3,
-               4
-            ]
-         ]
-      ],
-      "1": [
-         [
-            [
-               0,
-               1,
-               2
-            ],
-            [
-               3,
-               4
-            ]
-         ]
-      ],
-      "2": [
-         [
-            [
-               0,
-               1,
-               2
-            ],
-            [
-               3,
-               4
-            ]
-         ]
-      ],
-      "3": [
-         [
-            [
-               0,
-               1,
-               2
-            ],
-            [
-               3,
-               4
-            ]
-<<<<<<< HEAD:twinBFT/Loyal_Byzantine_Generals_phase_2/config/twin_safety_2f.json
-         ]
-      ]
-   },
-   "drop_round_msg": {
-      "1": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
+      "number_of_nodes": 4,
+      "number_of_twins": 1,
+      "round_leaders": {
+          "0" : 0,
+          "1" : 0,
+          "2" : 0,
+          "3" : 0
       },
-      "2": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
+      "round_partitions": {
+          "0" : [
+              [
+                  [
+                      0,
+                      1,
+                      2
+                  ],
+                  [
+                      3,
+                      4
+                  ]
+              ]
+          ],
+          "1" : [
+              [
+                  [
+                      0,
+                      1,
+                      2
+                  ],
+                  [
+                      3,
+                      4
+                  ]
+              ]
+          ],
+          "2" : [
+              [
+                  [
+                      0,
+                      1,
+                      2
+                  ],
+                  [
+                      3,
+                      4
+                  ]
+              ]
+          ],
+          "3" : [
+              [
+                  [
+                      0,
+                      1,
+                      2
+                  ],
+                  [
+                      3,
+                      4
+                  ]
+              ]
+          ]
       },
-      "3": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "4": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "5": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "6": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "7": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "8": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "9": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "10": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      }
-   },
-   "delay_round_msg": {
-      "1": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "2": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "3": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "4": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "5": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "6": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "7": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "8": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "9": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      },
-      "10": {
-         "Vote": [],
-         "Proposal": [],
-         "Timeout": []
-      }
-   }
-}
-=======
-        },
-        "drop_round_msg":{
-            "1":{
-               "Vote":[
+      "drop_round_msg":{
+          "1":{
+             "Vote":[
 
-               ],
-               "Proposal":[
-               ],
-               "Timeout":[
-               ]
-            },
-            "2":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "3":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "4":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "5":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "6":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "7":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "8":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "9":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "10":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            }
-         },
-         "delay_round_msg":{
-            "1":{
-               "Vote":[
+             ],
+             "Proposal":[
+             ],
+             "Timeout":[
+             ]
+          },
+          "2":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "3":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "4":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "5":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "6":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "7":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "8":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "9":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "10":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          }
+       },
+       "delay_round_msg":{
+          "1":{
+             "Vote":[
 
-               ],
-               "Proposal":[
+             ],
+             "Proposal":[
 
-               ],
-               "Timeout":[
-               ]
-            },
-            "2":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "3":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "4":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "5":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "6":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "7":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "8":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "9":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            },
-            "10":{
-               "Vote":[
-                  
-               ],
-               "Proposal":[
-                  
-               ],
-               "Timeout":[
-                  
-               ]
-            }
-         }
-    }
+             ],
+             "Timeout":[
+             ]
+          },
+          "2":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "3":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "4":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "5":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "6":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "7":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "8":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "9":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          },
+          "10":{
+             "Vote":[
+                
+             ],
+             "Proposal":[
+                
+             ],
+             "Timeout":[
+                
+             ]
+          }
+       }
+  }
 
 
->>>>>>> 504be6d3b28fa53faef587fd77e2bfab72a6d6ba:twinBFT/Loyal_Byzantine_Generals_phase_2/config/twinconfig_safety_2f.json
