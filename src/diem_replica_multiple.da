@@ -162,7 +162,7 @@ class Replica_Multiple_Failure(process):
                 if self.specialArgs['subtype'] =="probablisticdrop" and proposal_msg.block.roundNo in self.specialArgs["rounds"] :
                     self.OutputReplica("[process_next_round_event]  Drop process_proposal_msg message")
                     random.seed(self.specialArgs["randomSeed"])
-                    if random.uniform() <= self.specialArgs["probability"]:
+                    if random.uniform(0,1) <= self.specialArgs["probability"]:
                         return
                 send(("process_proposal_msg", [proposal_msg, SIGNED_MSG]), to=replicaInfo.process)
 
@@ -261,7 +261,7 @@ class Replica_Multiple_Failure(process):
             if self.specialArgs['subtype'] =="probablisticdrop" and P.block.roundNo in self.specialArgs["rounds"]:
                 self.OutputReplica("[process_proposal_msg]  [Drop proces_vote_msg]  ")
                 random.seed(self.specialArgs["randomSeed"])
-                if random.uniform() <= self.specialArgs["probability"]:
+                if random.uniform(0,1) <= self.specialArgs["probability"]:
                     return
             self.OutputReplica("[process_proposal_msg] Exit Sending vote message to next leader : {} for block ID {} at round {}".format( nextLeaderInfo.replicaID, P.block.id, self.paceMaker.current_round))
             SIGNED_MSG = Util.sign_object_dup(vote_message, self.privateKey)

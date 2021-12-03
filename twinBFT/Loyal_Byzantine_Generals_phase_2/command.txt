@@ -1,0 +1,2 @@
+python -m da --logfile --logfilename da.log --message-buffer-size 65535 scenario_executor.da
+

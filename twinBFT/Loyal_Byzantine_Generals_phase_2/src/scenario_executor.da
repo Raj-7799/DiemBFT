@@ -1,0 +1,199 @@
+import os
+import shutil
+import sys
+import json
+
+sys.path.append('../config')
+
+from object_types import FailType, Failure, FailureConfig, MsgType
+
+from client import Client
+from logger_util import LOGGER
+from cryptography import Cryptography
+from validator import Validator, ValidatorFI
+from network_playground import NetworkPlayground
+
+class ScenarioExecutor(process):
+        
+    def setup(config, config_id):
+        self.config_id=config_id
+
+        LOGGER.log_action("Initial configuration", config)
+        self.nvalidators = int(config['nvalidators'])
+        self.nclients = int(config['nclients'])
+        self.nfaulty = int(config['nfaulty'])
+        self.twin_config=config['twin_config']
+        self.round_leaders =self.twin_config['round_leaders'] 
+        config['round_leaders']=self.round_leaders
+        del config['twin_config']
+        self.exit=False
+
+    def run():
+
+
+        private_keys_validators = {}
+        public_keys_validators = {}
+        private_keys_clients = {}
+        public_keys_clients = {}
+
+        self.validators = list(new(Validator, num=nvalidators))
+        
+        clients = new(Client, num=nclients)
+        ntwins = int(twin_config["number_of_twins"])
+
+        self.twins =  new(ValidatorFI,num=ntwins)
+
+
+        self.network_playground =  new(NetworkPlayground, num=1)
+        config['network_playground']=self.network_playground
+
+        all_nodes=list()
+        for i,v in enumerate(validators):
+            private_key, public_key = Cryptography.generate_key()
+            private_keys_validators[v] = private_key
+            public_keys_validators[v] = public_key
+            all_nodes.append(v)
+        
+        twin_node_cache = {}
+        for i, v in enumerate(twins,start=len(validators)):
+            private_keys_validators[v]=private_keys_validators[validators[i-len(validators)]]
+            public_keys_validators[v]=public_keys_validators[validators[i-len(validators)]]
+            twin_node_cache[i]=v
+            all_nodes.append(v)
+        LOGGER.log(private_keys_validators)
+
+        for c in clients:
+            private_key, public_key = Cryptography.generate_key()
+            private_keys_clients[c] = private_key
+            public_keys_clients[c] = public_key
+
+        
+        # all_nodes = list(validators)+list(twins)
+        for i, v in enumerate(all_nodes):
+            setup({v}, (config, config_id, i, all_nodes, list(clients),
+                        private_keys_validators[v], public_keys_validators, public_keys_clients))
+       
+
+        for i, c in enumerate(clients):
+            setup({c}, (config, config_id, i, all_nodes,
+                        private_keys_clients[c], public_keys_validators))
+
+        
+        setup(network_playground, (twin_config, config_id, all_nodes,nvalidators ,public_keys_validators, public_keys_clients))
+        
+        start(network_playground)
+        start(validators)
+        start(twins)
+        start(clients)
+        
+        LOGGER.log("Awaiting for Playground to exit")
+        await(some(received(('DonePlayground',))))
+        LOGGER.log("All clients done, informing all network playground.", config_id)
+        LOGGER.log("Network Playground closed, informing all validators.", config_id)
+
+        LOGGER.log("Closing validator ")
+
+        send(('Done',), to=validators)
+        LOGGER.log("CLosed validator ")
+        send(('Done',), to=twins)
+        LOGGER.log("CLosed twin ")
+        send(('Done',), to=clients)
+        LOGGER.log("CLosed client ")
+        output("All nodes exited ", config_id)
+        LOGGER.log("All nodes exited ", config_id)
+
+
+    def is_config_valid(config):
+        if int(config['nvalidators']) < (3 * int(config['nfaulty']) + 1):
+            LOGGER.log(
+                "Number of validators should be more than thrice of number of faulty validators.")
+            return False
+        if (int(config['nfaulty']) > int(config['exclude_size'])) or (int(config['exclude_size']) > 2 * int(config['nfaulty'])):
+            LOGGER.log(
+                "Exlude size should be between nfaulty and 2*nfaulty")
+            return False
+        return True
+
+
+def read_config(file):
+    """
+        Reading Config file 
+    """
+    # config =  open(file)
+    with open(file, 'r') as json_file:
+        twin_config = json.load(json_file)
+        twin_config["round_leaders"] = list(twin_config["round_leaders"].values())
+        twin_config["round_partitions"] = list(twin_config["round_partitions"].values())
+        return twin_config
+
+
+def main():
+
+    if os.path.exists('../logs/') and os.path.isdir('../logs/'):
+        shutil.rmtree('../logs/')
+
+    if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
+        shutil.rmtree('../ledgers/')
+    if len(sys.argv) < 2:
+        files = os.listdir('../config/')
+    else:
+        files=sys.argv[1:]
+    
+    config_id = 0
+
+    for file in files:
+        file = "../config/" + file
+        os.makedirs('../logs/config' + str(config_id))
+        os.makedirs('../ledgers/config' + str(config_id))
+
+        LOGGER.process_id = "ScenarioExecutor_" + str(config_id)
+        LOGGER.filename = '../logs/config' + str(config_id) + '/' \
+            + LOGGER.process_id + ".log"
+        LOGGER.log("Running config file: " + str(file))
+
+        # twin_configs = json.load(file)
+        twin_config = read_config(file)
+        print(twin_config)
+        number_of_nodes =  int(twin_config["number_of_nodes"])
+        config = {
+            "nvalidators": number_of_nodes,
+            "nclients" : 1,
+            "nfaulty": (number_of_nodes-1)/3,
+            "twin_config": twin_config,
+            'sleeptime': 1,
+            'clienttimeout': 10,
+            'nclientops': 10,
+            'delta': 2,
+            'window_size': 3,
+            'exclude_size': 0,
+            "quorum_size" : 2*(int(number_of_nodes-1)/3),
+            'failure_config': FailureConfig(
+                failures=[],
+                seed=637713655
+            )        
+        }
+
+
+
+        # config_1={
+        #     'nvalidators': 4,
+        #     'nfaulty': 1,
+        #     'nclients': 3,
+        #     'nclientops': 6,
+        #     'sleeptime': 1,
+        #     'clienttimeout': 10,
+        #     'delta': 5,
+        #     'window_size': 5,
+        #     'exclude_size': 1,
+        #     'failure_config': FailureConfig(
+        #         failures=[
+        #             Failure(src='_', dest='_', msg_type=MsgType.All,
+        #                     round='all', prob=1, fail_type=FailType.SetAttr, val=2, attr='quorum_size')
+        #         ],
+        #         seed=637713655
+        #     )
+        # }
+        p = new(ScenarioExecutor)
+        setup(p, (config, config_id))
+        start(p)
+        config_id += 1

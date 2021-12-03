@@ -1,0 +1,237 @@
+Module ScenarioGenerator{
+  N // total number of rounds
+  total_nodes // total nodes excluding twins
+  M // max partitions per round
+  F // number of faulty nodes or twins
+  probability_of_overlap // probability of overlapping partition
+  probability_partition_has_overlap // probability that a network partition contains a overlap
+  twin_nodes // set of nodes that are twins
+
+  Function round_assignment(
+    leader_assignments,
+    twin_nodes,
+    parition_assignments
+  ) {
+    // generate the number of partition per round
+    partition_choices <- [i for i in 1...M + 1]
+    partition_per_round <- ∅
+    
+    for i in 1...(N + 1)
+      partition_per_round[i] <- random.choice(partition_choices)
+    
+    // generate all network partition scenarios from sum of total nodes and its twins
+    partition_scenarios, major_partitions <- NetworkPartitionGenerator.get_partition_scenarios(total_nodes + F)
+    final_assignments <- ∅
+    
+    for i in 1...(N + 1):
+      // if assignment is deterministic (user defined)
+      if i in parition_assignments:
+        final_assignments[i] <- parition_assignments[i]
+        continue
+    
+      // partitions can be populated randomly expect for last partition
+      for j in 0..(partition_per_round[i] - 1)
+        // generate and populate partition
+        final_assignments[i] <- final_assignments[i] ∪ (populate_partition(
+          random.choice(partition_scenarios),
+          ))
+    
+      // ensuring that the last partition trigger will have super majority
+      final_assignments[i] <- final_assignments[i] ∪ (populate_conensus_partition(
+        random.choice(major_partitions),
+        leader_assignments[i],
+        twin_nodes
+      ))
+    
+    // adding three extra rounds with super majority to ensure liveness
+    majority = random.choice(major_partitions)
+    // non faulty are always placed first hence the leader choosen down below
+    // at random will always be selected
+    majority = populate_conensus_partition(
+      majority,
+      random.choice(non_faulty),
+      twin_nodes
+    )
+    // set of non_faulty nodes
+    non_faulty = set([i for i in 0...(total_nodes + F)]) - twin_nodes
+    // add three additional nodes
+    for i in 0..3:
+      leader <- random.choice(non_faulty)
+      final_assignments[N + i]<- final_assignments[N + i] ∪ majority
+      // add the leader for the additional round
+      leader_assignments[N + i] <- leader
+    
+    return final_assignments
+  }
+  
+  
+  Function populate_partition(network_partition) {
+    // all possible nodes including twins
+    nodes <- [i for i in 0...(total_nodes + F)]
+    // shuffle the node set
+    node_shuffled <- random.sample(nodes, total_nodes + F)
+    
+    // count of partitions in specific network partition
+    no_of_partitions <- |network_partition|
+    i <- 0
+    k <- 0
+    
+    while i < no_of_partitions:
+      //size of that partition
+      partition_size <- |network_partition[i]|
+      // populate each partition subset
+      j <- 0
+      while j < partition_size:
+        network_partition[i][j] <- node_shuffled[k]
+        j <- j + 1
+    
+      k <- k + 1
+    
+    // add overlaps based on probability
+    // for a partition choose if overlap should be added between its partitions
+    if random.uniform(0, 1) < probability_of_overlap:
+      // for each parttion in network partition
+      for i in 0...|network_partition|:
+        // check probability of partition to have overlap
+        if random.uniform(0, 1) < probability_partition_has_overlap:
+          // choose a node which is not part of the current partition
+          non_partition_nodes <- set(node_shuffled) - set(network_partition[i])
+          // add new overlapping node to existing partition
+          network_partition[i] <- (network_partition[i] ∪ list(random.choice(non_partition_nodes)))
+    
+    return network_partition
+  }
+  
+  Function populate_conensus_partition(
+    network_partition,
+    leader //
+    twin_nodes //number of twin nodes
+  ){
+    // generate nodes including twins
+    nodes <- [i for i in 0..(total_nodes + F)]
+    // shuffle the generated set
+    nodes_shuffled <- random.sample(nodes, total_nodes + F)
+    
+    // if all nodes have to be in the partition then return
+    if len(network_partition) == 1
+      return nodes_shuffled
+    
+    // fill the majority partition first
+    majority_partition <- network_partition[0]
+    // place the leader in majority partition
+    majority_partition[0] <- leader
+    // remove leader from nodes shuffled
+    nodes_shuffled.remove(leader)
+    // remove leader from twin nodes if twin is leader
+    twin_nodes.remove(leader)
+    // remove twin nodes from node shuffled
+    nodes_shuffled <- nodes_shuffled - twin_nodes
+    
+    i <- 1
+    // first place the non twin nodes
+    // if nodes are exhausted then place the twin nodes
+    while i < len(majority_partition) && nodes_shuffled ≠ ∅
+      select_node <- nodes_shuffled.pop
+      majority_partition[i] <- select_node
+    
+      if nodes_shuffled = ∅
+        // if shuffle nodes become empty now place the twin nodes
+        nodes_shuffled <- nodes_shuffled + twin_nodes
+        // make twin nodes as null so that it is not added twice
+        twin_nodes = ∅
+    
+      i <- i + 1
+    
+    // if twin nodes have not been previously added, add twin nodes to the node_shuffled set
+    nodes_shuffled <- nodes_shuffled + twin_nodes
+    // fill up remaining partitions
+    for i in 1....|network_partition|
+      for j in 0...|network_partition[i]|
+        network_partition[i][j] <- nodes_shuffled.pop
+    
+    return network_partition
+  }
+  
+  
+  Function assign_leaders(
+    type = "random"
+    assignments = ∅
+  ) {
+    if !(|assignments| <= N and max{assignments} <= N)
+      return ⊥
+    
+    // non deterministic assigments to be assignmed
+    pending_assignments = ∅
+    // final pool of assignments
+    final_assignments = ∅
+    
+    // finding pending assignments
+    for i in 1...(N + 1):
+      if i ∉ assignments:
+        pending_assignments <- pending_assignments ∪ i
+    
+    // checking for case of sequential
+    if type == "sequential":
+      // go from round 1  to N
+      for i in 1....(N + 1):
+        if i ∉ in assignments:
+          final_assignments[i] <- i % total_nodes
+        else:
+          final_assignments[i] <- assignments[i]
+    // checking for case of random
+    else if type == "random":
+      // go from round 1 to N
+      for i in 1....(N + 1)
+        if i ∉ assignments:
+          // choose a random node between 0 and total_nodes
+          final_assignments[i] <- random.randint(0, total_nodes - 1)
+        else:
+          final_assignments[i] <- assignments[i]
+    else:
+      return ⊥
+    
+    return final_assignments
+  }
+
+  Function drop_delay(
+    total_nodes
+  ) {
+    //drop_sict contains information for Message drops
+    drop_dict = {}
+    //delay dictionary contains information of delay messages
+    delay_dict = {}
+
+    for i in range (1, R+1):
+        drop_dict[i]["Vote"]=[]
+        drop_dict[i]["Proposal"]=[]
+        drop_dict[i]["Timeout"]=[]
+    
+    //Randomly populate the Drop Information for each round for each message type
+    for r in range (1, R):
+        for n in range(0, total_nodes):
+            if randint(0, 4) == 1:
+                drop_dict[r]["Vote"].append(n)
+            if randint(0, 4) == 1:
+                drop_dict[r]["Proposal"].append(n)
+            if randint(0, 4) == 1:
+                drop_dict[r]["Timeout"].append(n)
+    drop_dict={"drop_round_msg":drop_dict}
+
+    //Randomly populate the Drop Information for each round for each message type
+    for i in range (1, R+1):
+        delay_dict[i]["Vote"]=[]
+        delay_dict[i]["Proposal"]=[]
+        delay_dict[i]["Timeout"]=[]
+    for r in range (1, R):
+        for n in range(0, total_nodes):
+            if randint(0, 4) == 1:
+                delay_dict[r]["Vote"].append(n)
+            if randint(0, 4) == 1:
+                delay_dict[r]["Proposal"].append(n)
+            if randint(0, 4) == 1:
+                delay_dict[r]["Timeout"].append(n)
+    delay_dict={"delay_round_msg":delay_dict}
+
+    return drop_dict, delay_dict
+  }
+}

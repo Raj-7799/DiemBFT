@@ -1,0 +1,99 @@
+Module ScenarioExecutor{
+ num_nodes, //total number of nodes excluding twin
+ twin_nodes, //nodes for which to create twins
+ round_partitions, //Configuration of Partition for each round
+ round_leaders //Leader for each round
+ num_of_rounds //number of rounds for which the network playground should run
+ id // file id of Configuration
+ mode // mode of operation
+ timeout // some timeout for the scenario executor
+ reached_timeout <- False
+
+ // if some id is given load the configuration
+ if id != None:
+  round_partitions, round_leaders = load_from_json(id)
+
+ current_round <- 0
+  //Initialise Network Partition
+
+  Function start()
+    // if some id is given load the configuration
+    // this indicates offline mode where reading config is required
+    if id != None:
+      round_partitions, round_leaders = load_from_json(id)
+  
+    NetworkPlaygroud <- NetworkPlayground(round_partitions, number_of_nodes)
+    F <- |twin_nodes| / 2
+    Keys <- generateKeys(num_nodes)
+    Nodes <- ∅
+
+    //Run the Algorithm for Number of round 
+    np <- NetworkPlayground()
+    //We need to pass Partition Con
+    for i in 1...(num_nodes+F):
+    //This assigns same cryptographic keys to twins
+      Nodes <- spawn(i, Keys[i % num_nodes], round_leaders, np) 
+
+    // start a timer
+    start_timer(timeout, onTimeout)
+    //Wait till we receive a callbacks from Network Playground with round exceeding the limit 
+    await (current_round<=num_of_rounds + 3 and !reachedTimeout);
+
+    for i in 1...(num_nodes+F):
+      // terminate all nodes as all rounds has been done
+      terminate(i)
+
+  OnReceive(M){
+    current_round=M.round;
+  }
+
+  onTimeout() {
+    reachedTimeout <- True
+  }
+
+  Function verify(){
+    SafetyCheck() && 
+    LivenessCheck()
+  }
+    
+  Function SafetyCheck(){
+    //check if there are differing commits
+    ledger_dict = {}
+    maxlines = 0
+    //extract data from ledger
+    for n in range(0, number_of_nodes):
+        level = 0
+        filename = "validator_" + str(n) + ".ledger"
+        //Read line by line from the ledger and insert in the ledger_dict for that node
+        ledger_dict[n] = Lines
+
+    
+    for l in range(0, maxlevel):
+        blocks = set()
+        for n in range(0, self.number_of_nodes):
+            if l < len(ledger_dict[n]):
+                blocks.add(ledger_dict[n][l])
+        //check if there are duplicate commits at the same level
+        if len(blocks) > 1:
+            //"Safety Check violated"
+            return False
+
+    return True
+  }
+    
+
+  Function LivenessCheck(current_round){
+    //check if round of the system has progressed
+    if current_round > self.liveness_round:
+      self.liveness_round = current_round
+      self.current_liveness_TTL = self.liveness_TTL
+      return True
+    //More than the TTL limit of messgaes have been passed in the system for a round
+    //This implies that the system is stuck and liveness i violated
+    if(self.current_liveness_TTL <= 0):
+        return False
+    //decrease the TLL for the current round
+    self.current_liveness_TTL-=1
+          return True
+  }
+}
