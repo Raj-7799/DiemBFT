@@ -253,9 +253,6 @@ class Validator (process):
 
             '''Block-Tree.execute and insert(P) // Adds a new speculative state to the Ledger'''
             self.blocktree.execute_and_insert(proposal_msg.block)
-            # if proposal_msg.block.qc:
-            #     self.proposal_cache[proposal_msg.block.qc.vote_info.round]=cache_msg
-            # else:
             self.proposal_cache[proposal_msg.block.round]=cache_msg
 
             '''vote msg ← Safety.make vote(P.block, P.last round tc)'''
@@ -384,8 +381,6 @@ class Validator (process):
 
     def check_for_sync(round,p):
         if(self.blocktree.high_commit_qc is None or round > self.blocktree.high_commit_qc.vote_info.round ):
-            # send sync message 
-            # self.lag =  round- self.blocktree.high_commit_qc.vote_info.round
             LOGGER.log_event("round {} Send".format(round),"SyncRequest", self.blocktree.high_commit_qc,p)
             send(('SyncRequest',self.blocktree.high_commit_qc), to=p)
 
@@ -512,3 +507,6 @@ class ValidatorFI (process, Validator):
                 else:
                     output('error: ValidatorFI.send: unsupported fail type',
                            failure_config.fail_type)
+
+
+# class Validator2f(process, Validator):
