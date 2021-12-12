@@ -4,7 +4,13 @@ from logger_util import LOGGER
 
 class LeaderElection:
 
-    def __init__(self, validator_id, replicas, ledger, pacemaker, window_size, exclude_size):
+    def __init__(self,round_leaders, validator_id, replicas, ledger, pacemaker, window_size, exclude_size, f):
+        # LOGGER.replicas = replicas
+        # LOGGER.process_id = "Leader_" + str(validator_id)
+        
+        # LOGGER.filename = '../logs/config' + str(0) + '/' \
+        #     + LOGGER.process_id + ".log"
+       
         self.validator = replicas[validator_id]
         self.validator_id = validator_id
         '''validators; // The list of current validators'''
@@ -18,9 +24,22 @@ class LeaderElection:
         '''reputation leaders; // Map from round numbers to leaders elected due to the reputation scheme'''
         self.reputation_leaders = dict()
 
+        self.round_leaders=round_leaders
+        self.max_node= int(3 * f + 1)
+
     '''Function get leader(round)'''
     def get_leader(self, round):
-        LOGGER.log('LeaderElection: get_leader', round)
+        '''
+            change for twins, injectin round leaders
+            
+        '''
+
+        if round - 1 < len(self.round_leaders):
+            LOGGER.log('LeaderElection: get_leader  round {} leader number {} leader process {}'.format(round, self.round_leaders[round - 1],self.replicas[self.round_leaders[round - 1]],), round)
+            leader = self.round_leaders[round - 1]
+            
+            return self.replicas[leader]
+
         '''if <round, leader> ∈ reputation leaders then'''
         if round in self.reputation_leaders:
             LOGGER.log('LeaderElection: get_leader: returns from reputated map',
@@ -33,6 +52,18 @@ class LeaderElection:
         LOGGER.log("Leader election is Done successfully", None)
         '''return validators[floor(round//2) mod |validators|] // Round-robin leader (two rounds per leader)'''
         return self.replicas[((round)//2) % len(self.replicas)]
+    
+    def get_twin_leader(self, round):
+        if round - 1 < len(self.round_leaders):
+            leader = self.round_leaders[round - 1]
+
+            if leader + self.max_node < len(self.replicas):
+                LOGGER.log('LeaderElection: get_leader {} twin {} {}'.format(leader, leader + self.max_node, self.validator_id))
+                return self.replicas[leader + self.max_node]
+            else:
+                return None
+        
+        return None
 
     '''Procedure update leaders(qc)'''
     def update_leaders(self, qc):

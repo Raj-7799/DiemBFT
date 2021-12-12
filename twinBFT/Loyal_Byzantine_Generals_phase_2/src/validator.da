@@ -1,6 +1,7 @@
 import random
 import threading
 import time
+from collections import defaultdict
 
 from block_tree import BlockTree
 from cryptography import Cryptography
@@ -25,22 +26,32 @@ class Validator (process):
 
         LOGGER.log_action("Initial configuration", config)
 
+        self.validator_id=validator_id
+        
+        self.network_playground =  config["network_playground"]
+        self.partition_round=0
+
         self.id_block = dict()
         self.request_cache = dict()
         self.recently_committed_block_ids = list()
         self.should_start_new_round = True
 
+        self.proposal_cache = dict()
+        self.quorum_size = config['quorum_size'] if 'quorum_size' in config else 2 * self.config['nfaulty'] +1
+
         self.ledger = Ledger(
             config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
         self.blocktree = BlockTree(
-            validator_id, replicas, self.ledger, config['nfaulty'], self.id_block)
+            validator_id, replicas, self.ledger, config['nfaulty'], self.quorum_size,self.id_block)
         self.safety = Safety(validator_id, replicas,
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
             validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
-        self.mempool = MemPool(validator_id)
-        self.leader_election = LeaderElection(
-            validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'])
+        self.mempool = MemPool(validator_id, self.request_cache)
+        self.leader_election = LeaderElection(config['round_leaders'],
+            validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'], config['nfaulty'])
+        
+        self.timeout_counter = defaultdict(int)
 
         Cryptography.private_key = self.private_key
         Cryptography.replicas = self.replicas
@@ -59,19 +70,30 @@ class Validator (process):
             self.pacemaker.current_round = value
         elif attr == 'highest_vote_round':
             self.safety.set_highest_vote_round(value)
+        elif attr == 'quorum_size':
+            self.quorum_size = val
+            self.blocktree.quorum_size=val
         else:
             output('error: Validator.setattr: unsupported attribute')
 
     # Broadcast the timeout message
     def send_timeout_msg(timeout_msg):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
-        send(('Timeout', timeout_msg), to=self.replicas)
+        # send(('Timeout', timeout_msg), to=self.replicas)
+        current_round = timeout_msg.tmo_info.round
+        if self.timeout_counter[current_round] < 5:
+            send(('Timeout', ({"from":self.validator_id, "to": self.replicas, "payload":timeout_msg, "current_round":current_round })), to=self.network_playground)
+        else:
+            LOGGER.log('Pausing timeout messages')
+        
+        self.timeout_counter[current_round] += 1
         LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.replicas)
 
     '''Procedure start event processing(M)'''
     def run():
         self.pacemaker.start_timer(1)
         LOGGER.log(replicas[validator_id])
+        print("Done validator ")
         await(received(('Done',), from_=parent()))
         self.pacemaker.stop_timer(self.pacemaker.current_round)
         output("Validator", self.validator_id, "is exiting")
@@ -112,10 +134,15 @@ class Validator (process):
         LOGGER.log('Validator: process_new_round_event', last_tc)
 
         '''if u = LeaderElection.get leader(Pacemaker.current round) then'''
-        if self.replicas[validator_id] == self.leader_election.get_leader(self.pacemaker.current_round):
+        leader = self.leader_election.get_leader(self.pacemaker.current_round)
+        twin_leader = self.leader_election.get_twin_leader(self.pacemaker.current_round)
+
+        if self.replicas[validator_id] == leader or self.replicas[validator_id] == twin_leader:
 
             # Check if there are any transactions in the MemPool
             if self.mempool.peek_pool() == 0:
+                print(self.mempool.pending_txns)
+
                 self.should_start_new_round = True
                 prev_block = self.id_block[self.blocktree.high_qc.vote_info.id]
                 prev_block_txn_len = len(prev_block.payload)
@@ -137,6 +164,7 @@ class Validator (process):
                     Pacemaker.current round )'''
             block = self.blocktree.generate_block(
                 self.mempool.get_transactions(), self.pacemaker.current_round)
+            
             LOGGER.log_action('Created a new block', block)
 
             '''broadcast ProposalMsghb, last tc, Block-Tree.high commit qci'''
@@ -146,7 +174,17 @@ class Validator (process):
                 high_commit_qc=self.blocktree.high_commit_qc,
                 validator=validator_id
             )
-            send(('Proposal', proposal_msg), to=self.replicas)
+            print("Proposal sending ",self.network_playground)
+            LOGGER.log("Broadcasting proposal message and setting to cache with block round {}".format(block.round))
+
+            current_round=proposal_msg.block.round
+            send(('Proposal', ({"from":self.validator_id,"to":self.replicas,"payload":proposal_msg, "current_round":current_round})), to=self.network_playground)
+            
+            # if proposal_msg.block.qc:
+            #     self.proposal_cache[proposal_msg.block.qc.vote_info.round] = (proposal_msg,self.validator_id, current_round)
+            # else:
+            self.proposal_cache[proposal_msg.block.round]= (proposal_msg,self.validator_id, current_round)
+
             LOGGER.log_event("Sent", "Proposal",
                              proposal_msg, self.replicas)
 
@@ -156,13 +194,32 @@ class Validator (process):
     def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
 
+        cache_msg = proposal_msg
+
+        msg,sender,self.partition_round= proposal_msg
+        proposal_msg=msg
+        LOGGER.log_event("Received Proposal from {} {} with payload {}".format(sender,self.partition_round, proposal_msg.block.payload), "Proposal", proposal_msg, p)
+
         signature_verified = Cryptography.get_verified_message(
-            proposal_msg.signature, public_keys_validators[p])
+            proposal_msg.signature, public_keys_validators[self.replicas[sender]])
+        p = self.replicas[sender]
+
+        if proposal_msg.block.round > self.pacemaker.current_round + 1:
+            if p!=self.replicas[self.validator_id]:
+                LOGGER.log("SyncRequest trigged on recieving Propsal msg  pacemaker round {} proposal round {}".format(self.pacemaker.current_round,proposal_msg.block.round))
+                check_for_sync(proposal_msg.block.round, p)
+            return
 
         if signature_verified is not None:
             LOGGER.log_action("Verified ProposalMsg signature", True)
 
             self.should_start_new_round = False
+            if p != replicas[validator_id]:
+                # Validate (and remove) the transactions in current mempool with the received txns
+                if not self.mempool.validate_and_remove_transactions(proposal_msg.block.payload):
+                    LOGGER.log(
+                        "Not processing the Proposal message as transactions are not valid", None)
+                    return
 
             if proposal_msg.block.qc is not None and p != replicas[validator_id]:
                 '''process certificate qc(P.block.qc)'''
@@ -179,24 +236,31 @@ class Validator (process):
             round = self.pacemaker.current_round
             '''leader ← LeaderElection.get leader(current round)'''
             leader = self.leader_election.get_leader(round)
+            twin_leader = self.leader_election.get_twin_leader(round)
+
+            LOGGER.log("Proposal leader", leader)
+            LOGGER.log("Proposal twin leader", twin_leader)
+            final_leader = None
+            if replicas[proposal_msg.sender] == leader:
+                final_leader = leader
+            elif replicas[proposal_msg.sender] == twin_leader:
+                final_leader = twin_leader
+            
             '''if P.block.round 6= round ∨ P.sender 6= leader ∨ P.block.author 6= leader then
                     return'''
-            if proposal_msg.block.round != round or replicas[proposal_msg.sender] != leader or replicas[proposal_msg.block.author] != leader:
-                LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], leader)
+            if proposal_msg.block.round != round or replicas[proposal_msg.sender] != final_leader or replicas[proposal_msg.block.author] != final_leader:
+                LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], proposal_msg.block.author, final_leader)
                 return
-
-            if p != replicas[validator_id]:
-                # Validate (and remove) the transactions in current mempool with the received txns
-                if not self.mempool.validate_and_remove_transactions(proposal_msg.block.payload):
-                    LOGGER.log(
-                        "Not processing the Proposal message as transactions are not valid", None)
-                    return
 
             if len(proposal_msg.block.payload) == 0:
                 self.should_start_new_round = True
 
             '''Block-Tree.execute and insert(P) // Adds a new speculative state to the Ledger'''
             self.blocktree.execute_and_insert(proposal_msg.block)
+            # if proposal_msg.block.qc:
+            #     self.proposal_cache[proposal_msg.block.qc.vote_info.round]=cache_msg
+            # else:
+            self.proposal_cache[proposal_msg.block.round]=cache_msg
 
             '''vote msg ← Safety.make vote(P.block, P.last round tc)'''
             vote_msg = self.safety.make_vote(
@@ -206,9 +270,17 @@ class Validator (process):
                     send vote msg to LeaderElection.get leader(current round + 1)'''
             if vote_msg is not None:
                 next_leader = self.leader_election.get_leader(round + 1)
-                send(('Vote', vote_msg),
-                     to=next_leader)
-                LOGGER.log_event("Sent", "Vote", vote_msg, next_leader)
+                next_twin_leader = self.leader_election.get_twin_leader(round + 1)
+
+                current_round=max(vote_msg.vote_info.round,self.partition_round)
+                LOGGER.log_event("Sent", "Vote to next leader", vote_msg, next_leader)
+                send(('Vote', ({"from":self.validator_id,"to": next_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+                
+                if next_twin_leader:
+                    current_round=max(vote_msg.vote_info.round,self.partition_round)
+                    LOGGER.log_event("Sent", "Vote to next twin leader", vote_msg, next_leader)
+                    send(('Vote', ({"from":self.validator_id,"to": next_twin_leader,"payload":vote_msg,"current_round":current_round})), to=self.network_playground)
+
 
         else:
             LOGGER.log_action("Verified ProposalMsg signature", False)
@@ -217,8 +289,28 @@ class Validator (process):
     def receive(msg=('Vote', vote_msg), from_=p):
         LOGGER.log_event("Received", "Vote", vote_msg, p)
 
+
+        ''' Changes, message receiver from network playground
+         will have p as networkplayground process
+        '''
+        msg,sender,self.partition_round= vote_msg
+        vote_msg=msg
+        LOGGER.log_event("Received from {} ".format(sender), "Vote", vote_msg, p)
+
         signature_verified = Cryptography.get_verified_message(
-            vote_msg.signature, public_keys_validators[p])
+            vote_msg.signature, public_keys_validators[self.replicas[sender]])
+
+        p = self.replicas[sender]
+
+        if vote_msg.vote_info.round > self.pacemaker.current_round:
+            if p!=self.replicas[self.validator_id]:
+                LOGGER.log("SyncRequest trigged on recieving Vote msg  pacemaker round {} vote round {} to {}".format(self.pacemaker.current_round,vote_msg.vote_info.round, sender))
+                check_for_sync(vote_msg.vote_info.round, p)
+            return
+        
+        if not Cryptography.hash_validation_votemsg(vote_msg):
+            LOGGER.log_action("VoteMsg hash validation failed", False)
+            return
 
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
@@ -241,8 +333,29 @@ class Validator (process):
     def receive(msg=('Timeout', timeout_msg), from_=p):
         LOGGER.log_event("Received", "Timeout", timeout_msg, p)
 
+        ''' Changes, message receiver from network playground
+            will have p as networkplayground process
+        '''
+        msg,sender,self.partition_round= timeout_msg
+        timeout_msg=msg
+        LOGGER.log_event("Received from {}".format(sender), "Timeout", timeout_msg, p)
+
+        # extract round info, (qc.vote_info.round) compare with pacemaker round (ideally use high commit qc)
+        # send sync based on compare (send to sender, high_commit_qc) , 
+        # reciever to send proposal to the lagging node
+        
+        if(timeout_msg.tmo_info is not None) and timeout_msg.tmo_info.round > self.pacemaker.current_round:
+            if self.replicas[sender]!=self.replicas[self.validator_id]:
+                LOGGER.log("SyncRequest trigged on recieving Timeout with round {} and current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
+                check_for_sync(timeout_msg.tmo_info.round,self.replicas[sender])
+                return
+        elif self.pacemaker.current_round > timeout_msg.tmo_info.round and self.replicas[sender]!=self.replicas[self.validator_id]:
+            LOGGER.log("Higher timeout round encountered syncing the node timeout msg round {} current pacemaker round {} ".format(timeout_msg.tmo_info.round, self.pacemaker.current_round))
+            process_sync_request(timeout_msg.high_commit_qc, self.replicas[sender])
+            return
+        
         signature_verified = Cryptography.get_verified_message(
-            timeout_msg.tmo_info.author_signature, public_keys_validators[p])
+            timeout_msg.tmo_info.author_signature, public_keys_validators[self.replicas[sender]])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified TimeoutMsg signature", True)
@@ -259,14 +372,58 @@ class Validator (process):
             tc = self.pacemaker.process_remote_timeout(timeout_msg)
             '''if tc != ⊥ then'''
             if tc is not None:
-                LOGGER.log_action("Generated a Timeout Certificate", tc)
+                LOGGER.log_action("Generated a Timeout Certificate at round {}".format(self.pacemaker.current_round), tc)
                 '''process certificate qc(qc)
                 process new round event(⊥)'''
                 self.pacemaker.advance_round_tc(tc)
+                self.proposal_cache[tc.round] = tc
                 process_new_round_event(tc)
         else:
             LOGGER.log_action("Verified TimeoutMsg signature", False)
 
+
+        # extract round info, (qc.vote_info.round) compare with pacemaker round (ideally use high commit qc)
+        # send sync based on compare (send to sender, high_commit_qc) , 
+        # reciever to send proposal to the lagging node
+
+    def check_for_sync(round,p):
+        if(self.blocktree.high_commit_qc is None or round > self.blocktree.high_commit_qc.vote_info.round ):
+            # send sync message 
+            # self.lag =  round- self.blocktree.high_commit_qc.vote_info.round
+            LOGGER.log_event("round {} Send".format(round),"SyncRequest", self.blocktree.high_commit_qc,p)
+            send(('SyncRequest',self.blocktree.high_commit_qc), to=p)
+
+
+    def process_sync_request(qc, p):
+        if qc is None: 
+            LOGGER.log("Received High Commit QC as none when processing sync request setting round to 0")
+            round=0
+        else:
+            LOGGER.log("Received High Commit QC with round {} when processing sync request".format(qc.vote_info.round))
+            round = qc.vote_info.round
+        
+        LOGGER.log("Sync Request proposal cache {}".format(self.proposal_cache))
+        
+        for r  in range(round,self.pacemaker.current_round + 1):
+            if r+1 <= self.pacemaker.current_round and r+1 in self.proposal_cache:
+                proposal_msg = self.proposal_cache[r+1]
+                if isinstance(proposal_msg, tuple):
+                    LOGGER.log_event("round in qc {} Replying to SyncRequest ".format(r),"Proposal", proposal_msg[0].block.payload, p)
+                    send(('Proposal', proposal_msg), to=p)
+                else:
+                    LOGGER.log_event("round in qc {} Replying to SyncRequest with TC".format(r),"Proposal", proposal_msg,p)
+                    send(('SyncTC', proposal_msg), to=p)
+            else:
+                LOGGER.log_event("round in qc {} Not Replying to SyncRequest ".format(r),"Proposal", "",p)
+                break
+
+    def receive(msg=('SyncRequest', qc), from_=p):
+        process_sync_request(qc, p)
+
+    def receive(msg=('SyncTC', tc)):
+        LOGGER.log_event("Received SyncTC Request at round {}".format(self.pacemaker.current_round),"SyncTC", "", tc)
+        self.pacemaker.advance_round_tc(tc)
+    
     def receive(msg=('Request', signed_req), from_=client):
         req = Cryptography.get_verified_message(
             signed_req, public_keys_clients[client])
@@ -323,6 +480,7 @@ class ValidatorFI (process, Validator):
                 return None
             else:
                 return failure_config
+        
         return None
 
     def send_msg_delayed(message, to, val):
@@ -354,6 +512,7 @@ class ValidatorFI (process, Validator):
 
                 elif failure_config.fail_type == FailType.SetAttr:
                     LOGGER.log('ValidatorFI.send', 'config changed')
+
                     super().setattr(failure_config.attr, failure_config.val)
 
                 else:

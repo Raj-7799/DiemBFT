@@ -1,0 +1,51 @@
+watch -n 1 "ps -aef | grep diem"
+
+rm -rf /tmp/diemLedger_*
+
+
+ps -aef | grep diem | awk -F' ' '{ print $2 }' | xargs kill -9
+
+python -m da --message-buffer-size 102400 testdiem.da &> out_0.log  &
+
+python -m da --message-buffer-size 102400 testdiem.da &> out.log  &
+
+
+cat out.log | grep -i "tmo"
+
+cat out.log | grep -i "exception"
+cat out.log | grep -i "tmo"
+
+
+cat out.log | grep -i "commited block"
+
+Show proposal message 
+
+
+cat out.log | grep -i "generated block"
+cat out.log | grep -i "received proposal msg with block"
+cat out.log | grep -i "votes for round"
+cat out.log | grep -i "tmo"
+cat out.log | grep -i "messages for transaction"
+cat out.log | grep -i "Verified signature for block"
+
+cat out.log | grep "Received message to close"
+
+
+
+
+13: 
+cat out.log | grep -i "Drop process_proposal_msg message"
+cat out.log | grep -i "Drop proces_vote_msg"
+
+
+12:
+cat out.log | grep -i "Vote delay twice"
+
+
+11
+cat out.log | grep -i "in the third and fourth"
+
+python testdb.py 7 > /tmp/1
+mv l
+
+10. cat out.log | grep -i "messages for transaction"

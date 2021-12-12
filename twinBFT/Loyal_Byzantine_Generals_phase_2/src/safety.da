@@ -63,7 +63,7 @@ class Safety:
         LOGGER.log("Safety: __safe_to_vote", block_round, qc_round, tc)
         '''if block round ≤ max{highest vote round, qc round} then'''
         if block_round <= max(self.__highest_vote_round, qc_round):
-            LOGGER.log("Safety: __safe_to_vote returns1", False)
+            LOGGER.log("Safety: __safe_to_vote returns1 block_round {} __highest_vote_round {} qc_round {}".format(block_round, self.__highest_vote_round, qc_round), False)
             '''// 1. must vote in monotonically increasing rounds
             // 2. must extend a smaller round
             return false'''

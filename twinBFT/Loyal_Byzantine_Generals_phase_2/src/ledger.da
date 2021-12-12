@@ -64,7 +64,7 @@ class Ledger:
     '''commit(block id) // commit the pending prefix of the given block id and prune other branches'''
     # This will commit the block which is specified and append the commited transactions to the Ledger file of the corresponding Validator
     def commit(self, block_id):
-        LOGGER.log('Ledger: commit', block_id)
+        LOGGER.log('Ledger: commit block_id {} validator_id {}'.format(block_id,self.validator_id))
         if block_id not in self.id_to_block:
             LOGGER.log('Ledger: commit: did not commit', None)
             return
@@ -76,7 +76,7 @@ class Ledger:
             if current_block_to_commit.id not in self.id_to_block:
                 break
             stack.append((current_block_to_commit.id,
-                          current_block_to_commit.payload))
+                          current_block_to_commit.payload, current_block_to_commit.round))
             recently_commited.add(current_block_to_commit.id)
 
             # Now check if the current block has a QC
@@ -87,7 +87,7 @@ class Ledger:
         fp = open('../ledgers/config' + str(self.config_id) +
                   "/" + self.filename, 'a+')
         while(stack):
-            block_id, payload = stack.pop()
+            block_id, payload, round = stack.pop()
             self.commited[block_id] = payload
             for txn in payload:
                 if txn['req_id'] in self.request_cache:
@@ -96,13 +96,14 @@ class Ledger:
                     continue
                 else:
                     LOGGER.log('Ledger: commit committing a txn', txn)
-                    fp.write(txn['command']+'\n')
+                    fp.write(txn['command']+ ' - ' + str(block_id) + '\n')
             self.recently_committed_block_ids.append(block_id)
-            LOGGER.log_action('Committed blocks to ledger',
+            LOGGER.log('Committed blocks to ledger',
                                self.recently_committed_block_ids)
         fp.close()
 
         LOGGER.log('Ledger: commit: ends', None)
+    
 
         # Discarding the speculated branches that fork from ancestors of the commited block -- Pruning of the speculate tree
         if block_id not in self.id_to_block:
